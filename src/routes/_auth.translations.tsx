@@ -3,7 +3,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
     Table,
     Button,
-    Modal,
+    Drawer,
     Form,
     Input,
     Select,
@@ -13,7 +13,6 @@ import {
     message,
     Tag,
     Tooltip,
-    Card,
     Tabs,
 } from 'antd';
 import {
@@ -25,7 +24,12 @@ import {
 } from '@ant-design/icons';
 import { useState } from 'react';
 import { translationsApi, localesApi } from '../lib/api';
-import type { TranslationResponseDto, LocaleResponseDto } from '../lib/types';
+import type {
+    TranslationResponseDto,
+    LocaleResponseDto,
+    UpdateTranslationDto,
+    UpdateLocaleDto,
+} from '../lib/types';
 
 const { Title, Text } = Typography;
 const { Search } = Input;
@@ -34,54 +38,94 @@ export const Route = createFileRoute('/_auth/translations')({
     component: TranslationsPage,
 });
 
+// ── Page Shell ─────────────────────────────────────────────────────────────────
+
 function TranslationsPage() {
+    const [activeTab, setActiveTab] = useState<'translations' | 'locales'>('translations');
+    const [createTranslationOpen, setCreateTranslationOpen] = useState(false);
+    const [createLocaleOpen, setCreateLocaleOpen] = useState(false);
+
     return (
-        <div className="p-8 max-w-5xl mx-auto">
-            <div className="flex items-center gap-3 mb-8">
-                <div className="w-10 h-10 rounded-xl bg-primary-light flex items-center justify-center">
-                    <TranslationOutlined className="text-primary text-lg" />
-                </div>
-                <div>
-                    <Title level={2} className="!mb-0 !font-bold">Manage Locales</Title>
-                    <Text className="!text-muted">Configure languages and manage translation strings</Text>
+        <div className="min-h-screen bg-app-bg">
+            {/* ── Page Header ─────────────────────────────────────────── */}
+            <div className="bg-surface border-b border-surface-border px-8 py-6">
+                <div className="flex justify-between items-center max-w-6xl mx-auto">
+                    <div>
+                        <Title level={3} className="mb-1! font-bold!">
+                            Translations
+                        </Title>
+                        <Text className="text-muted! text-sm">
+                            Manage application languages and translation strings
+                        </Text>
+                    </div>
+                    <Button
+                        type="primary"
+                        icon={<PlusOutlined />}
+                        onClick={() =>
+                            activeTab === 'locales'
+                                ? setCreateLocaleOpen(true)
+                                : setCreateTranslationOpen(true)
+                        }
+                    >
+                        {activeTab === 'locales' ? 'Add Language' : 'Add New Translation'}
+                    </Button>
                 </div>
             </div>
 
-            <Tabs
-                defaultActiveKey="locales"
-                items={[
-                    {
-                        key: 'locales',
-                        label: (
-                            <span>
-                                <GlobalOutlined className="mr-1" />
-                                Languages
-                            </span>
-                        ),
-                        children: <LocalesTab />,
-                    },
-                    {
-                        key: 'translations',
-                        label: (
-                            <span>
-                                <TranslationOutlined className="mr-1" />
-                                Translation Keys
-                            </span>
-                        ),
-                        children: <TranslationsTab />,
-                    },
-                ]}
-            />
+            {/* ── Main Content ─────────────────────────────────────────── */}
+            <div className="max-w-6xl mx-auto px-8 py-8">
+                <Tabs
+                    activeKey={activeTab}
+                    onChange={(key) => setActiveTab(key as typeof activeTab)}
+                    items={[
+                        {
+                            key: 'translations',
+                            label: (
+                                <span className="flex items-center gap-1.5">
+                                    <TranslationOutlined />
+                                    Translation Keys
+                                </span>
+                            ),
+                            children: (
+                                <TranslationsTab
+                                    createOpen={createTranslationOpen}
+                                    onCreateClose={() => setCreateTranslationOpen(false)}
+                                />
+                            ),
+                        },
+                        {
+                            key: 'locales',
+                            label: (
+                                <span className="flex items-center gap-1.5">
+                                    <GlobalOutlined />
+                                    Languages
+                                </span>
+                            ),
+                            children: (
+                                <LocalesTab
+                                    createOpen={createLocaleOpen}
+                                    onCreateClose={() => setCreateLocaleOpen(false)}
+                                />
+                            ),
+                        },
+                    ]}
+                />
+            </div>
         </div>
     );
 }
 
 // ── Locales Tab ────────────────────────────────────────────────────────────────
-function LocalesTab() {
+
+interface LocalesTabProps {
+    createOpen: boolean;
+    onCreateClose: () => void;
+}
+
+function LocalesTab({ createOpen, onCreateClose }: LocalesTabProps) {
     const qc = useQueryClient();
     const [messageApi, contextHolder] = message.useMessage();
 
-    const [createOpen, setCreateOpen] = useState(false);
     const [editItem, setEditItem] = useState<LocaleResponseDto | null>(null);
     const [createForm] = Form.useForm();
     const [editForm] = Form.useForm();
@@ -95,7 +139,7 @@ function LocalesTab() {
         mutationFn: localesApi.create,
         onSuccess: () => {
             qc.invalidateQueries({ queryKey: ['locales'] });
-            setCreateOpen(false);
+            onCreateClose();
             createForm.resetFields();
             messageApi.success('Language added.');
         },
@@ -104,7 +148,7 @@ function LocalesTab() {
     });
 
     const updateMutation = useMutation({
-        mutationFn: ({ id, dto }: Parameters<typeof localesApi.update>) =>
+        mutationFn: ({ id, dto }: { id: string; dto: UpdateLocaleDto }) =>
             localesApi.update(id, dto),
         onSuccess: () => {
             qc.invalidateQueries({ queryKey: ['locales'] });
@@ -128,7 +172,7 @@ function LocalesTab() {
             title: 'Code',
             dataIndex: 'code',
             key: 'code',
-            width: 100,
+            width: 120,
             render: (code: string) => (
                 <code className="text-xs bg-primary-light rounded px-2 py-1 text-primary font-mono">
                     {code}
@@ -144,7 +188,7 @@ function LocalesTab() {
             title: 'Added',
             dataIndex: 'createdAt',
             key: 'createdAt',
-            width: 130,
+            width: 140,
             render: (v: string) => new Date(v).toLocaleDateString(),
         },
         {
@@ -181,16 +225,16 @@ function LocalesTab() {
     return (
         <>
             {contextHolder}
-            <div className="flex items-center justify-between mb-4">
-                <Text type="secondary">
+
+            {/* Stats row */}
+            <div className="mb-4">
+                <Text className="text-muted! text-sm">
                     {locales.length} language{locales.length !== 1 ? 's' : ''} registered
                 </Text>
-                <Button type="primary" icon={<PlusOutlined />} onClick={() => setCreateOpen(true)}>
-                    Add Language
-                </Button>
             </div>
 
-            <Card className="rounded-xl border border-surface-border shadow-sm">
+            {/* Table Card */}
+            <div className="bg-surface rounded-xl border border-surface-border shadow-sm p-6">
                 <Table
                     dataSource={locales}
                     columns={columns}
@@ -198,20 +242,20 @@ function LocalesTab() {
                     loading={isPending}
                     pagination={false}
                 />
-            </Card>
+            </div>
 
-            {/* Create Modal */}
-            <Modal
+            {/* Create Drawer */}
+            <Drawer
                 title="Add Language"
+                placement="right"
+                width={480}
                 open={createOpen}
-                onCancel={() => { setCreateOpen(false); createForm.resetFields(); }}
-                footer={null}
-                destroyOnHidden
+                onClose={() => { onCreateClose(); createForm.resetFields(); }}
+                destroyOnClose
             >
                 <Form
                     form={createForm}
                     layout="vertical"
-                    className="mt-4"
                     onFinish={(v) => createMutation.mutate(v)}
                 >
                     <Form.Item
@@ -228,29 +272,29 @@ function LocalesTab() {
                     <Form.Item name="label" label="Display Name" rules={[{ required: true }]}>
                         <Input placeholder="English" maxLength={100} />
                     </Form.Item>
-                    <div className="flex justify-end gap-2">
-                        <Button onClick={() => { setCreateOpen(false); createForm.resetFields(); }}>
+                    <div className="flex justify-end gap-2 pt-2">
+                        <Button onClick={() => { onCreateClose(); createForm.resetFields(); }}>
                             Cancel
                         </Button>
                         <Button type="primary" htmlType="submit" loading={createMutation.isPending}>
-                            Add
+                            Add Language
                         </Button>
                     </div>
                 </Form>
-            </Modal>
+            </Drawer>
 
-            {/* Edit Modal */}
-            <Modal
+            {/* Edit Drawer */}
+            <Drawer
                 title={editItem ? `Edit: ${editItem.code}` : 'Edit Language'}
+                placement="right"
+                width={480}
                 open={!!editItem}
-                onCancel={() => setEditItem(null)}
-                footer={null}
-                destroyOnHidden
+                onClose={() => setEditItem(null)}
+                destroyOnClose
             >
                 <Form
                     form={editForm}
                     layout="vertical"
-                    className="mt-4"
                     onFinish={(v) => {
                         if (!editItem) return;
                         updateMutation.mutate({ id: editItem.id, dto: v });
@@ -259,24 +303,29 @@ function LocalesTab() {
                     <Form.Item name="label" label="Display Name" rules={[{ required: true }]}>
                         <Input maxLength={100} />
                     </Form.Item>
-                    <div className="flex justify-end gap-2">
+                    <div className="flex justify-end gap-2 pt-2">
                         <Button onClick={() => setEditItem(null)}>Cancel</Button>
                         <Button type="primary" htmlType="submit" loading={updateMutation.isPending}>
-                            Save
+                            Save Changes
                         </Button>
                     </div>
                 </Form>
-            </Modal>
+            </Drawer>
         </>
     );
 }
 
 // ── Translations Tab ───────────────────────────────────────────────────────────
-function TranslationsTab() {
+
+interface TranslationsTabProps {
+    createOpen: boolean;
+    onCreateClose: () => void;
+}
+
+function TranslationsTab({ createOpen, onCreateClose }: TranslationsTabProps) {
     const qc = useQueryClient();
     const [messageApi, contextHolder] = message.useMessage();
 
-    const [createOpen, setCreateOpen] = useState(false);
     const [editItem, setEditItem] = useState<TranslationResponseDto | null>(null);
     const [localeFilter, setLocaleFilter] = useState<string | undefined>(undefined);
     const [search, setSearch] = useState('');
@@ -307,7 +356,7 @@ function TranslationsTab() {
         mutationFn: translationsApi.create,
         onSuccess: () => {
             qc.invalidateQueries({ queryKey: ['translations'] });
-            setCreateOpen(false);
+            onCreateClose();
             createForm.resetFields();
             messageApi.success('Translation created.');
         },
@@ -316,7 +365,7 @@ function TranslationsTab() {
     });
 
     const updateMutation = useMutation({
-        mutationFn: ({ id, dto }: Parameters<typeof translationsApi.update>) =>
+        mutationFn: ({ id, dto }: { id: string; dto: UpdateTranslationDto }) =>
             translationsApi.update(id, dto),
         onSuccess: () => {
             qc.invalidateQueries({ queryKey: ['translations'] });
@@ -399,6 +448,8 @@ function TranslationsTab() {
     return (
         <>
             {contextHolder}
+
+            {/* Filters row */}
             <div className="flex items-center gap-3 mb-4">
                 <Select
                     allowClear
@@ -415,14 +466,12 @@ function TranslationsTab() {
                     onChange={(e) => setSearch(e.target.value)}
                 />
                 <Text type="secondary" className="text-sm ml-auto">
-                    {filtered.length} entries
+                    {filtered.length} {filtered.length === 1 ? 'entry' : 'entries'}
                 </Text>
-                <Button type="primary" icon={<PlusOutlined />} onClick={() => setCreateOpen(true)}>
-                    New Translation
-                </Button>
             </div>
 
-            <Card className="rounded-xl border border-surface-border shadow-sm">
+            {/* Table Card */}
+            <div className="bg-surface rounded-xl border border-surface-border shadow-sm p-6">
                 <Table
                     dataSource={filtered}
                     columns={columns}
@@ -431,20 +480,20 @@ function TranslationsTab() {
                     pagination={{ pageSize: 25, showSizeChanger: false }}
                     scroll={{ x: 'max-content' }}
                 />
-            </Card>
+            </div>
 
-            {/* Create Modal */}
-            <Modal
-                title="New Translation"
+            {/* Create Drawer */}
+            <Drawer
+                title="Add New Translation"
+                placement="right"
+                width={520}
                 open={createOpen}
-                onCancel={() => { setCreateOpen(false); createForm.resetFields(); }}
-                footer={null}
-                destroyOnHidden
+                onClose={() => { onCreateClose(); createForm.resetFields(); }}
+                destroyOnClose
             >
                 <Form
                     form={createForm}
                     layout="vertical"
-                    className="mt-4"
                     onFinish={(v) => createMutation.mutate(v)}
                 >
                     <Form.Item name="locale" label="Language" rules={[{ required: true }]}>
@@ -460,51 +509,52 @@ function TranslationsTab() {
                                 message: 'Use dot-separated identifiers, e.g. nav.home',
                             },
                         ]}
+                        extra="Use dot-separated identifiers, e.g. nav.home"
                     >
                         <Input placeholder="nav.home" />
                     </Form.Item>
                     <Form.Item name="value" label="Value" rules={[{ required: true }]}>
-                        <Input.TextArea rows={3} placeholder="Home" />
+                        <Input.TextArea rows={4} placeholder="Home" />
                     </Form.Item>
-                    <div className="flex justify-end gap-2">
-                        <Button onClick={() => { setCreateOpen(false); createForm.resetFields(); }}>
+                    <div className="flex justify-end gap-2 pt-2">
+                        <Button onClick={() => { onCreateClose(); createForm.resetFields(); }}>
                             Cancel
                         </Button>
                         <Button type="primary" htmlType="submit" loading={createMutation.isPending}>
-                            Create
+                            Create Translation
                         </Button>
                     </div>
                 </Form>
-            </Modal>
+            </Drawer>
 
-            {/* Edit Modal */}
-            <Modal
+            {/* Edit Drawer */}
+            <Drawer
                 title={editItem ? `Edit: ${editItem.key} (${editItem.locale})` : 'Edit Translation'}
+                placement="right"
+                width={520}
                 open={!!editItem}
-                onCancel={() => setEditItem(null)}
-                footer={null}
-                destroyOnHidden
+                onClose={() => setEditItem(null)}
+                destroyOnClose
             >
                 <Form
                     form={editForm}
                     layout="vertical"
-                    className="mt-4"
                     onFinish={(v) => {
                         if (!editItem) return;
                         updateMutation.mutate({ id: editItem.id, dto: v });
                     }}
                 >
                     <Form.Item name="value" label="Value" rules={[{ required: true }]}>
-                        <Input.TextArea rows={3} />
+                        <Input.TextArea rows={4} />
                     </Form.Item>
-                    <div className="flex justify-end gap-2">
+                    <div className="flex justify-end gap-2 pt-2">
                         <Button onClick={() => setEditItem(null)}>Cancel</Button>
                         <Button type="primary" htmlType="submit" loading={updateMutation.isPending}>
-                            Save
+                            Save Changes
                         </Button>
                     </div>
                 </Form>
-            </Modal>
+            </Drawer>
         </>
     );
 }
