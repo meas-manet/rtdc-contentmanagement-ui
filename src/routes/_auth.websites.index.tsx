@@ -13,7 +13,6 @@ import {
     Input,
     Select,
     Spin,
-    Empty,
     Popconfirm,
     Tag,
     Tooltip,
@@ -116,122 +115,125 @@ function WebsitesPage() {
                     </Title>
                     <Text className="!text-muted">Manage your sites and their API keys</Text>
                 </div>
-                <Button
-                    type="primary"
-                    icon={<PlusOutlined />}
-                    size="large"
-                    onClick={() => setCreateOpen(true)}
-                >
-                    New Website
-                </Button>
             </div>
 
-            {websites?.length === 0 ? (
-                <div className="flex flex-col items-center justify-center h-64 bg-surface rounded-xl border border-dashed border-surface-border">
-                    <Empty description="No websites yet" image={Empty.PRESENTED_IMAGE_SIMPLE} />
-                    <Button type="primary" icon={<PlusOutlined />} className="mt-4" onClick={() => setCreateOpen(true)}>
-                        Create your first website
-                    </Button>
-                </div>
-            ) : (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {websites?.map((site) => (
-                        <Card
-                            key={site.id}
-                            hoverable
-                            className="rounded-xl shadow-sm border border-surface-border cursor-pointer group"
-                            onClick={() => navigate({ to: '/websites/$websiteId', params: { websiteId: site.id } })}
-                            actions={[
-                                <Tooltip title="Manage Schemas" key="schemas">
-                                    <Button
-                                        type="text"
-                                        icon={<AppstoreOutlined />}
-                                        onClick={(e) => {
-                                            e.stopPropagation();
-                                            navigate({ to: '/websites/$websiteId', params: { websiteId: site.id } });
-                                        }}
-                                    >
-                                        Schemas
-                                    </Button>
-                                </Tooltip>,
-                                <Tooltip title="Edit" key="edit">
-                                    <Button
-                                        type="text"
-                                        icon={<EditOutlined />}
-                                        onClick={(e) => {
-                                            e.stopPropagation();
-                                            setEditSite(site);
-                                            editForm.setFieldsValue({
-                                                name: site.name,
-                                                slug: site.slug,
-                                                defaultLocale: site.defaultLocale,
-                                                supportedLocales: site.supportedLocales,
-                                            });
-                                        }}
-                                    />
-                                </Tooltip>,
-                                <Popconfirm
-                                    key="delete"
-                                    title="Delete this website?"
-                                    description="All schemas and content will be deleted."
-                                    onConfirm={(e) => {
-                                        e?.stopPropagation();
-                                        deleteMutation.mutate(site.id);
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                {websites?.map((site) => (
+                    <Card
+                        key={site.id}
+                        hoverable
+                        className="rounded-xl shadow-sm border border-surface-border cursor-pointer group"
+                        onClick={() => navigate({ to: '/websites/$websiteId', params: { websiteId: site.id } })}
+                        actions={[
+                            <Tooltip title="Manage Schemas" key="schemas">
+                                <Button
+                                    type="text"
+                                    icon={<AppstoreOutlined />}
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        navigate({ to: '/websites/$websiteId', params: { websiteId: site.id } });
                                     }}
-                                    onCancel={(e) => e?.stopPropagation()}
-                                    okText="Delete"
-                                    okButtonProps={{ danger: true }}
                                 >
-                                    <Button
-                                        type="text"
-                                        danger
-                                        icon={<DeleteOutlined />}
-                                        onClick={(e) => e.stopPropagation()}
-                                    />
-                                </Popconfirm>,
-                            ]}
-                        >
-                            <div className="mb-3">
-                                <div className="w-10 h-10 rounded-xl bg-primary-light flex items-center justify-center mb-3">
-                                    <GlobalOutlined className="text-primary text-lg" />
-                                </div>
-                                <Title level={5} className="!mb-1">
-                                    {site.name}
-                                </Title>
-                                <Tag color="blue">{site.slug}</Tag>
+                                    Schemas
+                                </Button>
+                            </Tooltip>,
+                            <Tooltip title="Edit" key="edit">
+                                <Button
+                                    type="text"
+                                    icon={<EditOutlined />}
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        setEditSite(site);
+                                        editForm.setFieldsValue({
+                                            name: site.name,
+                                            slug: site.slug,
+                                            defaultLocale: site.defaultLocale,
+                                            supportedLocales: site.supportedLocales,
+                                        });
+                                    }}
+                                />
+                            </Tooltip>,
+                            <Popconfirm
+                                key="delete"
+                                title="Delete this website?"
+                                description="All schemas and content will be deleted."
+                                onConfirm={(e) => {
+                                    e?.stopPropagation();
+                                    deleteMutation.mutate(site.id);
+                                }}
+                                onCancel={(e) => e?.stopPropagation()}
+                                okText="Delete"
+                                okButtonProps={{ danger: true }}
+                            >
+                                <Button
+                                    type="text"
+                                    danger
+                                    icon={<DeleteOutlined />}
+                                    onClick={(e) => e.stopPropagation()}
+                                />
+                            </Popconfirm>,
+                        ]}
+                    >
+                        <div className="mb-3">
+                            <div className="w-10 h-10 rounded-xl bg-primary-light flex items-center justify-center mb-3">
+                                <GlobalOutlined className="text-primary text-lg" />
                             </div>
+                            <Title level={5} className="!mb-1">
+                                {site.name}
+                            </Title>
+                            <Tag color="blue">{site.slug}</Tag>
+                        </div>
 
-                            <Divider className="!my-3" />
+                        <Divider className="!my-3" />
 
-                            <div>
-                                <Text className="!text-muted text-xs block mb-1">
-                                    API Key
-                                </Text>
-                                <div className="flex items-center gap-2">
-                                    <code className="text-xs bg-app-bg rounded px-2 py-1 flex-1 truncate text-muted font-mono">
-                                        {site.apiKey}
-                                    </code>
-                                    <Tooltip title="Regenerate key">
-                                        <Button
-                                            size="small"
-                                            icon={<KeyOutlined />}
-                                            onClick={(e) => {
-                                                e.stopPropagation();
-                                                regenMutation.mutate(site.id);
-                                            }}
-                                            loading={regenMutation.isPending}
-                                        />
-                                    </Tooltip>
-                                </div>
-                            </div>
-
-                            <Text type="secondary" className="text-xs mt-2 block">
-                                Created {new Date(site.createdAt).toLocaleDateString()}
+                        <div>
+                            <Text className="!text-muted text-xs block mb-1">
+                                API Key
                             </Text>
-                        </Card>
-                    ))}
-                </div>
-            )}
+                            <div className="flex items-center gap-2">
+                                <code className="text-xs bg-app-bg rounded px-2 py-1 flex-1 truncate text-muted font-mono">
+                                    {site.apiKey}
+                                </code>
+                                <Tooltip title="Regenerate key">
+                                    <Button
+                                        size="small"
+                                        icon={<KeyOutlined />}
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            regenMutation.mutate(site.id);
+                                        }}
+                                        loading={regenMutation.isPending}
+                                    />
+                                </Tooltip>
+                            </div>
+                        </div>
+
+                        <Text type="secondary" className="text-xs mt-2 block">
+                            Created {new Date(site.createdAt).toLocaleDateString()}
+                        </Text>
+                    </Card>
+                ))}
+
+                {/* New Website card */}
+                <Card
+                    hoverable
+                    className="rounded-xl shadow-sm border-2 border-dashed border-surface-border cursor-pointer group"
+                    onClick={() => setCreateOpen(true)}
+                    styles={{ body: { height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' } }}
+                >
+                    <div className="flex flex-col items-center text-center">
+                        <div className="w-10 h-10 rounded-xl bg-primary-light flex items-center justify-center mb-3">
+                            <PlusOutlined className="text-primary text-lg" />
+                        </div>
+                        <Title level={5} className="!mb-1 !text-primary">
+                            New Website
+                        </Title>
+                        <Text className="!text-muted text-sm">
+                            Add a new site to manage
+                        </Text>
+                    </div>
+                </Card>
+            </div>
 
             {/* Create Modal */}
             <Modal
