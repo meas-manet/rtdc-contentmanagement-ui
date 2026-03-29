@@ -36,12 +36,14 @@ export const Route = createFileRoute('/_auth/translations')({
 
 function TranslationsPage() {
     return (
-        <div className="p-6 max-w-5xl mx-auto">
-            <div className="flex items-center gap-3 mb-6">
-                <TranslationOutlined className="text-2xl text-[#213E9A]" />
+        <div className="p-8 max-w-5xl mx-auto">
+            <div className="flex items-center gap-3 mb-8">
+                <div className="w-10 h-10 rounded-xl bg-primary-light flex items-center justify-center">
+                    <TranslationOutlined className="text-primary text-lg" />
+                </div>
                 <div>
-                    <Title level={3} className="!mb-0">Manage Locales</Title>
-                    <Text type="secondary">Configure languages and manage translation strings</Text>
+                    <Title level={2} className="!mb-0 !font-bold">Manage Locales</Title>
+                    <Text className="!text-muted">Configure languages and manage translation strings</Text>
                 </div>
             </div>
 
@@ -128,7 +130,7 @@ function LocalesTab() {
             key: 'code',
             width: 100,
             render: (code: string) => (
-                <code className="text-xs bg-gray-100 rounded px-2 py-1 text-[#213E9A] font-mono">
+                <code className="text-xs bg-primary-light rounded px-2 py-1 text-primary font-mono">
                     {code}
                 </code>
             ),
@@ -188,7 +190,7 @@ function LocalesTab() {
                 </Button>
             </div>
 
-            <Card className="rounded-2xl border border-gray-100 shadow-sm">
+            <Card className="rounded-xl border border-surface-border shadow-sm">
                 <Table
                     dataSource={locales}
                     columns={columns}
@@ -339,7 +341,7 @@ function TranslationsTab() {
             dataIndex: 'key',
             key: 'key',
             render: (key: string) => (
-                <code className="text-xs bg-gray-100 rounded px-2 py-1 text-[#213E9A] font-mono">
+                <code className="text-xs bg-primary-light rounded px-2 py-1 text-primary font-mono">
                     {key}
                 </code>
             ),
@@ -420,7 +422,7 @@ function TranslationsTab() {
                 </Button>
             </div>
 
-            <Card className="rounded-2xl border border-gray-100 shadow-sm">
+            <Card className="rounded-xl border border-surface-border shadow-sm">
                 <Table
                     dataSource={filtered}
                     columns={columns}

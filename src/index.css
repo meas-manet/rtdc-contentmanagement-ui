@@ -1,12 +1,32 @@
 @import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap");
 @import "tailwindcss";
 
+/* ── Brand design tokens ──────────────────────────────────────
+   Use these Tailwind utility classes across the app:
+   bg-primary / text-primary / border-primary         (#213E9A)
+   bg-primary-dark                                    (#152e6e)
+   bg-primary-light / text-primary-light              (#eef1f9)
+   bg-app-bg                                          (#f4f6fb)
+   bg-surface                                         (#ffffff)
+   border-surface-border                              (#e4e7ec)
+   text-muted                                         (#64748b)
+──────────────────────────────────────────────────────────── */
+@theme {
+  --color-primary: #213E9A;
+  --color-primary-dark: #152e6e;
+  --color-primary-light: #eef1f9;
+  --color-app-bg: #f4f6fb;
+  --color-surface: #ffffff;
+  --color-surface-border: #e4e7ec;
+  --color-muted: #64748b;
+}
+
 * {
   font-family: "Inter", ui-sans-serif, system-ui, sans-serif;
 }
 
 body {
-  background-color: #f9fafb;
+  background-color: var(--color-app-bg);
 }
 
 /* Tiptap prose styles */

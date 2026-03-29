@@ -107,15 +107,14 @@ function WebsitesPage() {
     }
 
     return (
-        <div className="p-6 max-w-7xl mx-auto">
+        <div className="p-8 max-w-7xl mx-auto">
             {contextHolder}
-            <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center justify-between mb-8">
                 <div>
-                    <Title level={3} className="!mb-0">
-                        <GlobalOutlined className="mr-2 text-[#213E9A]" />
+                    <Title level={2} className="!mb-0 !font-bold">
                         Websites
                     </Title>
-                    <Text type="secondary">Manage your sites and their API keys</Text>
+                    <Text className="!text-muted">Manage your sites and their API keys</Text>
                 </div>
                 <Button
                     type="primary"
@@ -128,19 +127,19 @@ function WebsitesPage() {
             </div>
 
             {websites?.length === 0 ? (
-                <div className="flex flex-col items-center justify-center h-64 bg-white rounded-2xl border border-dashed border-gray-200">
+                <div className="flex flex-col items-center justify-center h-64 bg-surface rounded-xl border border-dashed border-surface-border">
                     <Empty description="No websites yet" image={Empty.PRESENTED_IMAGE_SIMPLE} />
                     <Button type="primary" icon={<PlusOutlined />} className="mt-4" onClick={() => setCreateOpen(true)}>
                         Create your first website
                     </Button>
                 </div>
             ) : (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                     {websites?.map((site) => (
                         <Card
                             key={site.id}
                             hoverable
-                            className="rounded-2xl shadow-sm border border-gray-100 cursor-pointer group"
+                            className="rounded-xl shadow-sm border border-surface-border cursor-pointer group"
                             onClick={() => navigate({ to: '/websites/$websiteId', params: { websiteId: site.id } })}
                             actions={[
                                 <Tooltip title="Manage Schemas" key="schemas">
@@ -193,8 +192,8 @@ function WebsitesPage() {
                             ]}
                         >
                             <div className="mb-3">
-                                <div className="w-10 h-10 rounded-xl bg-blue-100 flex items-center justify-center mb-3">
-                                    <GlobalOutlined className="text-[#213E9A] text-lg" />
+                                <div className="w-10 h-10 rounded-xl bg-primary-light flex items-center justify-center mb-3">
+                                    <GlobalOutlined className="text-primary text-lg" />
                                 </div>
                                 <Title level={5} className="!mb-1">
                                     {site.name}
@@ -205,11 +204,11 @@ function WebsitesPage() {
                             <Divider className="!my-3" />
 
                             <div>
-                                <Text type="secondary" className="text-xs block mb-1">
+                                <Text className="!text-muted text-xs block mb-1">
                                     API Key
                                 </Text>
                                 <div className="flex items-center gap-2">
-                                    <code className="text-xs bg-gray-100 rounded px-2 py-1 flex-1 truncate text-gray-600">
+                                    <code className="text-xs bg-app-bg rounded px-2 py-1 flex-1 truncate text-muted font-mono">
                                         {site.apiKey}
                                     </code>
                                     <Tooltip title="Regenerate key">

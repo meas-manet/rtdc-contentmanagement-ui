@@ -7,21 +7,16 @@ import {
     Popconfirm,
     Spin,
     Typography,
-    Tag,
     Empty,
     message,
     Image,
     Tooltip,
 } from 'antd';
 import {
-    UploadOutlined,
     DeleteOutlined,
     CopyOutlined,
-    PictureOutlined,
     FileOutlined,
 } from '@ant-design/icons';
-import type { UploadFile } from 'antd';
-import { useState } from 'react';
 import { mediaApi } from '../lib/api';
 import type { MediaAssetResponseDto } from '../lib/types';
 
@@ -84,20 +79,19 @@ function MediaPage() {
     }
 
     return (
-        <div className="p-6">
+        <div className="p-8">
             {contextHolder}
-            <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center justify-between mb-8">
                 <div>
-                    <Title level={3} className="!mb-0">
-                        <PictureOutlined className="mr-2 text-[#213E9A]" />
+                    <Title level={2} className="!mb-0 !font-bold">
                         Media Library
                     </Title>
-                    <Text type="secondary">{assets?.length ?? 0} assets</Text>
+                    <Text className="!text-muted">{assets?.length ?? 0} assets</Text>
                 </div>
             </div>
 
             {/* Upload zone */}
-            <Card className="rounded-2xl border border-dashed border-blue-200 bg-blue-50/30 mb-6">
+            <Card className="rounded-xl border border-dashed border-primary/30 bg-primary-light/40 mb-6">
                 <Dragger
                     multiple
                     showUploadList={false}
@@ -107,15 +101,15 @@ function MediaPage() {
                 >
                     <div className="py-6">
                         <p className="text-4xl mb-3">📁</p>
-                        <p className="text-gray-700 font-medium">
+                        <p className="font-medium">
                             Click or drag files to upload
                         </p>
-                        <p className="text-gray-400 text-sm mt-1">
+                        <p className="text-muted text-sm mt-1">
                             JPEG, PNG, WebP, GIF, SVG, PDF, MP4, WebM · Max 20 MB
                         </p>
                         {uploadMutation.isPending && (
                             <div className="mt-3">
-                                <Spin size="small" /> <span className="text-sm text-gray-500 ml-2">Uploading…</span>
+                                <Spin size="small" /> <span className="text-sm text-muted ml-2">Uploading…</span>
                             </div>
                         )}
                     </div>
@@ -156,10 +150,10 @@ function AssetCard({
     return (
         <Card
             size="small"
-            className="rounded-xl overflow-hidden border border-gray-100 shadow-sm group hover:shadow-md transition-shadow"
+            className="rounded-xl overflow-hidden border border-surface-border shadow-sm group hover:shadow-md transition-shadow"
             cover={
                 isImage(asset.contentType) ? (
-                    <div className="h-32 overflow-hidden bg-gray-100 flex items-center justify-center">
+                    <div className="h-32 overflow-hidden bg-app-bg flex items-center justify-center">
                         <Image
                             src={asset.url}
                             alt={asset.fileName}
@@ -170,9 +164,9 @@ function AssetCard({
                         />
                     </div>
                 ) : (
-                    <div className="h-32 flex flex-col items-center justify-center bg-gray-50">
-                        <FileOutlined className="text-4xl text-gray-400" />
-                        <Text type="secondary" className="text-xs mt-1 uppercase">
+                    <div className="h-32 flex flex-col items-center justify-center bg-app-bg">
+                        <FileOutlined className="text-4xl text-muted" />
+                        <Text className="!text-muted text-xs mt-1 uppercase">
                             {asset.contentType.split('/')[1]}
                         </Text>
                     </div>

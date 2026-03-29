@@ -23,7 +23,6 @@ import {
     PlusOutlined,
     EditOutlined,
     DeleteOutlined,
-    DatabaseOutlined,
 } from '@ant-design/icons';
 import { useState } from 'react';
 import { schemasApi, websitesApi } from '../lib/api';
@@ -96,7 +95,7 @@ function ContentTablePage() {
             if (field.type === 'richtext')
                 return (
                     <span
-                        className="text-sm text-gray-600 line-clamp-1"
+                        className="text-sm text-muted line-clamp-1"
                         dangerouslySetInnerHTML={{ __html: String(val).slice(0, 80) }}
                     />
                 );
@@ -172,15 +171,14 @@ function ContentTablePage() {
     }
 
     return (
-        <div className="p-6">
+        <div className="p-8">
             {contextHolder}
-            <div className="flex items-center justify-between mb-6 flex-wrap gap-3">
+            <div className="flex items-center justify-between mb-8 flex-wrap gap-3">
                 <div>
-                    <Title level={3} className="!mb-0">
-                        <DatabaseOutlined className="mr-2 text-[#213E9A]" />
+                    <Title level={2} className="!mb-0 !font-bold">
                         {schema.name}
                     </Title>
-                    <Text type="secondary">
+                    <Text className="!text-muted">
                         {pagedResult?.total ?? 0} entries · <Tag color="blue">{schema.slug}</Tag>
                     </Text>
                 </div>
@@ -207,7 +205,7 @@ function ContentTablePage() {
                 </div>
             </div>
 
-            <Card className="rounded-2xl border border-gray-100 shadow-sm">
+            <Card className="rounded-xl border border-surface-border shadow-sm">
                 <Table
                     dataSource={pagedResult?.data}
                     columns={columns}

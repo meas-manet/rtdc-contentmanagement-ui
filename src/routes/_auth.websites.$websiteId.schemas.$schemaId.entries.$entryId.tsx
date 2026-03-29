@@ -22,7 +22,6 @@ import {
     SaveOutlined,
     ArrowLeftOutlined,
     TranslationOutlined,
-    PlusOutlined,
     SendOutlined,
 } from '@ant-design/icons';
 import { useEffect, useState } from 'react';
@@ -185,7 +184,7 @@ function EntryEditorPage() {
                     {exists ? (
                         <span className="w-2 h-2 rounded-full bg-green-500 inline-block" />
                     ) : (
-                        <span className="w-2 h-2 rounded-full bg-gray-300 inline-block" />
+                        <span className="w-2 h-2 rounded-full bg-surface-border inline-block" />
                     )}
                 </span>
             ),
@@ -193,15 +192,15 @@ function EntryEditorPage() {
     });
 
     return (
-        <div className="p-6 max-w-3xl mx-auto">
+        <div className="p-8 max-w-3xl mx-auto">
             {contextHolder}
             {/* Header */}
-            <div className="flex items-start justify-between mb-6 gap-4">
+            <div className="flex items-start justify-between mb-8 gap-4">
                 <div>
                     <Button
                         type="text"
                         icon={<ArrowLeftOutlined />}
-                        className="!px-0 !text-gray-500 mb-2"
+                        className="!px-0 !text-muted mb-2"
                         onClick={() =>
                             navigate({
                                 to: '/websites/$websiteId/schemas/$schemaId',
@@ -211,7 +210,7 @@ function EntryEditorPage() {
                     >
                         Back to {schema.name}
                     </Button>
-                    <Title level={4} className="!mb-0">
+                    <Title level={3} className="!mb-0 !font-bold">
                         {isNew ? 'New Entry' : 'Edit Entry'}
                     </Title>
                     {!isNew && entry && (
@@ -249,7 +248,7 @@ function EntryEditorPage() {
             {!isNew && (
                 <div className="mb-4">
                     <div className="flex items-center gap-2 mb-2">
-                        <TranslationOutlined className="text-[#213E9A]" />
+                        <TranslationOutlined className="text-primary" />
                         <Text strong className="text-sm">
                             Translations
                         </Text>
@@ -273,7 +272,7 @@ function EntryEditorPage() {
             )}
 
             {/* Form */}
-            <Card className="rounded-2xl border border-gray-100 shadow-sm">
+            <Card className="rounded-xl border border-surface-border shadow-sm">
                 {!isNew && entryLoading ? (
                     <div className="flex justify-center py-12">
                         <Spin />

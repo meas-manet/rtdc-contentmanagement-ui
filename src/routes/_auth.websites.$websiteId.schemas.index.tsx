@@ -26,7 +26,6 @@ import {
     PlusOutlined,
     EditOutlined,
     DeleteOutlined,
-    AppstoreOutlined,
     MinusCircleOutlined,
 } from '@ant-design/icons';
 import { useState } from 'react';
@@ -108,7 +107,7 @@ function SchemasPage() {
             key: 'name',
             render: (name: string, row: SchemaResponseDto) => (
                 <button
-                    className="font-medium text-[#213E9A] hover:underline bg-transparent border-0 p-0 cursor-pointer"
+                    className="font-medium text-primary hover:underline bg-transparent border-0 p-0 cursor-pointer"
                     onClick={() =>
                         navigate({
                             to: '/websites/$websiteId/schemas/$schemaId',
@@ -177,22 +176,21 @@ function SchemasPage() {
     ];
 
     return (
-        <div className="p-6 max-w-5xl mx-auto">
+        <div className="p-8 max-w-5xl mx-auto">
             {contextHolder}
-            <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center justify-between mb-8">
                 <div>
-                    <Title level={3} className="!mb-0">
-                        <AppstoreOutlined className="mr-2 text-[#213E9A]" />
+                    <Title level={2} className="!mb-0 !font-bold">
                         Content Types
                     </Title>
-                    <Text type="secondary">Define the structure for your content</Text>
+                    <Text className="!text-muted">Define the structure for your content</Text>
                 </div>
                 <Button type="primary" icon={<PlusOutlined />} onClick={() => setCreateOpen(true)}>
                     New Schema
                 </Button>
             </div>
 
-            <Card className="rounded-2xl border border-gray-100 shadow-sm">
+            <Card className="rounded-xl border border-surface-border shadow-sm">
                 <Table
                     dataSource={schemas}
                     columns={columns}
@@ -300,7 +298,7 @@ function SchemaFormModal({
                                 {fields.map(({ key, name, ...restField }) => (
                                     <div
                                         key={key}
-                                        className="flex items-start gap-2 bg-gray-50 rounded-lg p-3 border border-gray-100"
+                                        className="flex items-start gap-2 bg-app-bg rounded-lg p-3 border border-surface-border"
                                     >
                                         <Form.Item
                                             {...restField}

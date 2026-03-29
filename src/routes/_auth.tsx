@@ -44,19 +44,20 @@ function AuthLayout() {
 
     return (
         <Layout className="min-h-screen">
-            <Header className="!bg-[#152e6e] flex items-center justify-between px-6 h-14 shadow-md">
-                <Link to="/websites" className="flex items-center gap-2 no-underline">
-                    <span className="text-lg font-bold text-white tracking-tight">RTDC Content Management</span>
+            <Header className="!bg-primary-dark flex items-center justify-between px-8 h-16 border-b border-white/10" style={{ lineHeight: 'normal' }}>
+                <Link to="/websites" className="flex items-center gap-2.5 no-underline">
+                    <div className="w-7 h-7 rounded-lg bg-white/15 flex items-center justify-center text-white text-sm font-bold">R</div>
+                    <span className="text-base font-semibold text-white tracking-tight">RTDC Content</span>
                 </Link>
                 <Dropdown menu={{ items: userMenu }} placement="bottomRight">
-                    <button className="flex items-center gap-2 cursor-pointer bg-transparent border-0 p-0">
-                        <Avatar size={32} icon={<UserOutlined />} className="bg-[#213E9A]" />
-                        <Text className="!text-blue-100 text-sm hidden sm:inline">Admin</Text>
+                    <button className="flex items-center gap-2.5 cursor-pointer bg-transparent border-0 p-0 rounded-lg hover:bg-white/10 px-2 py-1.5 transition-colors">
+                        <Avatar size={30} icon={<UserOutlined />} className="!bg-primary" />
+                        <Text className="!text-white/80 text-sm hidden sm:inline font-medium">Admin</Text>
                     </button>
                 </Dropdown>
             </Header>
             <Layout>
-                <Content className="bg-gray-50">
+                <Content className="bg-app-bg">
                     <Outlet />
                 </Content>
             </Layout>

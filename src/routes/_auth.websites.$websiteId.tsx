@@ -68,20 +68,20 @@ function WebsiteLayout() {
     });
 
     return (
-        <Layout className="min-h-[calc(100vh-56px)]">
+        <Layout className="min-h-[calc(100vh-64px)]">
             <Sider
                 width={240}
-                className="!bg-white border-r border-gray-100 shadow-sm"
+                className="!bg-surface border-r border-surface-border"
                 breakpoint="lg"
                 collapsedWidth={0}
             >
-                <div className="p-4 border-b border-gray-100">
+                <div className="p-4 border-b border-surface-border">
                     <Button
                         type="text"
                         icon={<ArrowLeftOutlined />}
                         size="small"
                         onClick={() => navigate({ to: '/websites' })}
-                        className="!text-gray-500 !px-0 mb-2"
+                        className="!text-muted !px-0 mb-3"
                     >
                         All websites
                     </Button>
@@ -99,7 +99,7 @@ function WebsiteLayout() {
 
                 <div className="py-2">
                     <div className="px-4 py-2 flex items-center justify-between">
-                        <Text type="secondary" className="text-xs uppercase tracking-wider font-medium">
+                        <Text className="!text-muted text-xs uppercase tracking-wider font-semibold">
                             Content Types
                         </Text>
                         <Tooltip title="New Schema">
@@ -130,7 +130,7 @@ function WebsiteLayout() {
                         />
                     )}
 
-                    <div className="px-2 mt-2 border-t border-gray-100 pt-2">
+                    <div className="px-2 mt-2 border-t border-surface-border pt-2">
                         <Menu
                             mode="inline"
                             selectedKeys={selectedKeys}
@@ -162,7 +162,7 @@ function WebsiteLayout() {
                 </div>
             </Sider>
 
-            <Content className="bg-gray-50 overflow-auto">
+            <Content className="bg-app-bg overflow-auto">
                 <Outlet />
             </Content>
         </Layout>
