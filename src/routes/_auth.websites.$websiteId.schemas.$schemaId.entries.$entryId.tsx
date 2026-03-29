@@ -10,7 +10,6 @@ import {
     Button,
     Select,
     Tabs,
-    Card,
     Spin,
     message,
     Typography,
@@ -194,23 +193,23 @@ function EntryEditorPage() {
     return (
         <div className="p-8 max-w-3xl mx-auto">
             {contextHolder}
-            {/* Header */}
+
+            {/* ── Page header ───────────────────────────────────── */}
             <div className="flex items-start justify-between mb-8 gap-4">
                 <div>
-                    <Button
-                        type="text"
-                        icon={<ArrowLeftOutlined />}
-                        className="!px-0 !text-muted mb-2"
+                    <button
                         onClick={() =>
                             navigate({
                                 to: '/websites/$websiteId/schemas/$schemaId',
                                 params: { websiteId, schemaId },
                             })
                         }
+                        className="flex items-center gap-1.5 text-muted text-xs hover:text-gray-800 transition-colors mb-2 bg-transparent border-0 cursor-pointer px-0 font-medium"
                     >
-                        Back to {schema.name}
-                    </Button>
-                    <Title level={3} className="!mb-0 !font-bold">
+                        <ArrowLeftOutlined />
+                        <span>Back to {schema.name}</span>
+                    </button>
+                    <Title level={2} className="mb-0! font-bold! text-gray-900!">
                         {isNew ? 'New Entry' : 'Edit Entry'}
                     </Title>
                     {!isNew && entry && (
@@ -235,6 +234,7 @@ function EntryEditorPage() {
                     </Button>
                     <Button
                         type="primary"
+                        size="large"
                         icon={<SendOutlined />}
                         onClick={() => handleSave('published')}
                         loading={isSaving}
@@ -271,8 +271,8 @@ function EntryEditorPage() {
                 </div>
             )}
 
-            {/* Form */}
-            <Card className="rounded-xl border border-surface-border shadow-sm">
+            {/* ── Form card ─────────────────────────────────────── */}
+            <div className="bg-white rounded-xl border border-surface-border shadow-sm p-6">
                 {!isNew && entryLoading ? (
                     <div className="flex justify-center py-12">
                         <Spin />
@@ -291,9 +291,9 @@ function EntryEditorPage() {
                         )}
                     </Form>
                 )}
-            </Card>
+            </div>
 
-            {/* Bottom action bar */}
+            {/* ── Bottom action bar ─────────────────────────────── */}
             <div className="flex justify-end gap-3 mt-6">
                 <Button onClick={() => handleSave('draft')} loading={isSaving} icon={<SaveOutlined />}>
                     Save Draft

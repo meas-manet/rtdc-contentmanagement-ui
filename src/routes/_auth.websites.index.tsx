@@ -6,7 +6,6 @@ import {
     useQueryClient,
 } from '@tanstack/react-query';
 import {
-    Card,
     Button,
     Modal,
     Form,
@@ -18,7 +17,7 @@ import {
     Tooltip,
     message,
     Typography,
-    Divider,
+    Empty,
 } from 'antd';
 import {
     PlusOutlined,
@@ -27,6 +26,7 @@ import {
     KeyOutlined,
     GlobalOutlined,
     AppstoreOutlined,
+    CopyOutlined,
 } from '@ant-design/icons';
 import { useState } from 'react';
 import { websitesApi } from '../lib/api';
@@ -69,7 +69,7 @@ function WebsitesPage() {
     });
 
     const updateMutation = useMutation({
-        mutationFn: ({ id, dto }: Parameters<typeof websitesApi.update>) =>
+        mutationFn: ({ id, dto }: { id: string; dto: Parameters<typeof websitesApi.update>[1] }) =>
             websitesApi.update(id, dto),
         onSuccess: () => {
             qc.invalidateQueries({ queryKey: ['websites'] });
@@ -97,151 +97,100 @@ function WebsitesPage() {
         onError: () => messageApi.error('Failed to regenerate key.'),
     });
 
-    if (isPending) {
-        return (
-            <div className="flex items-center justify-center h-96">
-                <Spin size="large" />
-            </div>
-        );
-    }
-
     return (
         <div className="p-8 max-w-7xl mx-auto">
             {contextHolder}
+
+            {/* ── Page header ───────────────────────────────────────── */}
             <div className="flex items-center justify-between mb-8">
                 <div>
-                    <Title level={2} className="!mb-0 !font-bold">
+                    <Title level={2} className="mb-0! font-bold! text-gray-900!">
                         Websites
                     </Title>
-                    <Text className="!text-muted">Manage your sites and their API keys</Text>
+                    <Text className="text-muted! text-sm">
+                        Manage your sites and their API keys
+                    </Text>
                 </div>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                {websites?.map((site) => (
-                    <Card
-                        key={site.id}
-                        hoverable
-                        className="rounded-xl shadow-sm border border-surface-border cursor-pointer group"
-                        onClick={() => navigate({ to: '/websites/$websiteId', params: { websiteId: site.id } })}
-                        actions={[
-                            <Tooltip title="Manage Schemas" key="schemas">
-                                <Button
-                                    type="text"
-                                    icon={<AppstoreOutlined />}
-                                    onClick={(e) => {
-                                        e.stopPropagation();
-                                        navigate({ to: '/websites/$websiteId', params: { websiteId: site.id } });
-                                    }}
-                                >
-                                    Schemas
-                                </Button>
-                            </Tooltip>,
-                            <Tooltip title="Edit" key="edit">
-                                <Button
-                                    type="text"
-                                    icon={<EditOutlined />}
-                                    onClick={(e) => {
-                                        e.stopPropagation();
-                                        setEditSite(site);
-                                        editForm.setFieldsValue({
-                                            name: site.name,
-                                            slug: site.slug,
-                                            defaultLocale: site.defaultLocale,
-                                            supportedLocales: site.supportedLocales,
-                                        });
-                                    }}
-                                />
-                            </Tooltip>,
-                            <Popconfirm
-                                key="delete"
-                                title="Delete this website?"
-                                description="All schemas and content will be deleted."
-                                onConfirm={(e) => {
-                                    e?.stopPropagation();
-                                    deleteMutation.mutate(site.id);
-                                }}
-                                onCancel={(e) => e?.stopPropagation()}
-                                okText="Delete"
-                                okButtonProps={{ danger: true }}
-                            >
-                                <Button
-                                    type="text"
-                                    danger
-                                    icon={<DeleteOutlined />}
-                                    onClick={(e) => e.stopPropagation()}
-                                />
-                            </Popconfirm>,
-                        ]}
-                    >
-                        <div className="mb-3">
-                            <div className="w-10 h-10 rounded-xl bg-primary-light flex items-center justify-center mb-3">
-                                <GlobalOutlined className="text-primary text-lg" />
-                            </div>
-                            <Title level={5} className="!mb-1">
-                                {site.name}
-                            </Title>
-                            <Tag color="blue">{site.slug}</Tag>
-                        </div>
-
-                        <Divider className="!my-3" />
-
-                        <div>
-                            <Text className="!text-muted text-xs block mb-1">
-                                API Key
-                            </Text>
-                            <div className="flex items-center gap-2">
-                                <code className="text-xs bg-app-bg rounded px-2 py-1 flex-1 truncate text-muted font-mono">
-                                    {site.apiKey}
-                                </code>
-                                <Tooltip title="Regenerate key">
-                                    <Button
-                                        size="small"
-                                        icon={<KeyOutlined />}
-                                        onClick={(e) => {
-                                            e.stopPropagation();
-                                            regenMutation.mutate(site.id);
-                                        }}
-                                        loading={regenMutation.isPending}
-                                    />
-                                </Tooltip>
-                            </div>
-                        </div>
-
-                        <Text type="secondary" className="text-xs mt-2 block">
-                            Created {new Date(site.createdAt).toLocaleDateString()}
-                        </Text>
-                    </Card>
-                ))}
-
-                {/* New Website card */}
-                <Card
-                    hoverable
-                    className="rounded-xl shadow-sm border-2 border-dashed border-surface-border cursor-pointer group"
+                <Button
+                    type="primary"
+                    icon={<PlusOutlined />}
+                    size="large"
                     onClick={() => setCreateOpen(true)}
-                    styles={{ body: { height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' } }}
                 >
-                    <div className="flex flex-col items-center text-center">
-                        <div className="w-10 h-10 rounded-xl bg-primary-light flex items-center justify-center mb-3">
-                            <PlusOutlined className="text-primary text-lg" />
-                        </div>
-                        <Title level={5} className="!mb-1 !text-primary">
-                            New Website
-                        </Title>
-                        <Text className="!text-muted text-sm">
-                            Add a new site to manage
-                        </Text>
-                    </div>
-                </Card>
+                    New Website
+                </Button>
             </div>
 
-            {/* Create Modal */}
+            {/* ── Content ───────────────────────────────────────────── */}
+            {isPending ? (
+                <div className="flex items-center justify-center h-64">
+                    <Spin size="large" />
+                </div>
+            ) : !websites?.length ? (
+                <div className="bg-white rounded-xl border border-surface-border shadow-sm p-16">
+                    <Empty
+                        description={
+                            <span className="text-muted">
+                                No websites yet. Create your first one to get started.
+                            </span>
+                        }
+                        image={Empty.PRESENTED_IMAGE_SIMPLE}
+                    >
+                        <Button
+                            type="primary"
+                            icon={<PlusOutlined />}
+                            onClick={() => setCreateOpen(true)}
+                        >
+                            Create Website
+                        </Button>
+                    </Empty>
+                </div>
+            ) : (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+                    {websites.map((site) => (
+                        <SiteCard
+                            key={site.id}
+                            site={site}
+                            onOpen={() =>
+                                navigate({
+                                    to: '/websites/$websiteId',
+                                    params: { websiteId: site.id },
+                                })
+                            }
+                            onEdit={() => {
+                                setEditSite(site);
+                                editForm.setFieldsValue({
+                                    name: site.name,
+                                    slug: site.slug,
+                                    defaultLocale: site.defaultLocale,
+                                    supportedLocales: site.supportedLocales,
+                                });
+                            }}
+                            onDelete={() => deleteMutation.mutate(site.id)}
+                            onRegen={() => regenMutation.mutate(site.id)}
+                            regenLoading={regenMutation.isPending && regenMutation.variables === site.id}
+                            onCopyKey={() => {
+                                navigator.clipboard.writeText(site.apiKey);
+                                messageApi.success('API key copied!');
+                            }}
+                        />
+                    ))}
+                </div>
+            )}
+
+            {/* ── Create Modal ──────────────────────────────────────── */}
             <Modal
-                title="Create Website"
+                title="Create New Website"
                 open={createOpen}
-                onCancel={() => { setCreateOpen(false); form.resetFields(); }}
-                footer={null}
+                onCancel={() => {
+                    setCreateOpen(false);
+                    form.resetFields();
+                }}
+                onOk={() => form.submit()}
+                okText="Create Website"
+                confirmLoading={createMutation.isPending}
                 destroyOnHidden
+                width={520}
             >
                 <Form
                     form={form}
@@ -249,7 +198,11 @@ function WebsitesPage() {
                     onFinish={(v) => createMutation.mutate(v)}
                     className="mt-4"
                 >
-                    <Form.Item name="name" label="Name" rules={[{ required: true }]}>
+                    <Form.Item
+                        name="name"
+                        label="Site Name"
+                        rules={[{ required: true, message: 'Enter a site name' }]}
+                    >
                         <Input placeholder="My Awesome Site" />
                     </Form.Item>
                     <Form.Item
@@ -257,8 +210,12 @@ function WebsitesPage() {
                         label="Slug"
                         rules={[
                             { required: true },
-                            { pattern: /^[a-z0-9-]+$/, message: 'Lowercase, numbers, hyphens only' },
+                            {
+                                pattern: /^[a-z0-9-]+$/,
+                                message: 'Lowercase letters, numbers, and hyphens only',
+                            },
                         ]}
+                        extra="Used in API URLs — cannot be changed later"
                     >
                         <Input placeholder="my-awesome-site" />
                     </Form.Item>
@@ -266,29 +223,32 @@ function WebsitesPage() {
                         name="supportedLocales"
                         label="Supported Locales"
                         initialValue={['en']}
-                        rules={[{ required: true, type: 'array', min: 1, message: 'Select at least one locale' }]}
+                        rules={[
+                            { required: true, type: 'array', min: 1, message: 'Select at least one locale' },
+                        ]}
                     >
-                        <Select mode="multiple" options={localeSelectOptions} placeholder="Select locales…" />
+                        <Select
+                            mode="multiple"
+                            options={localeSelectOptions}
+                            placeholder="Select locales…"
+                        />
                     </Form.Item>
                     <Form.Item name="defaultLocale" label="Default Locale" initialValue="en">
                         <Select options={localeSelectOptions} />
                     </Form.Item>
-                    <div className="flex justify-end gap-2">
-                        <Button onClick={() => { setCreateOpen(false); form.resetFields(); }}>Cancel</Button>
-                        <Button type="primary" htmlType="submit" loading={createMutation.isPending}>
-                            Create
-                        </Button>
-                    </div>
                 </Form>
             </Modal>
 
-            {/* Edit Modal */}
+            {/* ── Edit Modal ────────────────────────────────────────── */}
             <Modal
                 title="Edit Website"
                 open={!!editSite}
                 onCancel={() => setEditSite(null)}
-                footer={null}
+                onOk={() => editForm.submit()}
+                okText="Save Changes"
+                confirmLoading={updateMutation.isPending}
                 destroyOnHidden
+                width={520}
             >
                 <Form
                     form={editForm}
@@ -299,7 +259,7 @@ function WebsitesPage() {
                     }}
                     className="mt-4"
                 >
-                    <Form.Item name="name" label="Name" rules={[{ required: true }]}>
+                    <Form.Item name="name" label="Site Name" rules={[{ required: true }]}>
                         <Input />
                     </Form.Item>
                     <Form.Item
@@ -307,7 +267,10 @@ function WebsitesPage() {
                         label="Slug"
                         rules={[
                             { required: true },
-                            { pattern: /^[a-z0-9-]+$/, message: 'Lowercase, numbers, hyphens only' },
+                            {
+                                pattern: /^[a-z0-9-]+$/,
+                                message: 'Lowercase letters, numbers, and hyphens only',
+                            },
                         ]}
                     >
                         <Input />
@@ -315,21 +278,114 @@ function WebsitesPage() {
                     <Form.Item
                         name="supportedLocales"
                         label="Supported Locales"
-                        rules={[{ required: true, type: 'array', min: 1, message: 'Select at least one locale' }]}
+                        rules={[{ required: true, type: 'array', min: 1 }]}
                     >
-                        <Select mode="multiple" options={localeSelectOptions} placeholder="Select locales…" />
+                        <Select
+                            mode="multiple"
+                            options={localeSelectOptions}
+                            placeholder="Select locales…"
+                        />
                     </Form.Item>
                     <Form.Item name="defaultLocale" label="Default Locale">
                         <Select options={localeSelectOptions} />
                     </Form.Item>
-                    <div className="flex justify-end gap-2">
-                        <Button onClick={() => setEditSite(null)}>Cancel</Button>
-                        <Button type="primary" htmlType="submit" loading={updateMutation.isPending}>
-                            Save
-                        </Button>
-                    </div>
                 </Form>
             </Modal>
+        </div>
+    );
+}
+
+// ── Site card ──────────────────────────────────────────────────────────────────
+function SiteCard({
+    site,
+    onOpen,
+    onEdit,
+    onDelete,
+    onRegen,
+    regenLoading,
+    onCopyKey,
+}: {
+    site: WebsiteResponseDto;
+    onOpen: () => void;
+    onEdit: () => void;
+    onDelete: () => void;
+    onRegen: () => void;
+    regenLoading: boolean;
+    onCopyKey: () => void;
+}) {
+    return (
+        <div
+            className="bg-white rounded-xl border border-surface-border shadow-sm p-5 cursor-pointer group transition-all duration-150 hover:shadow-md hover:border-primary/25"
+            onClick={onOpen}
+        >
+            {/* Header row */}
+            <div className="flex items-start justify-between mb-3">
+                <div className="w-10 h-10 rounded-xl bg-primary-light flex items-center justify-center shrink-0">
+                    <GlobalOutlined className="text-[#213E9A] text-lg" />
+                </div>
+                <div
+                    className="flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity"
+                    onClick={(e) => e.stopPropagation()}
+                >
+                    <Tooltip title="Open">
+                        <Button type="text" size="small" icon={<AppstoreOutlined />} onClick={onOpen} />
+                    </Tooltip>
+                    <Tooltip title="Edit">
+                        <Button type="text" size="small" icon={<EditOutlined />} onClick={onEdit} />
+                    </Tooltip>
+                    <Popconfirm
+                        title="Delete this website?"
+                        description="All schemas and content will be permanently deleted."
+                        onConfirm={onDelete}
+                        okText="Delete"
+                        okButtonProps={{ danger: true }}
+                    >
+                        <Button type="text" size="small" danger icon={<DeleteOutlined />} />
+                    </Popconfirm>
+                </div>
+            </div>
+
+            {/* Name + slug */}
+            <h3 className="text-sm font-semibold text-gray-900 mb-2 leading-snug">
+                {site.name}
+            </h3>
+            <Tag color="blue" className="mb-4 text-xs">
+                {site.slug}
+            </Tag>
+
+            {/* API key section */}
+            <div
+                className="border-t border-surface-border pt-3"
+                onClick={(e) => e.stopPropagation()}
+            >
+                <p className="text-[11px] text-muted font-medium mb-1.5">API Key</p>
+                <div className="flex items-center gap-1.5">
+                    <code className="text-[11px] bg-app-bg rounded-md px-2 py-1 flex-1 truncate text-muted font-mono">
+                        {site.apiKey}
+                    </code>
+                    <Tooltip title="Copy key">
+                        <Button
+                            size="small"
+                            icon={<CopyOutlined />}
+                            onClick={onCopyKey}
+                            className="shrink-0"
+                        />
+                    </Tooltip>
+                    <Tooltip title="Regenerate key">
+                        <Button
+                            size="small"
+                            icon={<KeyOutlined />}
+                            onClick={onRegen}
+                            loading={regenLoading}
+                            className="shrink-0"
+                        />
+                    </Tooltip>
+                </div>
+            </div>
+
+            <p className="text-[11px] text-muted mt-3">
+                Created {new Date(site.createdAt).toLocaleDateString()}
+            </p>
         </div>
     );
 }

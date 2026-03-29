@@ -15,7 +15,6 @@ import {
     Typography,
     message,
     Select,
-    Card,
     Empty,
     Tooltip,
 } from 'antd';
@@ -173,13 +172,16 @@ function ContentTablePage() {
     return (
         <div className="p-8">
             {contextHolder}
+
+            {/* ── Page header ───────────────────────────────────────── */}
             <div className="flex items-center justify-between mb-8 flex-wrap gap-3">
                 <div>
-                    <Title level={2} className="!mb-0 !font-bold">
+                    <Title level={2} className="mb-0! font-bold! text-gray-900!">
                         {schema.name}
                     </Title>
-                    <Text className="!text-muted">
-                        {pagedResult?.total ?? 0} entries · <Tag color="blue">{schema.slug}</Tag>
+                    <Text className="text-muted! text-sm">
+                        {pagedResult?.total ?? 0} {(pagedResult?.total ?? 0) === 1 ? 'entry' : 'entries'} ·{' '}
+                        <Tag color="blue">{schema.slug}</Tag>
                     </Text>
                 </div>
                 <div className="flex items-center gap-3">
@@ -192,11 +194,12 @@ function ContentTablePage() {
                     />
                     <Button
                         type="primary"
+                        size="large"
                         icon={<PlusOutlined />}
                         onClick={() =>
                             navigate({
-                                to: '/websites/$websiteId/schemas/$schemaId/entries/new',
-                                params: { websiteId, schemaId },
+                                to: '/websites/$websiteId/schemas/$schemaId/entries/$entryId',
+                                params: { websiteId, schemaId, entryId: 'new' },
                             })
                         }
                     >
@@ -205,7 +208,8 @@ function ContentTablePage() {
                 </div>
             </div>
 
-            <Card className="rounded-xl border border-surface-border shadow-sm">
+            {/* ── Table card ────────────────────────────────────────── */}
+            <div className="bg-white rounded-xl border border-surface-border shadow-sm p-6">
                 <Table
                     dataSource={pagedResult?.data}
                     columns={columns}
@@ -219,8 +223,8 @@ function ContentTablePage() {
                                     icon={<PlusOutlined />}
                                     onClick={() =>
                                         navigate({
-                                            to: '/websites/$websiteId/schemas/$schemaId/entries/new',
-                                            params: { websiteId, schemaId },
+                                            to: '/websites/$websiteId/schemas/$schemaId/entries/$entryId',
+                                            params: { websiteId, schemaId, entryId: 'new' },
                                         })
                                     }
                                 >
@@ -239,7 +243,7 @@ function ContentTablePage() {
                     }}
                     scroll={{ x: 'max-content' }}
                 />
-            </Card>
+            </div>
         </div>
     );
 }

@@ -21,6 +21,7 @@ import {
     Tooltip,
     Empty,
     Card,
+    type FormInstance,
 } from 'antd';
 import {
     PlusOutlined,
@@ -180,10 +181,10 @@ function SchemasPage() {
             {contextHolder}
             <div className="flex items-center justify-between mb-8">
                 <div>
-                    <Title level={2} className="!mb-0 !font-bold">
+                    <Title level={2} className="mb-0! font-bold!">
                         Content Types
                     </Title>
-                    <Text className="!text-muted">Define the structure for your content</Text>
+                    <Text className="text-muted!">Define the structure for your content</Text>
                 </div>
                 <Button type="primary" icon={<PlusOutlined />} onClick={() => setCreateOpen(true)}>
                     New Schema
@@ -214,18 +215,18 @@ function SchemasPage() {
 
             {/* Create Modal */}
             <SchemaFormModal
-                title="Create Schema"
+                title="Create Content Type"
                 open={createOpen}
                 onClose={() => { setCreateOpen(false); form.resetFields(); }}
                 form={form}
                 showSlug
-                onFinish={(v) => createMutation.mutate(v)}
+                onFinish={(v) => createMutation.mutate({ ...v, slug: v.slug! })}
                 loading={createMutation.isPending}
             />
 
             {/* Edit Modal */}
             <SchemaFormModal
-                title="Edit Schema"
+                title="Edit Content Type"
                 open={!!editSchema}
                 onClose={() => setEditSchema(null)}
                 form={editForm}
@@ -244,7 +245,7 @@ interface SchemaFormModalProps {
     title: string;
     open: boolean;
     onClose: () => void;
-    form: ReturnType<typeof Form.useForm>[0];
+    form: FormInstance<any>;
     showSlug: boolean;
     onFinish: (values: { name: string; slug?: string; definition: SchemaFieldDto[] }) => void;
     loading: boolean;
@@ -264,7 +265,9 @@ function SchemaFormModal({
             title={title}
             open={open}
             onCancel={onClose}
-            footer={null}
+            onOk={() => form.submit()}
+            okText="Save"
+            confirmLoading={loading}
             width={640}
             destroyOnHidden
         >
@@ -344,13 +347,6 @@ function SchemaFormModal({
                         )}
                     </Form.List>
                 </Form.Item>
-
-                <div className="flex justify-end gap-2 mt-2">
-                    <Button onClick={onClose}>Cancel</Button>
-                    <Button type="primary" htmlType="submit" loading={loading}>
-                        Save
-                    </Button>
-                </div>
             </Form>
         </Modal>
     );
