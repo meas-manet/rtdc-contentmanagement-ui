@@ -2,7 +2,6 @@
 import { Form, Input, InputNumber, Switch, DatePicker, Select } from 'antd';
 import { RichTextEditor } from './RichTextEditor';
 import type { SchemaFieldDto } from '../lib/types';
-import dayjs from 'dayjs';
 
 interface SchemaFormProps {
     definition: SchemaFieldDto[];
@@ -25,11 +24,7 @@ export function SchemaForm({ definition, disabled }: SchemaFormProps) {
                     rules={field.required ? [{ required: true }] : []}
                     valuePropName={field.type === 'boolean' ? 'checked' : 'value'}
                     getValueFromEvent={
-                        field.type === 'richtext'
-                            ? (html: string) => html
-                            : field.type === 'date'
-                                ? (d: dayjs.Dayjs | null) => d?.toISOString() ?? ''
-                                : undefined
+                        field.type === 'richtext' ? (html: string) => html : undefined
                     }
                 >
                     {renderInput(field, disabled)}

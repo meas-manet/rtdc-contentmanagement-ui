@@ -1,10 +1,10 @@
 // Authenticated shell layout — guards all child routes
 import { createFileRoute, Outlet, redirect, useNavigate, Link } from '@tanstack/react-router';
-import { Layout, Menu, Button, Avatar, Dropdown, Typography } from 'antd';
+import { Layout, Avatar, Dropdown, Typography } from 'antd';
 import { LogoutOutlined, UserOutlined, TranslationOutlined } from '@ant-design/icons';
 import { useAuth } from '../context/AuthContext';
 
-const { Sider, Content, Header } = Layout;
+const { Content, Header } = Layout;
 const { Text } = Typography;
 
 export const Route = createFileRoute('/_auth')({
@@ -46,7 +46,7 @@ function AuthLayout() {
         <Layout className="min-h-screen">
             <Header className="!bg-[#152e6e] flex items-center justify-between px-6 h-14 shadow-md">
                 <Link to="/websites" className="flex items-center gap-2 no-underline">
-                    <span className="text-lg font-bold text-white tracking-tight">⚡ RTDC CMS</span>
+                    <span className="text-lg font-bold text-white tracking-tight">RTDC Content Management</span>
                 </Link>
                 <Dropdown menu={{ items: userMenu }} placement="bottomRight">
                     <button className="flex items-center gap-2 cursor-pointer bg-transparent border-0 p-0">
