@@ -12,7 +12,7 @@
    text-muted                                         (#64748b)
 ──────────────────────────────────────────────────────────── */
 @theme {
-  --color-primary: #213E9A;
+  --color-primary: #213e9a;
   --color-primary-dark: #152e6e;
   --color-primary-light: #eef1f9;
   --color-app-bg: #f4f6fb;
