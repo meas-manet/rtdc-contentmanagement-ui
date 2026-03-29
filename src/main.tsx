@@ -8,7 +8,15 @@ import './index.css'
 import { routeTree } from './routeTree.gen'
 
 // Create instances
-const queryClient = new QueryClient()
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 30_000,
+      retry: 1,
+      refetchOnWindowFocus: false,
+    },
+  },
+})
 const router = createRouter({ routeTree })
 
 // Register the router instance for strict type safety

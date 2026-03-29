@@ -9,38 +9,174 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as LoginRouteImport } from './routes/login'
+import { Route as AuthRouteImport } from './routes/_auth'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AuthWebsitesRouteImport } from './routes/_auth.websites'
+import { Route as AuthWebsitesIndexRouteImport } from './routes/_auth.websites.index'
+import { Route as AuthWebsitesWebsiteIdRouteImport } from './routes/_auth.websites.$websiteId'
+import { Route as AuthWebsitesWebsiteIdIndexRouteImport } from './routes/_auth.websites.$websiteId.index'
+import { Route as AuthWebsitesWebsiteIdMediaRouteImport } from './routes/_auth.websites.$websiteId.media'
+import { Route as AuthWebsitesWebsiteIdSchemasIndexRouteImport } from './routes/_auth.websites.$websiteId.schemas.index'
+import { Route as AuthWebsitesWebsiteIdSchemasSchemaIdIndexRouteImport } from './routes/_auth.websites.$websiteId.schemas.$schemaId.index'
+import { Route as AuthWebsitesWebsiteIdSchemasSchemaIdEntriesEntryIdRouteImport } from './routes/_auth.websites.$websiteId.schemas.$schemaId.entries.$entryId'
 
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthRoute = AuthRouteImport.update({
+  id: '/_auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthWebsitesRoute = AuthWebsitesRouteImport.update({
+  id: '/websites',
+  path: '/websites',
+  getParentRoute: () => AuthRoute,
+} as any)
+const AuthWebsitesIndexRoute = AuthWebsitesIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AuthWebsitesRoute,
+} as any)
+const AuthWebsitesWebsiteIdRoute = AuthWebsitesWebsiteIdRouteImport.update({
+  id: '/$websiteId',
+  path: '/$websiteId',
+  getParentRoute: () => AuthWebsitesRoute,
+} as any)
+const AuthWebsitesWebsiteIdIndexRoute =
+  AuthWebsitesWebsiteIdIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => AuthWebsitesWebsiteIdRoute,
+  } as any)
+const AuthWebsitesWebsiteIdMediaRoute =
+  AuthWebsitesWebsiteIdMediaRouteImport.update({
+    id: '/media',
+    path: '/media',
+    getParentRoute: () => AuthWebsitesWebsiteIdRoute,
+  } as any)
+const AuthWebsitesWebsiteIdSchemasIndexRoute =
+  AuthWebsitesWebsiteIdSchemasIndexRouteImport.update({
+    id: '/schemas/',
+    path: '/schemas/',
+    getParentRoute: () => AuthWebsitesWebsiteIdRoute,
+  } as any)
+const AuthWebsitesWebsiteIdSchemasSchemaIdIndexRoute =
+  AuthWebsitesWebsiteIdSchemasSchemaIdIndexRouteImport.update({
+    id: '/schemas/$schemaId/',
+    path: '/schemas/$schemaId/',
+    getParentRoute: () => AuthWebsitesWebsiteIdRoute,
+  } as any)
+const AuthWebsitesWebsiteIdSchemasSchemaIdEntriesEntryIdRoute =
+  AuthWebsitesWebsiteIdSchemasSchemaIdEntriesEntryIdRouteImport.update({
+    id: '/schemas/$schemaId/entries/$entryId',
+    path: '/schemas/$schemaId/entries/$entryId',
+    getParentRoute: () => AuthWebsitesWebsiteIdRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/login': typeof LoginRoute
+  '/websites': typeof AuthWebsitesRouteWithChildren
+  '/websites/$websiteId': typeof AuthWebsitesWebsiteIdRouteWithChildren
+  '/websites/': typeof AuthWebsitesIndexRoute
+  '/websites/$websiteId/media': typeof AuthWebsitesWebsiteIdMediaRoute
+  '/websites/$websiteId/': typeof AuthWebsitesWebsiteIdIndexRoute
+  '/websites/$websiteId/schemas/': typeof AuthWebsitesWebsiteIdSchemasIndexRoute
+  '/websites/$websiteId/schemas/$schemaId/': typeof AuthWebsitesWebsiteIdSchemasSchemaIdIndexRoute
+  '/websites/$websiteId/schemas/$schemaId/entries/$entryId': typeof AuthWebsitesWebsiteIdSchemasSchemaIdEntriesEntryIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/login': typeof LoginRoute
+  '/websites': typeof AuthWebsitesIndexRoute
+  '/websites/$websiteId/media': typeof AuthWebsitesWebsiteIdMediaRoute
+  '/websites/$websiteId': typeof AuthWebsitesWebsiteIdIndexRoute
+  '/websites/$websiteId/schemas': typeof AuthWebsitesWebsiteIdSchemasIndexRoute
+  '/websites/$websiteId/schemas/$schemaId': typeof AuthWebsitesWebsiteIdSchemasSchemaIdIndexRoute
+  '/websites/$websiteId/schemas/$schemaId/entries/$entryId': typeof AuthWebsitesWebsiteIdSchemasSchemaIdEntriesEntryIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/_auth': typeof AuthRouteWithChildren
+  '/login': typeof LoginRoute
+  '/_auth/websites': typeof AuthWebsitesRouteWithChildren
+  '/_auth/websites/$websiteId': typeof AuthWebsitesWebsiteIdRouteWithChildren
+  '/_auth/websites/': typeof AuthWebsitesIndexRoute
+  '/_auth/websites/$websiteId/media': typeof AuthWebsitesWebsiteIdMediaRoute
+  '/_auth/websites/$websiteId/': typeof AuthWebsitesWebsiteIdIndexRoute
+  '/_auth/websites/$websiteId/schemas/': typeof AuthWebsitesWebsiteIdSchemasIndexRoute
+  '/_auth/websites/$websiteId/schemas/$schemaId/': typeof AuthWebsitesWebsiteIdSchemasSchemaIdIndexRoute
+  '/_auth/websites/$websiteId/schemas/$schemaId/entries/$entryId': typeof AuthWebsitesWebsiteIdSchemasSchemaIdEntriesEntryIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/login'
+    | '/websites'
+    | '/websites/$websiteId'
+    | '/websites/'
+    | '/websites/$websiteId/media'
+    | '/websites/$websiteId/'
+    | '/websites/$websiteId/schemas/'
+    | '/websites/$websiteId/schemas/$schemaId/'
+    | '/websites/$websiteId/schemas/$schemaId/entries/$entryId'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/login'
+    | '/websites'
+    | '/websites/$websiteId/media'
+    | '/websites/$websiteId'
+    | '/websites/$websiteId/schemas'
+    | '/websites/$websiteId/schemas/$schemaId'
+    | '/websites/$websiteId/schemas/$schemaId/entries/$entryId'
+  id:
+    | '__root__'
+    | '/'
+    | '/_auth'
+    | '/login'
+    | '/_auth/websites'
+    | '/_auth/websites/$websiteId'
+    | '/_auth/websites/'
+    | '/_auth/websites/$websiteId/media'
+    | '/_auth/websites/$websiteId/'
+    | '/_auth/websites/$websiteId/schemas/'
+    | '/_auth/websites/$websiteId/schemas/$schemaId/'
+    | '/_auth/websites/$websiteId/schemas/$schemaId/entries/$entryId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AuthRoute: typeof AuthRouteWithChildren
+  LoginRoute: typeof LoginRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_auth': {
+      id: '/_auth'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -48,11 +184,117 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_auth/websites': {
+      id: '/_auth/websites'
+      path: '/websites'
+      fullPath: '/websites'
+      preLoaderRoute: typeof AuthWebsitesRouteImport
+      parentRoute: typeof AuthRoute
+    }
+    '/_auth/websites/': {
+      id: '/_auth/websites/'
+      path: '/'
+      fullPath: '/websites/'
+      preLoaderRoute: typeof AuthWebsitesIndexRouteImport
+      parentRoute: typeof AuthWebsitesRoute
+    }
+    '/_auth/websites/$websiteId': {
+      id: '/_auth/websites/$websiteId'
+      path: '/$websiteId'
+      fullPath: '/websites/$websiteId'
+      preLoaderRoute: typeof AuthWebsitesWebsiteIdRouteImport
+      parentRoute: typeof AuthWebsitesRoute
+    }
+    '/_auth/websites/$websiteId/': {
+      id: '/_auth/websites/$websiteId/'
+      path: '/'
+      fullPath: '/websites/$websiteId/'
+      preLoaderRoute: typeof AuthWebsitesWebsiteIdIndexRouteImport
+      parentRoute: typeof AuthWebsitesWebsiteIdRoute
+    }
+    '/_auth/websites/$websiteId/media': {
+      id: '/_auth/websites/$websiteId/media'
+      path: '/media'
+      fullPath: '/websites/$websiteId/media'
+      preLoaderRoute: typeof AuthWebsitesWebsiteIdMediaRouteImport
+      parentRoute: typeof AuthWebsitesWebsiteIdRoute
+    }
+    '/_auth/websites/$websiteId/schemas/': {
+      id: '/_auth/websites/$websiteId/schemas/'
+      path: '/schemas'
+      fullPath: '/websites/$websiteId/schemas/'
+      preLoaderRoute: typeof AuthWebsitesWebsiteIdSchemasIndexRouteImport
+      parentRoute: typeof AuthWebsitesWebsiteIdRoute
+    }
+    '/_auth/websites/$websiteId/schemas/$schemaId/': {
+      id: '/_auth/websites/$websiteId/schemas/$schemaId/'
+      path: '/schemas/$schemaId'
+      fullPath: '/websites/$websiteId/schemas/$schemaId/'
+      preLoaderRoute: typeof AuthWebsitesWebsiteIdSchemasSchemaIdIndexRouteImport
+      parentRoute: typeof AuthWebsitesWebsiteIdRoute
+    }
+    '/_auth/websites/$websiteId/schemas/$schemaId/entries/$entryId': {
+      id: '/_auth/websites/$websiteId/schemas/$schemaId/entries/$entryId'
+      path: '/schemas/$schemaId/entries/$entryId'
+      fullPath: '/websites/$websiteId/schemas/$schemaId/entries/$entryId'
+      preLoaderRoute: typeof AuthWebsitesWebsiteIdSchemasSchemaIdEntriesEntryIdRouteImport
+      parentRoute: typeof AuthWebsitesWebsiteIdRoute
+    }
   }
 }
 
+interface AuthWebsitesWebsiteIdRouteChildren {
+  AuthWebsitesWebsiteIdMediaRoute: typeof AuthWebsitesWebsiteIdMediaRoute
+  AuthWebsitesWebsiteIdIndexRoute: typeof AuthWebsitesWebsiteIdIndexRoute
+  AuthWebsitesWebsiteIdSchemasIndexRoute: typeof AuthWebsitesWebsiteIdSchemasIndexRoute
+  AuthWebsitesWebsiteIdSchemasSchemaIdIndexRoute: typeof AuthWebsitesWebsiteIdSchemasSchemaIdIndexRoute
+  AuthWebsitesWebsiteIdSchemasSchemaIdEntriesEntryIdRoute: typeof AuthWebsitesWebsiteIdSchemasSchemaIdEntriesEntryIdRoute
+}
+
+const AuthWebsitesWebsiteIdRouteChildren: AuthWebsitesWebsiteIdRouteChildren = {
+  AuthWebsitesWebsiteIdMediaRoute: AuthWebsitesWebsiteIdMediaRoute,
+  AuthWebsitesWebsiteIdIndexRoute: AuthWebsitesWebsiteIdIndexRoute,
+  AuthWebsitesWebsiteIdSchemasIndexRoute:
+    AuthWebsitesWebsiteIdSchemasIndexRoute,
+  AuthWebsitesWebsiteIdSchemasSchemaIdIndexRoute:
+    AuthWebsitesWebsiteIdSchemasSchemaIdIndexRoute,
+  AuthWebsitesWebsiteIdSchemasSchemaIdEntriesEntryIdRoute:
+    AuthWebsitesWebsiteIdSchemasSchemaIdEntriesEntryIdRoute,
+}
+
+const AuthWebsitesWebsiteIdRouteWithChildren =
+  AuthWebsitesWebsiteIdRoute._addFileChildren(
+    AuthWebsitesWebsiteIdRouteChildren,
+  )
+
+interface AuthWebsitesRouteChildren {
+  AuthWebsitesWebsiteIdRoute: typeof AuthWebsitesWebsiteIdRouteWithChildren
+  AuthWebsitesIndexRoute: typeof AuthWebsitesIndexRoute
+}
+
+const AuthWebsitesRouteChildren: AuthWebsitesRouteChildren = {
+  AuthWebsitesWebsiteIdRoute: AuthWebsitesWebsiteIdRouteWithChildren,
+  AuthWebsitesIndexRoute: AuthWebsitesIndexRoute,
+}
+
+const AuthWebsitesRouteWithChildren = AuthWebsitesRoute._addFileChildren(
+  AuthWebsitesRouteChildren,
+)
+
+interface AuthRouteChildren {
+  AuthWebsitesRoute: typeof AuthWebsitesRouteWithChildren
+}
+
+const AuthRouteChildren: AuthRouteChildren = {
+  AuthWebsitesRoute: AuthWebsitesRouteWithChildren,
+}
+
+const AuthRouteWithChildren = AuthRoute._addFileChildren(AuthRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AuthRoute: AuthRouteWithChildren,
+  LoginRoute: LoginRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

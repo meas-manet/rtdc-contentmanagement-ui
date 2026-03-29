@@ -1,1 +1,32 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap");
 @import "tailwindcss";
+
+* {
+  font-family: "Inter", ui-sans-serif, system-ui, sans-serif;
+}
+
+body {
+  background-color: #f9fafb;
+}
+
+/* Tiptap prose styles */
+.ProseMirror {
+  outline: none;
+}
+.ProseMirror p {
+  margin: 0.4em 0;
+}
+.ProseMirror ul,
+.ProseMirror ol {
+  padding-left: 1.5em;
+}
+.ProseMirror h1,
+.ProseMirror h2 {
+  font-weight: 600;
+  margin: 0.5em 0;
+}
+
+/* Hide default antd input number spinners in table cells */
+.ant-table-cell .ant-input-number {
+  width: 100%;
+}
