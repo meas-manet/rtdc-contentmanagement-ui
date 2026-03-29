@@ -6,7 +6,7 @@ import { AuthProvider } from '../context/AuthContext';
 
 const antdTheme = {
     token: {
-        colorPrimary: '#7c3aed',
+        colorPrimary: '#213E9A',
         borderRadius: 8,
         fontFamily:
             'Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif',

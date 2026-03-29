@@ -26,18 +26,13 @@ import {
     DatabaseOutlined,
 } from '@ant-design/icons';
 import { useState } from 'react';
-import { schemasApi } from '../lib/api';
+import { schemasApi, websitesApi } from '../lib/api';
+import { toLocaleOptions, useLocales } from '../lib/locales';
 import type { ContentEntryResponseDto, SchemaFieldDto } from '../lib/types';
 
 const { Title, Text } = Typography;
 
-const LOCALES = [
-    { label: 'English (en)', value: 'en' },
-    { label: 'Thai (th)', value: 'th' },
-    { label: 'French (fr)', value: 'fr' },
-    { label: 'German (de)', value: 'de' },
-    { label: 'Japanese (ja)', value: 'ja' },
-];
+
 
 export const Route = createFileRoute('/_auth/websites/$websiteId/schemas/$schemaId/')({
     component: ContentTablePage,
@@ -52,6 +47,14 @@ function ContentTablePage() {
     const [messageApi, contextHolder] = message.useMessage();
     const [locale, setLocale] = useState('en');
     const [page, setPage] = useState(1);
+
+    const { data: website } = useQuery({
+        queryKey: ['websites', websiteId],
+        queryFn: () => websitesApi.getById(websiteId),
+    });
+
+    const { data: localeData = [] } = useLocales();
+    const localeOptions = toLocaleOptions(website?.supportedLocales ?? ['en'], localeData);
 
     const { data: schema } = useQuery({
         queryKey: ['schemas', websiteId, schemaId],
@@ -174,18 +177,18 @@ function ContentTablePage() {
             <div className="flex items-center justify-between mb-6 flex-wrap gap-3">
                 <div>
                     <Title level={3} className="!mb-0">
-                        <DatabaseOutlined className="mr-2 text-violet-600" />
+                        <DatabaseOutlined className="mr-2 text-[#213E9A]" />
                         {schema.name}
                     </Title>
                     <Text type="secondary">
-                        {pagedResult?.total ?? 0} entries · <Tag color="purple">{schema.slug}</Tag>
+                        {pagedResult?.total ?? 0} entries · <Tag color="blue">{schema.slug}</Tag>
                     </Text>
                 </div>
                 <div className="flex items-center gap-3">
                     <Select
                         value={locale}
                         onChange={(v) => { setLocale(v); setPage(1); }}
-                        options={LOCALES}
+                        options={localeOptions}
                         size="middle"
                         style={{ width: 160 }}
                     />

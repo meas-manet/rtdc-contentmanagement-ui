@@ -27,19 +27,14 @@ import {
 } from '@ant-design/icons';
 import { useEffect, useState } from 'react';
 import { schemasApi, websitesApi, contentApi } from '../lib/api';
+import { toLocaleOptions, useLocales } from '../lib/locales';
 import { SchemaForm } from '../components/SchemaForm';
 import type { ContentStatus } from '../lib/types';
 import dayjs from 'dayjs';
 
 const { Title, Text } = Typography;
 
-const LOCALES = [
-    { label: '🇬🇧 English', value: 'en' },
-    { label: '🇹🇭 Thai', value: 'th' },
-    { label: '🇫🇷 French', value: 'fr' },
-    { label: '🇩🇪 German', value: 'de' },
-    { label: '🇯🇵 Japanese', value: 'ja' },
-];
+
 
 export const Route = createFileRoute('/_auth/websites/$websiteId/schemas/$schemaId/entries/$entryId')({
     component: EntryEditorPage,
@@ -89,6 +84,9 @@ function EntryEditorPage() {
 
     const existingLocales = Object.keys(localeMap);
     const currentLocaleEntry = localeMap[activeLocale];
+
+    const { data: localeData = [] } = useLocales();
+    const localeOptions = toLocaleOptions(website?.supportedLocales ?? ['en'], localeData);
 
     // Populate form when locale or entry data changes
     useEffect(() => {
@@ -177,8 +175,8 @@ function EntryEditorPage() {
         updateMutation.isPending ||
         createLocalizationMutation.isPending;
 
-    const tabItems = LOCALES.map((loc) => {
-        const exists = existingLocales.includes(loc.value) || (isNew && loc.value === 'en');
+    const tabItems = localeOptions.map((loc) => {
+        const exists = existingLocales.includes(loc.value) || (isNew && loc.value === (website?.defaultLocale ?? 'en'));
         return {
             key: loc.value,
             label: (
@@ -251,7 +249,7 @@ function EntryEditorPage() {
             {!isNew && (
                 <div className="mb-4">
                     <div className="flex items-center gap-2 mb-2">
-                        <TranslationOutlined className="text-violet-600" />
+                        <TranslationOutlined className="text-[#213E9A]" />
                         <Text strong className="text-sm">
                             Translations
                         </Text>
@@ -276,7 +274,7 @@ function EntryEditorPage() {
 
             {/* Form */}
             <Card className="rounded-2xl border border-gray-100 shadow-sm">
-                {entryLoading ? (
+                {!isNew && entryLoading ? (
                     <div className="flex justify-center py-12">
                         <Spin />
                     </div>
@@ -285,9 +283,9 @@ function EntryEditorPage() {
                         <SchemaForm definition={schema.definition} />
 
                         {isNew && (
-                            <Form.Item name="_locale" label="Initial Locale" initialValue="en">
+                            <Form.Item name="_locale" label="Initial Locale" initialValue={website?.defaultLocale ?? 'en'}>
                                 <Select
-                                    options={LOCALES}
+                                    options={localeOptions}
                                     onChange={(v) => setActiveLocale(v)}
                                 />
                             </Form.Item>

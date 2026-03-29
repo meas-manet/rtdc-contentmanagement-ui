@@ -28,7 +28,7 @@ function LoginPage() {
     });
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-violet-950 via-violet-800 to-purple-600 flex items-center justify-center p-4">
+        <div className="min-h-screen bg-gradient-to-br from-[#0a1748] via-[#1a3580] to-[#213E9A] flex items-center justify-center p-4">
             {contextHolder}
             <div className="w-full max-w-sm">
                 <div className="text-center mb-8">
@@ -38,7 +38,7 @@ function LoginPage() {
                     <Title level={3} className="!text-white !mb-1">
                         Content Management
                     </Title>
-                    <Text className="!text-violet-200 text-sm">Sign in to your admin portal</Text>
+                    <Text className="!text-blue-200 text-sm">Sign in to your admin portal</Text>
                 </div>
 
                 <Card className="shadow-2xl border-0 bg-white/95 backdrop-blur">

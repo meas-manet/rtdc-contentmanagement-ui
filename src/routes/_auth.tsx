@@ -1,7 +1,7 @@
 // Authenticated shell layout — guards all child routes
 import { createFileRoute, Outlet, redirect, useNavigate, Link } from '@tanstack/react-router';
 import { Layout, Menu, Button, Avatar, Dropdown, Typography } from 'antd';
-import { LogoutOutlined, UserOutlined, GlobalOutlined } from '@ant-design/icons';
+import { LogoutOutlined, UserOutlined, TranslationOutlined } from '@ant-design/icons';
 import { useAuth } from '../context/AuthContext';
 
 const { Sider, Content, Header } = Layout;
@@ -25,6 +25,15 @@ function AuthLayout() {
 
     const userMenu = [
         {
+            key: 'translations',
+            icon: <TranslationOutlined />,
+            label: 'Manage Locales',
+            onClick: () => navigate({ to: '/translations' }),
+        },
+        {
+            type: 'divider' as const,
+        },
+        {
             key: 'logout',
             icon: <LogoutOutlined />,
             label: 'Sign out',
@@ -35,14 +44,14 @@ function AuthLayout() {
 
     return (
         <Layout className="min-h-screen">
-            <Header className="!bg-violet-900 flex items-center justify-between px-6 h-14 shadow-md">
+            <Header className="!bg-[#152e6e] flex items-center justify-between px-6 h-14 shadow-md">
                 <Link to="/websites" className="flex items-center gap-2 no-underline">
                     <span className="text-lg font-bold text-white tracking-tight">⚡ RTDC CMS</span>
                 </Link>
                 <Dropdown menu={{ items: userMenu }} placement="bottomRight">
                     <button className="flex items-center gap-2 cursor-pointer bg-transparent border-0 p-0">
-                        <Avatar size={32} icon={<UserOutlined />} className="bg-violet-600" />
-                        <Text className="!text-violet-100 text-sm hidden sm:inline">Admin</Text>
+                        <Avatar size={32} icon={<UserOutlined />} className="bg-[#213E9A]" />
+                        <Text className="!text-blue-100 text-sm hidden sm:inline">Admin</Text>
                     </button>
                 </Dropdown>
             </Header>

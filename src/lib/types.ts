@@ -15,17 +15,23 @@ export interface WebsiteResponseDto {
   name: string;
   slug: string;
   apiKey: string;
+  defaultLocale: string;
+  supportedLocales: string[];
   createdAt: string;
 }
 
 export interface CreateWebsiteDto {
   name: string;
   slug: string;
+  defaultLocale?: string;
+  supportedLocales?: string[];
 }
 
 export interface UpdateWebsiteDto {
   name: string;
   slug: string;
+  defaultLocale?: string;
+  supportedLocales?: string[];
 }
 
 // ── Schema ────────────────────────────────────────────────────────────────────
@@ -125,4 +131,41 @@ export interface RelationResponseDto {
   childId: string;
   relationType: RelationType;
   relationName: string;
+}
+
+// ── Translations ────────────────────────────────────────────────────────────────────
+export interface TranslationResponseDto {
+  id: string;
+  locale: string;
+  key: string;
+  value: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CreateTranslationDto {
+  locale: string;
+  key: string;
+  value: string;
+}
+
+export interface UpdateTranslationDto {
+  value: string;
+}
+
+// ── Locales ───────────────────────────────────────────────────────────────────
+export interface LocaleResponseDto {
+  id: string;
+  code: string;
+  label: string;
+  createdAt: string;
+}
+
+export interface CreateLocaleDto {
+  code: string;
+  label: string;
+}
+
+export interface UpdateLocaleDto {
+  label: string;
 }

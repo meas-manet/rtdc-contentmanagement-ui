@@ -108,7 +108,7 @@ function SchemasPage() {
             key: 'name',
             render: (name: string, row: SchemaResponseDto) => (
                 <button
-                    className="font-medium text-violet-700 hover:underline bg-transparent border-0 p-0 cursor-pointer"
+                    className="font-medium text-[#213E9A] hover:underline bg-transparent border-0 p-0 cursor-pointer"
                     onClick={() =>
                         navigate({
                             to: '/websites/$websiteId/schemas/$schemaId',
@@ -124,7 +124,7 @@ function SchemasPage() {
             title: 'Slug',
             dataIndex: 'slug',
             key: 'slug',
-            render: (slug: string) => <Tag color="purple">{slug}</Tag>,
+            render: (slug: string) => <Tag color="blue">{slug}</Tag>,
         },
         {
             title: 'Fields',
@@ -182,7 +182,7 @@ function SchemasPage() {
             <div className="flex items-center justify-between mb-6">
                 <div>
                     <Title level={3} className="!mb-0">
-                        <AppstoreOutlined className="mr-2 text-violet-600" />
+                        <AppstoreOutlined className="mr-2 text-[#213E9A]" />
                         Content Types
                     </Title>
                     <Text type="secondary">Define the structure for your content</Text>

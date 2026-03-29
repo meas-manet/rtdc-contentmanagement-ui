@@ -4,13 +4,11 @@ import {
     Outlet,
     useNavigate,
     useParams,
-    Link,
     useMatchRoute,
 } from '@tanstack/react-router';
 import { useQuery } from '@tanstack/react-query';
 import { Layout, Menu, Spin, Button, Tag, Typography, Tooltip } from 'antd';
 import {
-    AppstoreOutlined,
     DatabaseOutlined,
     PictureOutlined,
     ArrowLeftOutlined,
@@ -92,7 +90,7 @@ function WebsiteLayout() {
                             <Text strong className="block text-sm">
                                 {website.name}
                             </Text>
-                            <Tag color="purple" className="mt-1 text-xs">
+                            <Tag color="blue" className="mt-1 text-xs">
                                 {website.slug}
                             </Tag>
                         </div>

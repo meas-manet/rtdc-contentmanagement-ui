@@ -11,6 +11,7 @@ import {
     Modal,
     Form,
     Input,
+    Select,
     Spin,
     Empty,
     Popconfirm,
@@ -31,6 +32,7 @@ import {
 import { useState } from 'react';
 import { websitesApi } from '../lib/api';
 import type { WebsiteResponseDto } from '../lib/types';
+import { useLocales } from '../lib/locales';
 
 const { Title, Text } = Typography;
 
@@ -53,6 +55,9 @@ function WebsitesPage() {
         queryFn: websitesApi.getAll,
     });
 
+    const { data: localeData = [] } = useLocales();
+    const localeSelectOptions = localeData.map((l) => ({ value: l.code, label: l.label }));
+
     const createMutation = useMutation({
         mutationFn: websitesApi.create,
         onSuccess: () => {
@@ -65,7 +70,7 @@ function WebsitesPage() {
     });
 
     const updateMutation = useMutation({
-        mutationFn: ({ id, dto }: { id: string; dto: { name: string; slug: string } }) =>
+        mutationFn: ({ id, dto }: Parameters<typeof websitesApi.update>) =>
             websitesApi.update(id, dto),
         onSuccess: () => {
             qc.invalidateQueries({ queryKey: ['websites'] });
@@ -107,7 +112,7 @@ function WebsitesPage() {
             <div className="flex items-center justify-between mb-6">
                 <div>
                     <Title level={3} className="!mb-0">
-                        <GlobalOutlined className="mr-2 text-violet-600" />
+                        <GlobalOutlined className="mr-2 text-[#213E9A]" />
                         Websites
                     </Title>
                     <Text type="secondary">Manage your sites and their API keys</Text>
@@ -157,7 +162,12 @@ function WebsitesPage() {
                                         onClick={(e) => {
                                             e.stopPropagation();
                                             setEditSite(site);
-                                            editForm.setFieldsValue({ name: site.name, slug: site.slug });
+                                            editForm.setFieldsValue({
+                                                name: site.name,
+                                                slug: site.slug,
+                                                defaultLocale: site.defaultLocale,
+                                                supportedLocales: site.supportedLocales,
+                                            });
                                         }}
                                     />
                                 </Tooltip>,
@@ -183,13 +193,13 @@ function WebsitesPage() {
                             ]}
                         >
                             <div className="mb-3">
-                                <div className="w-10 h-10 rounded-xl bg-violet-100 flex items-center justify-center mb-3">
-                                    <GlobalOutlined className="text-violet-600 text-lg" />
+                                <div className="w-10 h-10 rounded-xl bg-blue-100 flex items-center justify-center mb-3">
+                                    <GlobalOutlined className="text-[#213E9A] text-lg" />
                                 </div>
                                 <Title level={5} className="!mb-1">
                                     {site.name}
                                 </Title>
-                                <Tag color="purple">{site.slug}</Tag>
+                                <Tag color="blue">{site.slug}</Tag>
                             </div>
 
                             <Divider className="!my-3" />
@@ -251,6 +261,17 @@ function WebsitesPage() {
                     >
                         <Input placeholder="my-awesome-site" />
                     </Form.Item>
+                    <Form.Item
+                        name="supportedLocales"
+                        label="Supported Locales"
+                        initialValue={['en']}
+                        rules={[{ required: true, type: 'array', min: 1, message: 'Select at least one locale' }]}
+                    >
+                        <Select mode="multiple" options={localeSelectOptions} placeholder="Select locales…" />
+                    </Form.Item>
+                    <Form.Item name="defaultLocale" label="Default Locale" initialValue="en">
+                        <Select options={localeSelectOptions} />
+                    </Form.Item>
                     <div className="flex justify-end gap-2">
                         <Button onClick={() => { setCreateOpen(false); form.resetFields(); }}>Cancel</Button>
                         <Button type="primary" htmlType="submit" loading={createMutation.isPending}>
@@ -289,6 +310,16 @@ function WebsitesPage() {
                         ]}
                     >
                         <Input />
+                    </Form.Item>
+                    <Form.Item
+                        name="supportedLocales"
+                        label="Supported Locales"
+                        rules={[{ required: true, type: 'array', min: 1, message: 'Select at least one locale' }]}
+                    >
+                        <Select mode="multiple" options={localeSelectOptions} placeholder="Select locales…" />
+                    </Form.Item>
+                    <Form.Item name="defaultLocale" label="Default Locale">
+                        <Select options={localeSelectOptions} />
                     </Form.Item>
                     <div className="flex justify-end gap-2">
                         <Button onClick={() => setEditSite(null)}>Cancel</Button>

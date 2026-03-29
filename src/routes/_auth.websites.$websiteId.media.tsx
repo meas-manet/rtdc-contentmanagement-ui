@@ -89,7 +89,7 @@ function MediaPage() {
             <div className="flex items-center justify-between mb-6">
                 <div>
                     <Title level={3} className="!mb-0">
-                        <PictureOutlined className="mr-2 text-violet-600" />
+                        <PictureOutlined className="mr-2 text-[#213E9A]" />
                         Media Library
                     </Title>
                     <Text type="secondary">{assets?.length ?? 0} assets</Text>
@@ -97,7 +97,7 @@ function MediaPage() {
             </div>
 
             {/* Upload zone */}
-            <Card className="rounded-2xl border border-dashed border-violet-200 bg-violet-50/30 mb-6">
+            <Card className="rounded-2xl border border-dashed border-blue-200 bg-blue-50/30 mb-6">
                 <Dragger
                     multiple
                     showUploadList={false}
