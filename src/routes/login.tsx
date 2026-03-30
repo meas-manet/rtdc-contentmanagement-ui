@@ -28,17 +28,17 @@ function LoginPage() {
     });
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-[#0a1748] via-primary-dark to-primary flex items-center justify-center p-4">
+        <div className="min-h-screen bg-linear-to-br from-[#0a1748] via-primary-dark to-primary flex items-center justify-center p-4">
             {contextHolder}
             <div className="w-full max-w-sm">
                 <div className="text-center mb-8">
                     <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-white/10 backdrop-blur mb-4">
                         <span className="text-2xl">⚡</span>
                     </div>
-                    <Title level={3} className="!text-white !mb-1 !font-bold">
+                    <Title level={3} className="text-white! mb-1! font-bold!">
                         Content Management
                     </Title>
-                    <Text className="!text-white/60 text-sm">Sign in to your admin portal</Text>
+                    <Text className="text-white/60! text-sm">Sign in to your admin portal</Text>
                 </div>
 
                 <Card className="shadow-2xl border-0 bg-white/95 backdrop-blur rounded-xl">
