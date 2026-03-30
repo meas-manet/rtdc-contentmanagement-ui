@@ -229,7 +229,7 @@ function MediaPage() {
             />
 
             {/* ── Upload zone ───────────────────────────────────────── */}
-            <div className="rounded-xl border border-dashed border-primary/30 bg-primary-light/40 mb-6">
+            <div className="rounded-xl border border-dashed border-primary/30 bg-primary-light/40 mb-6 mt-3">
                 <Dragger
                     multiple
                     showUploadList={false}
