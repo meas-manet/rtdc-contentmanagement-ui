@@ -1,24 +1,22 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
-    Table,
     Button,
-    Modal,
     Form,
     Input,
     Select,
-    Space,
-    Popconfirm,
     Typography,
     message,
     Tag,
-    Tooltip,
     Tabs,
 } from 'antd';
+import { PageHeader } from '../components/PageHeader';
+import { TableCard } from '../components/TableCard';
+import { RowActions } from '../components/RowActions';
+import { ActionModal } from '../components/ActionModal';
+import { CodeBadge } from '../components/CodeBadge';
 import {
     PlusOutlined,
-    EditOutlined,
-    DeleteOutlined,
     TranslationOutlined,
     GlobalOutlined,
 } from '@ant-design/icons';
@@ -31,7 +29,7 @@ import type {
     UpdateLocaleDto,
 } from '../lib/types';
 
-const { Title, Text } = Typography;
+const { Text } = Typography;
 const { Search } = Input;
 
 export const Route = createFileRoute('/_auth/translations')({
@@ -47,29 +45,24 @@ function TranslationsPage() {
 
     return (
         <div className="p-8 max-w-6xl mx-auto">
-            {/* ── Page header ───────────────────────────────────────── */}
-            <div className="flex items-center justify-between mb-8">
-                <div>
-                    <Title level={2} className="mb-0! font-bold! text-gray-900!">
-                        Translations
-                    </Title>
-                    <Text className="text-muted! text-sm">
-                        Manage application languages and translation strings
-                    </Text>
-                </div>
-                <Button
-                    type="primary"
-                    size="large"
-                    icon={<PlusOutlined />}
-                    onClick={() =>
-                        activeTab === 'locales'
-                            ? setCreateLocaleOpen(true)
-                            : setCreateTranslationOpen(true)
-                    }
-                >
-                    {activeTab === 'locales' ? 'Add Language' : 'Add Translation'}
-                </Button>
-            </div>
+            <PageHeader
+                title="Translations"
+                subtitle="Manage application languages and translation strings"
+                actions={
+                    <Button
+                        type="primary"
+                        size="large"
+                        icon={<PlusOutlined />}
+                        onClick={() =>
+                            activeTab === 'locales'
+                                ? setCreateLocaleOpen(true)
+                                : setCreateTranslationOpen(true)
+                        }
+                    >
+                        {activeTab === 'locales' ? 'Add Language' : 'Add Translation'}
+                    </Button>
+                }
+            />
 
             {/* ── Tabs ──────────────────────────────────────────────── */}
             <Tabs
@@ -170,11 +163,7 @@ function LocalesTab({ createOpen, onCreateClose }: LocalesTabProps) {
             dataIndex: 'code',
             key: 'code',
             width: 120,
-            render: (code: string) => (
-                <code className="text-xs bg-primary-light rounded px-2 py-1 text-primary font-mono">
-                    {code}
-                </code>
-            ),
+            render: (code: string) => <CodeBadge>{code}</CodeBadge>,
         },
         {
             title: 'Label',
@@ -193,28 +182,16 @@ function LocalesTab({ createOpen, onCreateClose }: LocalesTabProps) {
             key: 'actions',
             width: 90,
             render: (_: unknown, row: LocaleResponseDto) => (
-                <Space size={4}>
-                    <Tooltip title="Edit label">
-                        <Button
-                            type="text"
-                            size="small"
-                            icon={<EditOutlined />}
-                            onClick={() => {
-                                setEditItem(row);
-                                editForm.setFieldsValue({ label: row.label });
-                            }}
-                        />
-                    </Tooltip>
-                    <Popconfirm
-                        title="Remove this language?"
-                        description="Existing content with this locale code will not be deleted."
-                        onConfirm={() => deleteMutation.mutate(row.id)}
-                        okText="Remove"
-                        okButtonProps={{ danger: true }}
-                    >
-                        <Button type="text" danger size="small" icon={<DeleteOutlined />} />
-                    </Popconfirm>
-                </Space>
+                <RowActions
+                    onEdit={() => {
+                        setEditItem(row);
+                        editForm.setFieldsValue({ label: row.label });
+                    }}
+                    onDelete={() => deleteMutation.mutate(row.id)}
+                    editTooltip="Edit label"
+                    deleteConfirmTitle="Remove this language?"
+                    deleteConfirmDescription="Existing content with this locale code will not be deleted."
+                />
             ),
         },
     ];
@@ -230,32 +207,28 @@ function LocalesTab({ createOpen, onCreateClose }: LocalesTabProps) {
             </div>
 
             {/* Table */}
-            <div className="bg-white rounded-xl border border-surface-border shadow-sm p-6">
-                <Table
-                    dataSource={locales}
-                    columns={columns}
-                    rowKey="id"
-                    loading={isPending}
-                    pagination={false}
-                />
-            </div>
+            <TableCard
+                dataSource={locales}
+                columns={columns}
+                rowKey="id"
+                loading={isPending}
+                pagination={false}
+            />
 
             {/* Create Modal */}
-            <Modal
+            <ActionModal
                 title="Add Language"
                 open={createOpen}
                 onCancel={() => { onCreateClose(); createForm.resetFields(); }}
                 onOk={() => createForm.submit()}
                 okText="Add Language"
                 confirmLoading={createMutation.isPending}
-                destroyOnHidden
                 width={480}
             >
                 <Form
                     form={createForm}
                     layout="vertical"
                     onFinish={(v) => createMutation.mutate(v)}
-                    className="mt-4"
                 >
                     <Form.Item
                         name="code"
@@ -275,17 +248,16 @@ function LocalesTab({ createOpen, onCreateClose }: LocalesTabProps) {
                         <Input placeholder="English" maxLength={100} />
                     </Form.Item>
                 </Form>
-            </Modal>
+            </ActionModal>
 
             {/* Edit Modal */}
-            <Modal
+            <ActionModal
                 title={editItem ? `Edit: ${editItem.code}` : 'Edit Language'}
                 open={!!editItem}
                 onCancel={() => setEditItem(null)}
                 onOk={() => editForm.submit()}
                 okText="Save Changes"
                 confirmLoading={updateMutation.isPending}
-                destroyOnHidden
                 width={480}
             >
                 <Form
@@ -295,13 +267,12 @@ function LocalesTab({ createOpen, onCreateClose }: LocalesTabProps) {
                         if (!editItem) return;
                         updateMutation.mutate({ id: editItem.id, dto: v });
                     }}
-                    className="mt-4"
                 >
                     <Form.Item name="label" label="Display Name" rules={[{ required: true }]}>
                         <Input maxLength={100} />
                     </Form.Item>
                 </Form>
-            </Modal>
+            </ActionModal>
         </>
     );
 }
@@ -337,10 +308,10 @@ function TranslationsTab({ createOpen, onCreateClose }: TranslationsTabProps) {
 
     const filtered = search
         ? translations.filter(
-              (t) =>
-                  t.key.toLowerCase().includes(search.toLowerCase()) ||
-                  t.value.toLowerCase().includes(search.toLowerCase()),
-          )
+            (t) =>
+                t.key.toLowerCase().includes(search.toLowerCase()) ||
+                t.value.toLowerCase().includes(search.toLowerCase()),
+        )
         : translations;
 
     const createMutation = useMutation({
@@ -380,11 +351,7 @@ function TranslationsTab({ createOpen, onCreateClose }: TranslationsTabProps) {
             title: 'Key',
             dataIndex: 'key',
             key: 'key',
-            render: (key: string) => (
-                <code className="text-xs bg-primary-light rounded px-2 py-1 text-primary font-mono">
-                    {key}
-                </code>
-            ),
+            render: (key: string) => <CodeBadge>{key}</CodeBadge>,
         },
         {
             title: 'Locale',
@@ -411,27 +378,15 @@ function TranslationsTab({ createOpen, onCreateClose }: TranslationsTabProps) {
             key: 'actions',
             width: 90,
             render: (_: unknown, row: TranslationResponseDto) => (
-                <Space size={4}>
-                    <Tooltip title="Edit value">
-                        <Button
-                            type="text"
-                            size="small"
-                            icon={<EditOutlined />}
-                            onClick={() => {
-                                setEditItem(row);
-                                editForm.setFieldsValue({ value: row.value });
-                            }}
-                        />
-                    </Tooltip>
-                    <Popconfirm
-                        title="Delete this translation?"
-                        onConfirm={() => deleteMutation.mutate(row.id)}
-                        okText="Delete"
-                        okButtonProps={{ danger: true }}
-                    >
-                        <Button type="text" danger size="small" icon={<DeleteOutlined />} />
-                    </Popconfirm>
-                </Space>
+                <RowActions
+                    onEdit={() => {
+                        setEditItem(row);
+                        editForm.setFieldsValue({ value: row.value });
+                    }}
+                    onDelete={() => deleteMutation.mutate(row.id)}
+                    editTooltip="Edit value"
+                    deleteConfirmTitle="Delete this translation?"
+                />
             ),
         },
     ];
@@ -462,33 +417,29 @@ function TranslationsTab({ createOpen, onCreateClose }: TranslationsTabProps) {
             </div>
 
             {/* Table */}
-            <div className="bg-white rounded-xl border border-surface-border shadow-sm p-6">
-                <Table
-                    dataSource={filtered}
-                    columns={columns}
-                    rowKey="id"
-                    loading={isPending}
-                    pagination={{ pageSize: 25, showSizeChanger: false }}
-                    scroll={{ x: 'max-content' }}
-                />
-            </div>
+            <TableCard
+                dataSource={filtered}
+                columns={columns}
+                rowKey="id"
+                loading={isPending}
+                pagination={{ pageSize: 25, showSizeChanger: false }}
+                scroll={{ x: 'max-content' }}
+            />
 
             {/* Create Modal */}
-            <Modal
+            <ActionModal
                 title="Add New Translation"
                 open={createOpen}
                 onCancel={() => { onCreateClose(); createForm.resetFields(); }}
                 onOk={() => createForm.submit()}
                 okText="Create Translation"
                 confirmLoading={createMutation.isPending}
-                destroyOnHidden
                 width={520}
             >
                 <Form
                     form={createForm}
                     layout="vertical"
                     onFinish={(v) => createMutation.mutate(v)}
-                    className="mt-4"
                 >
                     <Form.Item name="locale" label="Language" rules={[{ required: true }]}>
                         <Select options={localeSelectOptions} placeholder="Select language" />
@@ -511,17 +462,16 @@ function TranslationsTab({ createOpen, onCreateClose }: TranslationsTabProps) {
                         <Input.TextArea rows={4} placeholder="Home" />
                     </Form.Item>
                 </Form>
-            </Modal>
+            </ActionModal>
 
             {/* Edit Modal */}
-            <Modal
+            <ActionModal
                 title={editItem ? `Edit: ${editItem.key} (${editItem.locale})` : 'Edit Translation'}
                 open={!!editItem}
                 onCancel={() => setEditItem(null)}
                 onOk={() => editForm.submit()}
                 okText="Save Changes"
                 confirmLoading={updateMutation.isPending}
-                destroyOnHidden
                 width={520}
             >
                 <Form
@@ -531,13 +481,12 @@ function TranslationsTab({ createOpen, onCreateClose }: TranslationsTabProps) {
                         if (!editItem) return;
                         updateMutation.mutate({ id: editItem.id, dto: v });
                     }}
-                    className="mt-4"
                 >
                     <Form.Item name="value" label="Value" rules={[{ required: true }]}>
                         <Input.TextArea rows={4} />
                     </Form.Item>
                 </Form>
-            </Modal>
+            </ActionModal>
         </>
     );
 }

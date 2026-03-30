@@ -6,7 +6,6 @@ import {
     useQueryClient,
 } from '@tanstack/react-query';
 import {
-    Table,
     Button,
     Tag,
     Space,
@@ -18,6 +17,10 @@ import {
     Empty,
     Tooltip,
 } from 'antd';
+import { PageHeader } from '../../../components/PageHeader';
+import { TableCard } from '../../../components/TableCard';
+import { RowActions } from '../../../components/RowActions';
+import { LoadingScreen } from '../../../components/LoadingScreen';
 import {
     PlusOutlined,
     EditOutlined,
@@ -28,7 +31,7 @@ import { schemasApi, websitesApi } from '../lib/api';
 import { toLocaleOptions, useLocales } from '../lib/locales';
 import type { ContentEntryResponseDto, SchemaFieldDto } from '../lib/types';
 
-const { Title, Text } = Typography;
+const { Text } = Typography;
 
 
 
@@ -134,39 +137,22 @@ function ContentTablePage() {
             key: 'actions',
             width: 80,
             render: (_: unknown, row: ContentEntryResponseDto) => (
-                <Space size={4}>
-                    <Tooltip title="Edit">
-                        <Button
-                            type="text"
-                            size="small"
-                            icon={<EditOutlined />}
-                            onClick={() =>
-                                navigate({
-                                    to: '/websites/$websiteId/schemas/$schemaId/entries/$entryId',
-                                    params: { websiteId, schemaId, entryId: row.id },
-                                })
-                            }
-                        />
-                    </Tooltip>
-                    <Popconfirm
-                        title="Delete entry?"
-                        onConfirm={() => deleteMutation.mutate(row.id)}
-                        okText="Delete"
-                        okButtonProps={{ danger: true }}
-                    >
-                        <Button type="text" danger size="small" icon={<DeleteOutlined />} />
-                    </Popconfirm>
-                </Space>
+                <RowActions
+                    onEdit={() =>
+                        navigate({
+                            to: '/websites/$websiteId/schemas/$schemaId/entries/$entryId',
+                            params: { websiteId, schemaId, entryId: row.id },
+                        })
+                    }
+                    onDelete={() => deleteMutation.mutate(row.id)}
+                    deleteConfirmTitle="Delete entry?"
+                />
             ),
         },
     ];
 
     if (!schema) {
-        return (
-            <div className="flex items-center justify-center h-64">
-                <Spin size="large" />
-            </div>
-        );
+        return <LoadingScreen />;
     }
 
     return (
@@ -174,76 +160,75 @@ function ContentTablePage() {
             {contextHolder}
 
             {/* ── Page header ───────────────────────────────────────── */}
-            <div className="flex items-center justify-between mb-8 flex-wrap gap-3">
-                <div>
-                    <Title level={2} className="mb-0! font-bold! text-gray-900!">
-                        {schema.name}
-                    </Title>
-                    <Text className="text-muted! text-sm">
-                        {pagedResult?.total ?? 0} {(pagedResult?.total ?? 0) === 1 ? 'entry' : 'entries'} ·{' '}
+            <PageHeader
+                title={schema.name}
+                subtitle={
+                    <>
+                        {pagedResult?.total ?? 0}{' '}
+                        {(pagedResult?.total ?? 0) === 1 ? 'entry' : 'entries'} ·{' '}
                         <Tag color="blue">{schema.slug}</Tag>
-                    </Text>
-                </div>
-                <div className="flex items-center gap-3">
-                    <Select
-                        value={locale}
-                        onChange={(v) => { setLocale(v); setPage(1); }}
-                        options={localeOptions}
-                        size="middle"
-                        style={{ width: 160 }}
-                    />
-                    <Button
-                        type="primary"
-                        size="large"
-                        icon={<PlusOutlined />}
-                        onClick={() =>
-                            navigate({
-                                to: '/websites/$websiteId/schemas/$schemaId/entries/$entryId',
-                                params: { websiteId, schemaId, entryId: 'new' },
-                            })
-                        }
-                    >
-                        New Entry
-                    </Button>
-                </div>
-            </div>
+                    </>
+                }
+                actions={
+                    <>
+                        <Select
+                            value={locale}
+                            onChange={(v) => { setLocale(v); setPage(1); }}
+                            options={localeOptions}
+                            size="middle"
+                            style={{ width: 160 }}
+                        />
+                        <Button
+                            type="primary"
+                            size="large"
+                            icon={<PlusOutlined />}
+                            onClick={() =>
+                                navigate({
+                                    to: '/websites/$websiteId/schemas/$schemaId/entries/$entryId',
+                                    params: { websiteId, schemaId, entryId: 'new' },
+                                })
+                            }
+                        >
+                            New Entry
+                        </Button>
+                    </>
+                }
+            />
 
             {/* ── Table card ────────────────────────────────────────── */}
-            <div className="bg-white rounded-xl border border-surface-border shadow-sm p-6">
-                <Table
-                    dataSource={pagedResult?.data}
-                    columns={columns}
-                    rowKey="id"
-                    loading={isPending}
-                    locale={{
-                        emptyText: (
-                            <Empty description="No entries yet" image={Empty.PRESENTED_IMAGE_SIMPLE}>
-                                <Button
-                                    type="primary"
-                                    icon={<PlusOutlined />}
-                                    onClick={() =>
-                                        navigate({
-                                            to: '/websites/$websiteId/schemas/$schemaId/entries/$entryId',
-                                            params: { websiteId, schemaId, entryId: 'new' },
-                                        })
-                                    }
-                                >
-                                    Create first entry
-                                </Button>
-                            </Empty>
-                        ),
-                    }}
-                    pagination={{
-                        current: page,
-                        pageSize: 20,
-                        total: pagedResult?.total ?? 0,
-                        onChange: setPage,
-                        showSizeChanger: false,
-                        showTotal: (t) => `${t} total`,
-                    }}
-                    scroll={{ x: 'max-content' }}
-                />
-            </div>
+            <TableCard
+                dataSource={pagedResult?.data}
+                columns={columns}
+                rowKey="id"
+                loading={isPending}
+                locale={{
+                    emptyText: (
+                        <Empty description="No entries yet" image={Empty.PRESENTED_IMAGE_SIMPLE}>
+                            <Button
+                                type="primary"
+                                icon={<PlusOutlined />}
+                                onClick={() =>
+                                    navigate({
+                                        to: '/websites/$websiteId/schemas/$schemaId/entries/$entryId',
+                                        params: { websiteId, schemaId, entryId: 'new' },
+                                    })
+                                }
+                            >
+                                Create first entry
+                            </Button>
+                        </Empty>
+                    ),
+                }}
+                pagination={{
+                    current: page,
+                    pageSize: 20,
+                    total: pagedResult?.total ?? 0,
+                    onChange: setPage,
+                    showSizeChanger: false,
+                    showTotal: (t) => `${t} total`,
+                }}
+                scroll={{ x: 'max-content' }}
+            />
         </div>
     );
 }

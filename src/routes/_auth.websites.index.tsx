@@ -7,18 +7,18 @@ import {
 } from '@tanstack/react-query';
 import {
     Button,
-    Modal,
     Form,
     Input,
     Select,
-    Spin,
     Popconfirm,
     Tag,
     Tooltip,
     message,
-    Typography,
     Empty,
 } from 'antd';
+import { PageHeader } from '../components/PageHeader';
+import { ActionModal } from '../components/ActionModal';
+import { LoadingScreen } from '../components/LoadingScreen';
 import {
     PlusOutlined,
     EditOutlined,
@@ -33,7 +33,6 @@ import { websitesApi } from '../lib/api';
 import type { WebsiteResponseDto } from '../lib/types';
 import { useLocales } from '../lib/locales';
 
-const { Title, Text } = Typography;
 
 export const Route = createFileRoute('/_auth/websites/')({
     component: WebsitesPage,
@@ -101,31 +100,24 @@ function WebsitesPage() {
         <div className="p-8 max-w-7xl mx-auto">
             {contextHolder}
 
-            {/* ── Page header ───────────────────────────────────────── */}
-            <div className="flex items-center justify-between mb-8">
-                <div>
-                    <Title level={2} className="mb-0! font-bold! text-gray-900!">
-                        Websites
-                    </Title>
-                    <Text className="text-muted! text-sm">
-                        Manage your sites and their API keys
-                    </Text>
-                </div>
-                <Button
-                    type="primary"
-                    icon={<PlusOutlined />}
-                    size="large"
-                    onClick={() => setCreateOpen(true)}
-                >
-                    New Website
-                </Button>
-            </div>
+            <PageHeader
+                title="Websites"
+                subtitle="Manage your sites and their API keys"
+                actions={
+                    <Button
+                        type="primary"
+                        icon={<PlusOutlined />}
+                        size="large"
+                        onClick={() => setCreateOpen(true)}
+                    >
+                        New Website
+                    </Button>
+                }
+            />
 
             {/* ── Content ───────────────────────────────────────────── */}
             {isPending ? (
-                <div className="flex items-center justify-center h-64">
-                    <Spin size="large" />
-                </div>
+                <LoadingScreen />
             ) : !websites?.length ? (
                 <div className="bg-white rounded-xl border border-surface-border shadow-sm p-16">
                     <Empty
@@ -179,24 +171,19 @@ function WebsitesPage() {
             )}
 
             {/* ── Create Modal ──────────────────────────────────────── */}
-            <Modal
+            <ActionModal
                 title="Create New Website"
                 open={createOpen}
-                onCancel={() => {
-                    setCreateOpen(false);
-                    form.resetFields();
-                }}
+                onCancel={() => { setCreateOpen(false); form.resetFields(); }}
                 onOk={() => form.submit()}
                 okText="Create Website"
                 confirmLoading={createMutation.isPending}
-                destroyOnHidden
                 width={520}
             >
                 <Form
                     form={form}
                     layout="vertical"
                     onFinish={(v) => createMutation.mutate(v)}
-                    className="mt-4"
                 >
                     <Form.Item
                         name="name"
@@ -237,17 +224,16 @@ function WebsitesPage() {
                         <Select options={localeSelectOptions} />
                     </Form.Item>
                 </Form>
-            </Modal>
+            </ActionModal>
 
             {/* ── Edit Modal ────────────────────────────────────────── */}
-            <Modal
+            <ActionModal
                 title="Edit Website"
                 open={!!editSite}
                 onCancel={() => setEditSite(null)}
                 onOk={() => editForm.submit()}
                 okText="Save Changes"
                 confirmLoading={updateMutation.isPending}
-                destroyOnHidden
                 width={520}
             >
                 <Form
@@ -257,7 +243,6 @@ function WebsitesPage() {
                         if (!editSite) return;
                         updateMutation.mutate({ id: editSite.id, dto: v });
                     }}
-                    className="mt-4"
                 >
                     <Form.Item name="name" label="Site Name" rules={[{ required: true }]}>
                         <Input />
@@ -290,7 +275,7 @@ function WebsitesPage() {
                         <Select options={localeSelectOptions} />
                     </Form.Item>
                 </Form>
-            </Modal>
+            </ActionModal>
         </div>
     );
 }
