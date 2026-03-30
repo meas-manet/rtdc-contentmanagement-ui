@@ -8,23 +8,17 @@ import {
 import {
     Button,
     Tag,
-    Space,
-    Popconfirm,
-    Spin,
     Typography,
     message,
     Select,
     Empty,
-    Tooltip,
 } from 'antd';
-import { PageHeader } from '../../../components/PageHeader';
-import { TableCard } from '../../../components/TableCard';
-import { RowActions } from '../../../components/RowActions';
-import { LoadingScreen } from '../../../components/LoadingScreen';
+import { PageHeader } from '../components/PageHeader';
+import { TableCard } from '../components/TableCard';
+import { RowActions } from '../components/RowActions';
+import { LoadingScreen } from '../components/LoadingScreen';
 import {
     PlusOutlined,
-    EditOutlined,
-    DeleteOutlined,
 } from '@ant-design/icons';
 import { useState } from 'react';
 import { schemasApi, websitesApi } from '../lib/api';

@@ -35,12 +35,9 @@ export function AppNavbar() {
     return (
         <header className="bg-primary-dark! flex items-center justify-between px-8 h-16 border-b border-white/10">
             <Link to="/websites" className="flex items-center gap-2.5 no-underline">
-                <div className="w-7 h-7 rounded-lg bg-white/15 flex items-center justify-center text-white text-sm font-bold">
-                    R
+                <div className="w-14 h-7 rounded-lg bg-white/15 flex items-center justify-center text-white text-sm font-bold">
+                    RTDC
                 </div>
-                <span className="text-base font-semibold text-white tracking-tight">
-                    RTDC Content
-                </span>
             </Link>
 
             <Dropdown menu={{ items: userMenu }} placement="bottomRight">
