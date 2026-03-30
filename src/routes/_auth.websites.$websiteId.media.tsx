@@ -136,9 +136,10 @@ function MediaPage() {
     });
 
     const uploadMutation = useMutation({
-        mutationFn: (file: File) => mediaApi.upload(websiteId, file, currentFolderId),
-        onSuccess: () => {
-            qc.invalidateQueries({ queryKey: ['media', websiteId, currentFolderId] });
+        mutationFn: ({ file, folderId }: { file: File; folderId: string | null }) =>
+            mediaApi.upload(websiteId, file, folderId),
+        onSuccess: (_, { folderId }) => {
+            qc.invalidateQueries({ queryKey: ['media', websiteId, folderId] });
             qc.invalidateQueries({ queryKey: ['media-folders', websiteId] });
             messageApi.success('File uploaded!');
         },
@@ -169,7 +170,7 @@ function MediaPage() {
 
     // ── Handlers ───────────────────────────────────────────────────────────
     const handleUpload = (file: File) => {
-        uploadMutation.mutate(file);
+        uploadMutation.mutate({ file, folderId: currentFolderId });
         return false;
     };
 
