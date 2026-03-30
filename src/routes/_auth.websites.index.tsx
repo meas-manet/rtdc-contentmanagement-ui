@@ -334,7 +334,7 @@ function SiteCard({
             <h3 className="text-sm font-semibold text-gray-900 mb-2 leading-snug">
                 {site.name}
             </h3>
-            <Tag color="blue" className="mb-4 text-xs">
+            <Tag color="blue" className="mb-3! text-xs">
                 {site.slug}
             </Tag>
 
