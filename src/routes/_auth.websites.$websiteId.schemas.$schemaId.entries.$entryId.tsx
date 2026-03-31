@@ -11,12 +11,10 @@ import {
     Select,
     Tabs,
     Spin,
-    message,
     Typography,
     Space,
     Tag,
     Alert,
-    Popconfirm,
 } from 'antd';
 import {
     SaveOutlined,
@@ -31,6 +29,8 @@ import { contentApi } from '../features/entries/api';
 import { toLocaleOptions, useLocales } from '../core/locales';
 import { SchemaForm } from '../shared/components/SchemaForm';
 import type { ContentStatus } from '../features/entries/types';
+import { useAppToast } from '../shared/hooks/useAppToast';
+import { useDeleteConfirm } from '../shared/hooks/useDeleteConfirm';
 import dayjs from 'dayjs';
 
 const { Title, Text } = Typography;
@@ -48,7 +48,8 @@ function EntryEditorPage() {
     const isNew = entryId === 'new';
     const navigate = useNavigate();
     const qc = useQueryClient();
-    const [messageApi, contextHolder] = message.useMessage();
+    const toast = useAppToast();
+    const deleteConfirm = useDeleteConfirm();
     const [activeLocale, setActiveLocale] = useState('en');
     const [form] = Form.useForm();
 
@@ -104,13 +105,13 @@ function EntryEditorPage() {
             contentApi.create(website!.slug, schema!.slug, { ...values, locale: activeLocale }, website!.apiKey),
         onSuccess: (created) => {
             qc.invalidateQueries({ queryKey: ['content', websiteId, schemaId] });
-            messageApi.success('Entry created!');
+            toast.success('Entry created!');
             navigate({
                 to: '/websites/$websiteId/schemas/$schemaId/entries/$entryId',
                 params: { websiteId, schemaId, entryId: created.id },
             });
         },
-        onError: () => messageApi.error('Failed to create entry.'),
+        onError: () => toast.error('Failed to create entry.'),
     });
 
     const updateMutation = useMutation({
@@ -126,9 +127,9 @@ function EntryEditorPage() {
             qc.invalidateQueries({ queryKey: ['content', websiteId, schemaId] });
             qc.invalidateQueries({ queryKey: ['entry', entryId] });
             qc.invalidateQueries({ queryKey: ['localizations', entryId] });
-            messageApi.success('Entry saved!');
+            toast.success('Entry saved!');
         },
-        onError: () => messageApi.error('Failed to save entry.'),
+        onError: () => toast.error('Failed to save entry.'),
     });
 
     // ── Status-only mutation (unpublish / re-draft) ──────────────────────────
@@ -148,11 +149,11 @@ function EntryEditorPage() {
             qc.invalidateQueries({ queryKey: ['localizations', entryId] });
             qc.invalidateQueries({ queryKey: ['content', websiteId, schemaId] });
             const label = status === 'draft' ? 'reverted to draft' : 'published';
-            messageApi.success(`Entry ${label} successfully.`);
+            toast.success(`Entry ${label} successfully.`);
         },
         onError: (_err, status) => {
             const label = status === 'draft' ? 'unpublish' : 'publish';
-            messageApi.error(`Failed to ${label} entry.`);
+            toast.error(`Failed to ${label} entry.`);
         },
     });
 
@@ -167,9 +168,9 @@ function EntryEditorPage() {
             ),
         onSuccess: () => {
             qc.invalidateQueries({ queryKey: ['localizations', entryId] });
-            messageApi.success(`Translation for "${activeLocale}" created!`);
+            toast.success(`Translation for "${activeLocale}" created!`);
         },
-        onError: () => messageApi.error('Failed to create localization.'),
+        onError: () => toast.error('Failed to create localization.'),
     });
 
     const handleSave = async (status: ContentStatus = 'draft') => {
@@ -223,7 +224,6 @@ function EntryEditorPage() {
 
     return (
         <div className="min-h-screen bg-app-bg pb-12">
-            {contextHolder}
 
             {/* ── Sticky Header ───────────────────────────────────── */}
             <div className="sticky top-0 z-20 backdrop-blur-md bg-white/80 border-b border-surface-border shadow-sm px-8 py-4 mb-8 flex items-center justify-between transition-all duration-300">
@@ -258,26 +258,23 @@ function EntryEditorPage() {
                 <Space className="hidden md:flex" wrap>
                     {/* Unpublish — only visible when the entry is live */}
                     {isPublished && (
-                        <Popconfirm
-                            title="Revert to draft?"
-                            description="This entry will no longer be visible on the live site."
-                            okText="Yes, unpublish"
-                            cancelText="Cancel"
-                            okButtonProps={{ danger: true }}
-                            onConfirm={() => statusMutation.mutate('draft')}
-                            placement="bottomRight"
+                        <Button
+                            onClick={() =>
+                                deleteConfirm({
+                                    title: 'Revert to draft?',
+                                    description: 'This entry will no longer be visible on the live site.',
+                                    onConfirm: () => statusMutation.mutateAsync('draft'),
+                                })
+                            }
+                            size="large"
+                            icon={<EyeInvisibleOutlined />}
+                            loading={isUnpublishing}
+                            disabled={isSaving}
+                            danger
+                            className="font-semibold"
                         >
-                            <Button
-                                size="large"
-                                icon={<EyeInvisibleOutlined />}
-                                loading={isUnpublishing}
-                                disabled={isSaving}
-                                danger
-                                className="font-semibold"
-                            >
-                                Unpublish
-                            </Button>
-                        </Popconfirm>
+                            Unpublish
+                        </Button>
                     )}
 
                     <Button
@@ -430,26 +427,23 @@ function EntryEditorPage() {
                                 )}
 
                                 {isPublished && (
-                                    <Popconfirm
-                                        title="Revert to draft?"
-                                        description="This entry will no longer be visible on the live site."
-                                        okText="Yes, unpublish"
-                                        cancelText="Cancel"
-                                        okButtonProps={{ danger: true }}
-                                        onConfirm={() => statusMutation.mutate('draft')}
-                                        placement="top"
+                                    <Button
+                                        onClick={() =>
+                                            deleteConfirm({
+                                                title: 'Revert to draft?',
+                                                description: 'This entry will no longer be visible on the live site.',
+                                                onConfirm: () => statusMutation.mutateAsync('draft'),
+                                            })
+                                        }
+                                        size="large"
+                                        icon={<EyeInvisibleOutlined />}
+                                        loading={isUnpublishing}
+                                        disabled={isSaving}
+                                        danger
+                                        block
                                     >
-                                        <Button
-                                            size="large"
-                                            icon={<EyeInvisibleOutlined />}
-                                            loading={isUnpublishing}
-                                            disabled={isSaving}
-                                            danger
-                                            block
-                                        >
-                                            Unpublish
-                                        </Button>
-                                    </Popconfirm>
+                                        Unpublish
+                                    </Button>
                                 )}
                             </div>
                         </div>

@@ -3,16 +3,14 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
     Upload,
     Button,
-    Popconfirm,
+    Input,
+    Dropdown,
     Typography,
     Empty,
-    message,
     Image,
     Tooltip,
     Breadcrumb,
     Modal,
-    Input,
-    Dropdown,
 } from 'antd';
 import type { MenuProps } from 'antd';
 import {
@@ -29,6 +27,8 @@ import {
 } from '@ant-design/icons';
 import { mediaApi } from '../features/media/api';
 import type { MediaAssetResponseDto, MediaFolderResponseDto } from '../features/media/types';
+import { useAppToast } from '../shared/hooks/useAppToast';
+import { useDeleteConfirm } from '../shared/hooks/useDeleteConfirm';
 import { useState } from 'react';
 
 const { Title, Text } = Typography;
@@ -57,7 +57,8 @@ interface BreadcrumbEntry {
 function MediaPage() {
     const { websiteId } = useParams({ from: '/_auth/websites/$websiteId/media' });
     const qc = useQueryClient();
-    const [messageApi, contextHolder] = message.useMessage();
+    const toast = useAppToast();
+    const deleteConfirm = useDeleteConfirm();
 
     // Current folder navigation state
     const [breadcrumb, setBreadcrumb] = useState<BreadcrumbEntry[]>([
@@ -100,12 +101,12 @@ function MediaPage() {
             mediaApi.createFolder(websiteId, { name, parentFolderId: currentFolderId }),
         onSuccess: () => {
             qc.invalidateQueries({ queryKey: ['media-folders', websiteId] });
-            messageApi.success('Folder created!');
+            toast.success('Folder created!');
             setCreateFolderOpen(false);
             setNewFolderName('');
         },
         onError: (err: { response?: { data?: { error?: string } } }) => {
-            messageApi.error(err?.response?.data?.error ?? 'Failed to create folder.');
+            toast.error(err?.response?.data?.error ?? 'Failed to create folder.');
         },
     });
 
@@ -114,12 +115,12 @@ function MediaPage() {
             mediaApi.renameFolder(websiteId, id, { name }),
         onSuccess: () => {
             qc.invalidateQueries({ queryKey: ['media-folders', websiteId] });
-            messageApi.success('Folder renamed.');
+            toast.success('Folder renamed.');
             setRenameFolderTarget(null);
             setRenameFolderName('');
         },
         onError: (err: { response?: { data?: { error?: string } } }) => {
-            messageApi.error(err?.response?.data?.error ?? 'Failed to rename folder.');
+            toast.error(err?.response?.data?.error ?? 'Failed to rename folder.');
         },
     });
 
@@ -128,10 +129,10 @@ function MediaPage() {
         onSuccess: () => {
             qc.invalidateQueries({ queryKey: ['media-folders', websiteId] });
             qc.invalidateQueries({ queryKey: ['media', websiteId] });
-            messageApi.success('Folder deleted.');
+            toast.success('Folder deleted.');
         },
         onError: (err: { response?: { data?: { error?: string } } }) => {
-            messageApi.error(err?.response?.data?.error ?? 'Failed to delete folder.');
+            toast.error(err?.response?.data?.error ?? 'Failed to delete folder.');
         },
     });
 
@@ -141,9 +142,9 @@ function MediaPage() {
         onSuccess: (_, { folderId }) => {
             qc.invalidateQueries({ queryKey: ['media', websiteId, folderId] });
             qc.invalidateQueries({ queryKey: ['media-folders', websiteId] });
-            messageApi.success('File uploaded!');
+            toast.success('File uploaded!');
         },
-        onError: () => messageApi.error('Upload failed.'),
+        onError: () => toast.error('Upload failed.'),
     });
 
     const deleteMutation = useMutation({
@@ -151,9 +152,9 @@ function MediaPage() {
         onSuccess: () => {
             qc.invalidateQueries({ queryKey: ['media', websiteId] });
             qc.invalidateQueries({ queryKey: ['media-folders', websiteId] });
-            messageApi.success('Asset deleted.');
+            toast.success('Asset deleted.');
         },
-        onError: () => messageApi.error('Failed to delete asset.'),
+        onError: () => toast.error('Failed to delete asset.'),
     });
 
     const moveAssetMutation = useMutation({
@@ -162,10 +163,10 @@ function MediaPage() {
         onSuccess: () => {
             qc.invalidateQueries({ queryKey: ['media', websiteId] });
             qc.invalidateQueries({ queryKey: ['media-folders', websiteId] });
-            messageApi.success('Asset moved.');
+            toast.success('Asset moved.');
             setMoveAssetTarget(null);
         },
-        onError: () => messageApi.error('Failed to move asset.'),
+        onError: () => toast.error('Failed to move asset.'),
     });
 
     // ── Handlers ───────────────────────────────────────────────────────────
@@ -186,7 +187,6 @@ function MediaPage() {
 
     return (
         <div className="p-8">
-            {contextHolder}
 
             {/* ── Page header ────────────────────────────────────────── */}
             <div className="flex items-center justify-between mb-4">
@@ -272,17 +272,28 @@ function MediaPage() {
                                 setRenameFolderTarget(folder);
                                 setRenameFolderName(folder.name);
                             }}
-                            onDelete={() => deleteFolderMutation.mutate(folder.id)}
+                            onDelete={() => {
+                                deleteConfirm({
+                                    title: 'Delete this folder?',
+                                    description: 'This will permanently remove the folder and all its contents.',
+                                    onConfirm: () => deleteFolderMutation.mutateAsync(folder.id),
+                                })
+                            }}
                         />
                     ))}
                     {assets?.map((asset) => (
                         <AssetCard
                             key={asset.id}
                             asset={asset}
-                            onDelete={() => deleteMutation.mutate(asset.id)}
+                            onDelete={() => {
+                                deleteConfirm({
+                                    title: 'Delete this asset?',
+                                    onConfirm: () => deleteMutation.mutateAsync(asset.id),
+                                })
+                            }}
                             onCopy={() => {
                                 navigator.clipboard.writeText(asset.url);
-                                messageApi.success('URL copied!');
+                                toast.success('URL copied!');
                             }}
                             onMove={() => {
                                 setMoveAssetTarget(asset);
@@ -505,14 +516,9 @@ function AssetCard({
                             className="flex-1"
                         />
                     </Tooltip>
-                    <Popconfirm
-                        title="Delete this asset?"
-                        onConfirm={onDelete}
-                        okText="Delete"
-                        okButtonProps={{ danger: true }}
-                    >
-                        <Button size="small" type="text" danger icon={<DeleteOutlined />} className="flex-1" />
-                    </Popconfirm>
+                    <Tooltip title="Delete">
+                        <Button size="small" type="text" danger icon={<DeleteOutlined />} onClick={onDelete} className="flex-1" />
+                    </Tooltip>
                 </div>
             </div>
         </div>

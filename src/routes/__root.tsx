@@ -1,7 +1,7 @@
 import { createRootRoute, Outlet } from '@tanstack/react-router';
 import { TanStackRouterDevtools } from '@tanstack/router-devtools';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
-import { ConfigProvider } from 'antd';
+import { App, ConfigProvider } from 'antd';
 import { AuthProvider } from '../core/auth/AuthContext';
 
 const antdTheme = {
@@ -16,11 +16,13 @@ const antdTheme = {
 export const Route = createRootRoute({
     component: () => (
         <ConfigProvider theme={antdTheme}>
-            <AuthProvider>
-                <Outlet />
-                <TanStackRouterDevtools position="bottom-right" />
-                <ReactQueryDevtools initialIsOpen={false} />
-            </AuthProvider>
+            <App>
+                <AuthProvider>
+                    <Outlet />
+                    <TanStackRouterDevtools position="bottom-right" />
+                    <ReactQueryDevtools initialIsOpen={false} />
+                </AuthProvider>
+            </App>
         </ConfigProvider>
     ),
 });

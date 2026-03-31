@@ -7,7 +7,6 @@ import {
     Select,
     Switch,
     Button,
-    message,
     Typography,
     Alert,
 } from 'antd';
@@ -19,6 +18,7 @@ import {
     InfoCircleOutlined,
 } from '@ant-design/icons';
 import { schemasApi } from '../features/schemas/api';
+import { useAppToast } from '../shared/hooks/useAppToast';
 import type { FieldType, SchemaFieldDto } from '../features/schemas/types';
 
 const { Title, Text } = Typography;
@@ -47,7 +47,7 @@ function CreateSchemaPage() {
     const { websiteId } = useParams({ from: '/_auth/websites/$websiteId/schemas/new' });
     const navigate = useNavigate();
     const qc = useQueryClient();
-    const [messageApi, contextHolder] = message.useMessage();
+    const toast = useAppToast();
     const [form] = Form.useForm<SchemaFormValues>();
 
     const createMutation = useMutation({
@@ -59,13 +59,13 @@ function CreateSchemaPage() {
             }),
         onSuccess: (created) => {
             qc.invalidateQueries({ queryKey: ['schemas', websiteId] });
-            messageApi.success('Schema created!');
+            toast.success('Schema created!');
             navigate({
                 to: '/websites/$websiteId/schemas/$schemaId',
                 params: { websiteId, schemaId: created.id },
             });
         },
-        onError: () => messageApi.error('Failed to create schema.'),
+        onError: () => toast.error('Failed to create schema.'),
     });
 
     const handleSave = async () => {
@@ -88,7 +88,6 @@ function CreateSchemaPage() {
 
     return (
         <div className="min-h-screen bg-app-bg pb-12">
-            {contextHolder}
 
             {/* ── Sticky Header ───────────────────────────────────── */}
             <div className="sticky top-0 z-20 backdrop-blur-md bg-white/80 border-b border-surface-border shadow-sm px-8 py-4 mb-8 flex items-center justify-between transition-all duration-300">

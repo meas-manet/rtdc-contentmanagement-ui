@@ -8,7 +8,6 @@ import {
     Switch,
     Button,
     Spin,
-    message,
     Typography,
     Tag,
 } from 'antd';
@@ -21,6 +20,7 @@ import {
 } from '@ant-design/icons';
 import { useEffect } from 'react';
 import { schemasApi } from '../features/schemas/api';
+import { useAppToast } from '../shared/hooks/useAppToast';
 import type { FieldType, SchemaFieldDto } from '../features/schemas/types';
 
 const { Title, Text } = Typography;
@@ -50,7 +50,7 @@ function EditSchemaPage() {
     });
     const navigate = useNavigate();
     const qc = useQueryClient();
-    const [messageApi, contextHolder] = message.useMessage();
+    const toast = useAppToast();
     const [form] = Form.useForm<SchemaFormValues>();
 
     const { data: schema, isPending: schemaLoading } = useQuery({
@@ -77,13 +77,13 @@ function EditSchemaPage() {
         onSuccess: () => {
             qc.invalidateQueries({ queryKey: ['schemas', websiteId] });
             qc.invalidateQueries({ queryKey: ['schemas', websiteId, schemaId] });
-            messageApi.success('Schema updated!');
+            toast.success('Schema updated!');
             navigate({
                 to: '/websites/$websiteId/schemas',
                 params: { websiteId },
             });
         },
-        onError: () => messageApi.error('Failed to update schema.'),
+        onError: () => toast.error('Failed to update schema.'),
     });
 
     const handleSave = async () => {
@@ -105,7 +105,6 @@ function EditSchemaPage() {
 
     return (
         <div className="min-h-screen bg-app-bg pb-12">
-            {contextHolder}
 
             {/* ── Sticky Header ───────────────────────────────────── */}
             <div className="sticky top-0 z-20 backdrop-blur-md bg-white/80 border-b border-surface-border shadow-sm px-8 py-4 mb-8 flex items-center justify-between transition-all duration-300">

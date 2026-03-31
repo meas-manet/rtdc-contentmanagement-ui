@@ -9,7 +9,6 @@ import {
     Button,
     Tag,
     Typography,
-    message,
     Select,
     Empty,
 } from 'antd';
@@ -17,6 +16,8 @@ import { PageHeader } from '../shared/components/PageHeader';
 import { TableCard } from '../shared/components/TableCard';
 import { RowActions } from '../shared/components/RowActions';
 import { LoadingScreen } from '../shared/components/LoadingScreen';
+import { useAppToast } from '../shared/hooks/useAppToast';
+import { useDeleteConfirm } from '../shared/hooks/useDeleteConfirm';
 import {
     PlusOutlined,
 } from '@ant-design/icons';
@@ -41,7 +42,8 @@ function ContentTablePage() {
     });
     const navigate = useNavigate();
     const qc = useQueryClient();
-    const [messageApi, contextHolder] = message.useMessage();
+    const toast = useAppToast();
+    const deleteConfirm = useDeleteConfirm();
     const [locale, setLocale] = useState('en');
     const [page, setPage] = useState(1);
 
@@ -72,9 +74,9 @@ function ContentTablePage() {
         mutationFn: (id: string) => schemasApi.deleteEntry(websiteId, schemaId, id),
         onSuccess: () => {
             qc.invalidateQueries({ queryKey: ['content', websiteId, schemaId] });
-            messageApi.success('Entry deleted.');
+            toast.success('Entry deleted.');
         },
-        onError: () => messageApi.error('Failed to delete entry.'),
+        onError: () => toast.error('Failed to delete entry.'),
     });
 
     const definition: SchemaFieldDto[] = schema?.definition ?? [];
@@ -140,8 +142,14 @@ function ContentTablePage() {
                             params: { websiteId, schemaId, entryId: row.id },
                         })
                     }
-                    onDelete={() => deleteMutation.mutate(row.id)}
-                    deleteConfirmTitle="Delete entry?"
+                    onDelete={() =>
+                        deleteConfirm({
+                            title: 'Delete entry?',
+                            description: 'This action cannot be undone.',
+                            onConfirm: () => deleteMutation.mutateAsync(row.id),
+                        })
+                    }
+                    deleteLoading={deleteMutation.isPending && deleteMutation.variables === row.id}
                 />
             ),
         },
@@ -153,7 +161,6 @@ function ContentTablePage() {
 
     return (
         <div className="p-8">
-            {contextHolder}
 
             {/* ── Page header ───────────────────────────────────────── */}
             <PageHeader

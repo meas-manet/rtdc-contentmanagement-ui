@@ -1,21 +1,23 @@
 // Edit + Delete icon-button pair used in table action columns.
-import { Button, Popconfirm, Space, Tooltip } from 'antd';
+// The delete button now calls onDelete directly — callers use useDeleteConfirm()
+// to show the global Modal.confirm before calling onDelete.
+import { Button, Space, Tooltip } from 'antd';
 import { EditOutlined, DeleteOutlined } from '@ant-design/icons';
 
 interface RowActionsProps {
     onEdit: () => void;
     onDelete: () => void;
-    deleteConfirmTitle?: string;
-    deleteConfirmDescription?: string;
+    deleteLoading?: boolean;
     editTooltip?: string;
+    deleteTooltip?: string;
 }
 
 export function RowActions({
     onEdit,
     onDelete,
-    deleteConfirmTitle = 'Delete this item?',
-    deleteConfirmDescription,
+    deleteLoading = false,
     editTooltip = 'Edit',
+    deleteTooltip = 'Delete',
 }: RowActionsProps) {
     return (
         <Space size={4}>
@@ -27,15 +29,16 @@ export function RowActions({
                     onClick={onEdit}
                 />
             </Tooltip>
-            <Popconfirm
-                title={deleteConfirmTitle}
-                description={deleteConfirmDescription}
-                onConfirm={onDelete}
-                okText="Delete"
-                okButtonProps={{ danger: true }}
-            >
-                <Button type="text" danger size="small" icon={<DeleteOutlined />} />
-            </Popconfirm>
+            <Tooltip title={deleteTooltip}>
+                <Button
+                    type="text"
+                    danger
+                    size="small"
+                    icon={<DeleteOutlined />}
+                    loading={deleteLoading}
+                    onClick={onDelete}
+                />
+            </Tooltip>
         </Space>
     );
 }

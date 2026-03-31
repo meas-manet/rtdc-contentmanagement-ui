@@ -10,10 +10,8 @@ import {
     Form,
     Input,
     Select,
-    Popconfirm,
     Tag,
     Tooltip,
-    message,
     Empty,
 } from 'antd';
 import { PageHeader } from '../shared/components/PageHeader';
@@ -32,6 +30,8 @@ import { useState } from 'react';
 import { websitesApi } from '../features/websites/api';
 import type { WebsiteResponseDto } from '../features/websites/types';
 import { useLocales } from '../core/locales';
+import { useAppToast } from '../shared/hooks/useAppToast';
+import { useDeleteConfirm } from '../shared/hooks/useDeleteConfirm';
 
 
 export const Route = createFileRoute('/_auth/websites/')({
@@ -41,7 +41,8 @@ export const Route = createFileRoute('/_auth/websites/')({
 function WebsitesPage() {
     const navigate = useNavigate();
     const qc = useQueryClient();
-    const [messageApi, contextHolder] = message.useMessage();
+    const toast = useAppToast();
+    const deleteConfirm = useDeleteConfirm();
 
     const [createOpen, setCreateOpen] = useState(false);
     const [editSite, setEditSite] = useState<WebsiteResponseDto | null>(null);
@@ -62,9 +63,9 @@ function WebsitesPage() {
             qc.invalidateQueries({ queryKey: ['websites'] });
             setCreateOpen(false);
             form.resetFields();
-            messageApi.success('Website created!');
+            toast.success('Website created!');
         },
-        onError: () => messageApi.error('Failed to create website.'),
+        onError: () => toast.error('Failed to create website.'),
     });
 
     const updateMutation = useMutation({
@@ -73,32 +74,31 @@ function WebsitesPage() {
         onSuccess: () => {
             qc.invalidateQueries({ queryKey: ['websites'] });
             setEditSite(null);
-            messageApi.success('Website updated!');
+            toast.success('Website updated!');
         },
-        onError: () => messageApi.error('Failed to update website.'),
+        onError: () => toast.error('Failed to update website.'),
     });
 
     const deleteMutation = useMutation({
         mutationFn: websitesApi.delete,
         onSuccess: () => {
             qc.invalidateQueries({ queryKey: ['websites'] });
-            messageApi.success('Website deleted.');
+            toast.success('Website deleted.');
         },
-        onError: () => messageApi.error('Failed to delete website.'),
+        onError: () => toast.error('Failed to delete website.'),
     });
 
     const regenMutation = useMutation({
         mutationFn: websitesApi.regenerateKey,
         onSuccess: () => {
             qc.invalidateQueries({ queryKey: ['websites'] });
-            messageApi.success('API key regenerated.');
+            toast.success('API key regenerated.');
         },
-        onError: () => messageApi.error('Failed to regenerate key.'),
+        onError: () => toast.error('Failed to regenerate key.'),
     });
 
     return (
         <div className="p-8 max-w-7xl mx-auto">
-            {contextHolder}
 
             <PageHeader
                 title="Websites"
@@ -158,12 +158,18 @@ function WebsitesPage() {
                                     supportedLocales: site.supportedLocales,
                                 });
                             }}
-                            onDelete={() => deleteMutation.mutate(site.id)}
+                            onDelete={() =>
+                                deleteConfirm({
+                                    title: 'Delete this website?',
+                                    description: 'All schemas and content will be permanently deleted.',
+                                    onConfirm: () => deleteMutation.mutateAsync(site.id)
+                                })
+                            }
                             onRegen={() => regenMutation.mutate(site.id)}
                             regenLoading={regenMutation.isPending && regenMutation.variables === site.id}
                             onCopyKey={() => {
                                 navigator.clipboard.writeText(site.apiKey);
-                                messageApi.success('API key copied!');
+                                toast.success('API key copied!');
                             }}
                         />
                     ))}
@@ -318,15 +324,15 @@ function SiteCard({
                     <Tooltip title="Edit">
                         <Button type="text" size="small" icon={<EditOutlined />} onClick={onEdit} />
                     </Tooltip>
-                    <Popconfirm
-                        title="Delete this website?"
-                        description="All schemas and content will be permanently deleted."
-                        onConfirm={onDelete}
-                        okText="Delete"
-                        okButtonProps={{ danger: true }}
-                    >
-                        <Button type="text" size="small" danger icon={<DeleteOutlined />} />
-                    </Popconfirm>
+                    <Tooltip title="Delete">
+                        <Button
+                            type="text"
+                            size="small"
+                            danger
+                            icon={<DeleteOutlined />}
+                            onClick={onDelete}
+                        />
+                    </Tooltip>
                 </div>
             </div>
 

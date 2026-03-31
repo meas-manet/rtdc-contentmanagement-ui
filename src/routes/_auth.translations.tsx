@@ -6,7 +6,6 @@ import {
     Input,
     Select,
     Typography,
-    message,
     Tag,
     Tabs,
 } from 'antd';
@@ -23,6 +22,8 @@ import {
 import { useState } from 'react';
 import { translationsApi } from '../features/translations/api';
 import { localesApi } from '../features/locales/api';
+import { useAppToast } from '../shared/hooks/useAppToast';
+import { useDeleteConfirm } from '../shared/hooks/useDeleteConfirm';
 import type {
     TranslationResponseDto,
     UpdateTranslationDto,
@@ -117,7 +118,8 @@ interface LocalesTabProps {
 
 function LocalesTab({ createOpen, onCreateClose }: LocalesTabProps) {
     const qc = useQueryClient();
-    const [messageApi, contextHolder] = message.useMessage();
+    const toast = useAppToast();
+    const deleteConfirm = useDeleteConfirm();
 
     const [editItem, setEditItem] = useState<LocaleResponseDto | null>(null);
     const [createForm] = Form.useForm();
@@ -134,10 +136,10 @@ function LocalesTab({ createOpen, onCreateClose }: LocalesTabProps) {
             qc.invalidateQueries({ queryKey: ['locales'] });
             onCreateClose();
             createForm.resetFields();
-            messageApi.success('Language added.');
+            toast.success('Language added.');
         },
         onError: (err: any) =>
-            messageApi.error(err?.response?.data?.error ?? 'Failed to add language.'),
+            toast.error(err?.response?.data?.error ?? 'Failed to add language.'),
     });
 
     const updateMutation = useMutation({
@@ -146,18 +148,18 @@ function LocalesTab({ createOpen, onCreateClose }: LocalesTabProps) {
         onSuccess: () => {
             qc.invalidateQueries({ queryKey: ['locales'] });
             setEditItem(null);
-            messageApi.success('Language updated.');
+            toast.success('Language updated.');
         },
-        onError: () => messageApi.error('Failed to update language.'),
+        onError: () => toast.error('Failed to update language.'),
     });
 
     const deleteMutation = useMutation({
         mutationFn: localesApi.delete,
         onSuccess: () => {
             qc.invalidateQueries({ queryKey: ['locales'] });
-            messageApi.success('Language removed.');
+            toast.success('Language removed.');
         },
-        onError: () => messageApi.error('Failed to remove language.'),
+        onError: () => toast.error('Failed to remove language.'),
     });
 
     const columns = [
@@ -190,10 +192,15 @@ function LocalesTab({ createOpen, onCreateClose }: LocalesTabProps) {
                         setEditItem(row);
                         editForm.setFieldsValue({ label: row.label });
                     }}
-                    onDelete={() => deleteMutation.mutate(row.id)}
+                    onDelete={() =>
+                        deleteConfirm({
+                            title: 'Remove this language?',
+                            description: 'Existing content with this locale code will not be deleted.',
+                            onConfirm: () => deleteMutation.mutateAsync(row.id),
+                        })
+                    }
                     editTooltip="Edit label"
-                    deleteConfirmTitle="Remove this language?"
-                    deleteConfirmDescription="Existing content with this locale code will not be deleted."
+                    deleteLoading={deleteMutation.isPending && deleteMutation.variables === row.id}
                 />
             ),
         },
@@ -201,8 +208,6 @@ function LocalesTab({ createOpen, onCreateClose }: LocalesTabProps) {
 
     return (
         <>
-            {contextHolder}
-
             <div className="mb-4">
                 <Text className="text-muted! text-sm">
                     {locales.length} language{locales.length !== 1 ? 's' : ''} registered
@@ -289,7 +294,8 @@ interface TranslationsTabProps {
 
 function TranslationsTab({ createOpen, onCreateClose }: TranslationsTabProps) {
     const qc = useQueryClient();
-    const [messageApi, contextHolder] = message.useMessage();
+    const toast = useAppToast();
+    const deleteConfirm = useDeleteConfirm();
 
     const [editItem, setEditItem] = useState<TranslationResponseDto | null>(null);
     const [localeFilter, setLocaleFilter] = useState<string | undefined>(undefined);
@@ -323,10 +329,10 @@ function TranslationsTab({ createOpen, onCreateClose }: TranslationsTabProps) {
             qc.invalidateQueries({ queryKey: ['translations'] });
             onCreateClose();
             createForm.resetFields();
-            messageApi.success('Translation created.');
+            toast.success('Translation created.');
         },
         onError: (err: any) =>
-            messageApi.error(err?.response?.data?.error ?? 'Failed to create translation.'),
+            toast.error(err?.response?.data?.error ?? 'Failed to create translation.'),
     });
 
     const updateMutation = useMutation({
@@ -335,18 +341,18 @@ function TranslationsTab({ createOpen, onCreateClose }: TranslationsTabProps) {
         onSuccess: () => {
             qc.invalidateQueries({ queryKey: ['translations'] });
             setEditItem(null);
-            messageApi.success('Translation updated.');
+            toast.success('Translation updated.');
         },
-        onError: () => messageApi.error('Failed to update translation.'),
+        onError: () => toast.error('Failed to update translation.'),
     });
 
     const deleteMutation = useMutation({
         mutationFn: translationsApi.delete,
         onSuccess: () => {
             qc.invalidateQueries({ queryKey: ['translations'] });
-            messageApi.success('Translation deleted.');
+            toast.success('Translation deleted.');
         },
-        onError: () => messageApi.error('Failed to delete translation.'),
+        onError: () => toast.error('Failed to delete translation.'),
     });
 
     const columns = [
@@ -386,9 +392,14 @@ function TranslationsTab({ createOpen, onCreateClose }: TranslationsTabProps) {
                         setEditItem(row);
                         editForm.setFieldsValue({ value: row.value });
                     }}
-                    onDelete={() => deleteMutation.mutate(row.id)}
+                    onDelete={() =>
+                        deleteConfirm({
+                            title: 'Delete this translation?',
+                            onConfirm: () => deleteMutation.mutateAsync(row.id),
+                        })
+                    }
                     editTooltip="Edit value"
-                    deleteConfirmTitle="Delete this translation?"
+                    deleteLoading={deleteMutation.isPending && deleteMutation.variables === row.id}
                 />
             ),
         },
@@ -396,8 +407,6 @@ function TranslationsTab({ createOpen, onCreateClose }: TranslationsTabProps) {
 
     return (
         <>
-            {contextHolder}
-
             {/* Filters */}
             <div className="flex items-center gap-3 mb-4">
                 <Select

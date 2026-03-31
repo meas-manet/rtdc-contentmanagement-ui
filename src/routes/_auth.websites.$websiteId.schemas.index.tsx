@@ -9,7 +9,6 @@ import {
     Button,
     Space,
     Tag,
-    message,
     Typography,
     Empty,
 } from 'antd';
@@ -21,6 +20,8 @@ import { PageHeader } from '../shared/components/PageHeader';
 import { TableCard } from '../shared/components/TableCard';
 import { RowActions } from '../shared/components/RowActions';
 import { LoadingScreen } from '../shared/components/LoadingScreen';
+import { useAppToast } from '../shared/hooks/useAppToast';
+import { useDeleteConfirm } from '../shared/hooks/useDeleteConfirm';
 import type { SchemaResponseDto, SchemaFieldDto } from '../features/schemas/types';
 
 const { Text } = Typography;
@@ -33,7 +34,8 @@ function SchemasPage() {
     const { websiteId } = useParams({ from: '/_auth/websites/$websiteId/schemas/' });
     const navigate = useNavigate();
     const qc = useQueryClient();
-    const [messageApi, contextHolder] = message.useMessage();
+    const toast = useAppToast();
+    const deleteConfirm = useDeleteConfirm();
 
     const { data: schemas, isPending } = useQuery({
         queryKey: ['schemas', websiteId],
@@ -44,9 +46,9 @@ function SchemasPage() {
         mutationFn: (id: string) => schemasApi.delete(websiteId, id),
         onSuccess: () => {
             qc.invalidateQueries({ queryKey: ['schemas', websiteId] });
-            messageApi.success('Schema deleted.');
+            toast.success('Schema deleted.');
         },
-        onError: () => messageApi.error('Failed to delete schema.'),
+        onError: () => toast.error('Failed to delete schema.'),
     });
 
     const columns = [
@@ -120,9 +122,14 @@ function SchemasPage() {
                             params: { websiteId, schemaId: row.id },
                         })
                     }
-                    onDelete={() => deleteMutation.mutate(row.id)}
-                    deleteConfirmTitle="Delete schema?"
-                    deleteConfirmDescription="All content entries for this schema will also be deleted."
+                    onDelete={() =>
+                        deleteConfirm({
+                            title: 'Delete schema?',
+                            description: 'All content entries for this schema will also be deleted.',
+                            onConfirm: () => deleteMutation.mutateAsync(row.id),
+                        })
+                    }
+                    deleteLoading={deleteMutation.isPending && deleteMutation.variables === row.id}
                 />
             ),
         },
@@ -132,8 +139,6 @@ function SchemasPage() {
 
     return (
         <div className="p-8">
-            {contextHolder}
-
             <PageHeader
                 title="Content Types"
                 subtitle={`${schemas?.length ?? 0} ${(schemas?.length ?? 0) === 1 ? 'schema' : 'schemas'} defined`}
