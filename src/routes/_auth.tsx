@@ -1,7 +1,7 @@
 // Authenticated shell layout — guards all child routes
 import { createFileRoute, Outlet, redirect } from '@tanstack/react-router';
 import { Layout } from 'antd';
-import { AppNavbar } from '../components/AppNavbar';
+import { AppNavbar } from '../shared/components/AppNavbar';
 
 const { Content } = Layout;
 

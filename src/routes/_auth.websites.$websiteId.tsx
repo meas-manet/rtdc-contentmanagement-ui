@@ -16,7 +16,8 @@ import {
     SettingOutlined,
 } from '@ant-design/icons';
 import type { ReactNode } from 'react';
-import { websitesApi, schemasApi } from '../lib/api';
+import { websitesApi } from '../features/websites/api';
+import { schemasApi } from '../features/schemas/api';
 
 const { Text } = Typography;
 

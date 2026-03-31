@@ -27,8 +27,8 @@ import {
     FolderOpenOutlined,
     ScissorOutlined,
 } from '@ant-design/icons';
-import { mediaApi } from '../lib/api';
-import type { MediaAssetResponseDto, MediaFolderResponseDto } from '../lib/types';
+import { mediaApi } from '../features/media/api';
+import type { MediaAssetResponseDto, MediaFolderResponseDto } from '../features/media/types';
 import { useState } from 'react';
 
 const { Title, Text } = Typography;

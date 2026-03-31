@@ -1,7 +1,7 @@
 // Universal schema-driven form engine
 import { Form, Input, InputNumber, Switch, DatePicker, Select } from 'antd';
 import { RichTextEditor } from './RichTextEditor';
-import type { SchemaFieldDto } from '../lib/types';
+import type { SchemaFieldDto } from '../../features/schemas/types';
 
 interface SchemaFormProps {
     definition: SchemaFieldDto[];

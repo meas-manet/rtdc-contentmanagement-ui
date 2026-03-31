@@ -2,8 +2,8 @@ import { createFileRoute, useNavigate } from '@tanstack/react-router';
 import { Form, Input, Button, Card, message, Typography } from 'antd';
 import { UserOutlined, LockOutlined } from '@ant-design/icons';
 import { useMutation } from '@tanstack/react-query';
-import { authApi } from '../lib/api';
-import { useAuth } from '../context/AuthContext';
+import { authApi } from '../features/auth/api';
+import { useAuth } from '../core/auth/AuthContext';
 
 const { Title, Text } = Typography;
 

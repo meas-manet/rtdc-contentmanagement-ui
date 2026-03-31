@@ -13,17 +13,19 @@ import {
     Select,
     Empty,
 } from 'antd';
-import { PageHeader } from '../components/PageHeader';
-import { TableCard } from '../components/TableCard';
-import { RowActions } from '../components/RowActions';
-import { LoadingScreen } from '../components/LoadingScreen';
+import { PageHeader } from '../shared/components/PageHeader';
+import { TableCard } from '../shared/components/TableCard';
+import { RowActions } from '../shared/components/RowActions';
+import { LoadingScreen } from '../shared/components/LoadingScreen';
 import {
     PlusOutlined,
 } from '@ant-design/icons';
 import { useState } from 'react';
-import { schemasApi, websitesApi } from '../lib/api';
-import { toLocaleOptions, useLocales } from '../lib/locales';
-import type { ContentEntryResponseDto, SchemaFieldDto } from '../lib/types';
+import { schemasApi } from '../features/schemas/api';
+import { websitesApi } from '../features/websites/api';
+import { toLocaleOptions, useLocales } from '../core/locales';
+import type { ContentEntryResponseDto } from '../features/entries/types';
+import type { SchemaFieldDto } from '../features/schemas/types';
 
 const { Text } = Typography;
 

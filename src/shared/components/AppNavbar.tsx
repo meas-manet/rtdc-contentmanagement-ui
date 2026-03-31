@@ -2,7 +2,7 @@
 import { Link, useNavigate } from '@tanstack/react-router';
 import { Avatar, Dropdown, Typography } from 'antd';
 import { LogoutOutlined, UserOutlined, TranslationOutlined } from '@ant-design/icons';
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from '../../core/auth/AuthContext';
 
 const { Text } = Typography;
 

@@ -22,13 +22,3 @@ adminClient.interceptors.response.use(
     return Promise.reject(err);
   },
 );
-
-// Content client factory — attaches X-API-Key for a specific site
-export function makeContentClient(apiKey: string) {
-  const client = axios.create({ baseURL: BASE_URL });
-  client.interceptors.request.use((config) => {
-    config.headers["X-API-Key"] = apiKey;
-    return config;
-  });
-  return client;
-}

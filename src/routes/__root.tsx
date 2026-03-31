@@ -2,7 +2,7 @@ import { createRootRoute, Outlet } from '@tanstack/react-router';
 import { TanStackRouterDevtools } from '@tanstack/router-devtools';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { ConfigProvider } from 'antd';
-import { AuthProvider } from '../context/AuthContext';
+import { AuthProvider } from '../core/auth/AuthContext';
 
 const antdTheme = {
     token: {

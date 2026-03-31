@@ -10,24 +10,27 @@ import {
     Tag,
     Tabs,
 } from 'antd';
-import { PageHeader } from '../components/PageHeader';
-import { TableCard } from '../components/TableCard';
-import { RowActions } from '../components/RowActions';
-import { ActionModal } from '../components/ActionModal';
-import { CodeBadge } from '../components/CodeBadge';
+import { PageHeader } from '../shared/components/PageHeader';
+import { TableCard } from '../shared/components/TableCard';
+import { RowActions } from '../shared/components/RowActions';
+import { ActionModal } from '../shared/components/ActionModal';
+import { CodeBadge } from '../shared/components/CodeBadge';
 import {
     PlusOutlined,
     TranslationOutlined,
     GlobalOutlined,
 } from '@ant-design/icons';
 import { useState } from 'react';
-import { translationsApi, localesApi } from '../lib/api';
+import { translationsApi } from '../features/translations/api';
+import { localesApi } from '../features/locales/api';
 import type {
     TranslationResponseDto,
-    LocaleResponseDto,
     UpdateTranslationDto,
+} from '../features/translations/types';
+import type {
+    LocaleResponseDto,
     UpdateLocaleDto,
-} from '../lib/types';
+} from '../features/locales/types';
 
 const { Text } = Typography;
 const { Search } = Input;

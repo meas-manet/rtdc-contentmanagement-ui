@@ -30,8 +30,8 @@ import {
     MinusCircleOutlined,
 } from '@ant-design/icons';
 import { useState } from 'react';
-import { schemasApi } from '../lib/api';
-import type { SchemaResponseDto, SchemaFieldDto, FieldType } from '../lib/types';
+import { schemasApi } from '../features/schemas/api';
+import type { SchemaResponseDto, SchemaFieldDto, FieldType } from '../features/schemas/types';
 
 const { Title, Text } = Typography;
 

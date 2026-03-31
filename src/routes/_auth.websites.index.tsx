@@ -16,9 +16,9 @@ import {
     message,
     Empty,
 } from 'antd';
-import { PageHeader } from '../components/PageHeader';
-import { ActionModal } from '../components/ActionModal';
-import { LoadingScreen } from '../components/LoadingScreen';
+import { PageHeader } from '../shared/components/PageHeader';
+import { ActionModal } from '../shared/components/ActionModal';
+import { LoadingScreen } from '../shared/components/LoadingScreen';
 import {
     PlusOutlined,
     EditOutlined,
@@ -29,9 +29,9 @@ import {
     CopyOutlined,
 } from '@ant-design/icons';
 import { useState } from 'react';
-import { websitesApi } from '../lib/api';
-import type { WebsiteResponseDto } from '../lib/types';
-import { useLocales } from '../lib/locales';
+import { websitesApi } from '../features/websites/api';
+import type { WebsiteResponseDto } from '../features/websites/types';
+import { useLocales } from '../core/locales';
 
 
 export const Route = createFileRoute('/_auth/websites/')({

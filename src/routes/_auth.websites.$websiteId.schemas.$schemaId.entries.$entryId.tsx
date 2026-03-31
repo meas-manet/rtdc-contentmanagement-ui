@@ -25,10 +25,12 @@ import {
     EyeInvisibleOutlined,
 } from '@ant-design/icons';
 import { useEffect, useState } from 'react';
-import { schemasApi, websitesApi, contentApi } from '../lib/api';
-import { toLocaleOptions, useLocales } from '../lib/locales';
-import { SchemaForm } from '../components/SchemaForm';
-import type { ContentStatus } from '../lib/types';
+import { schemasApi } from '../features/schemas/api';
+import { websitesApi } from '../features/websites/api';
+import { contentApi } from '../features/entries/api';
+import { toLocaleOptions, useLocales } from '../core/locales';
+import { SchemaForm } from '../shared/components/SchemaForm';
+import type { ContentStatus } from '../features/entries/types';
 import dayjs from 'dayjs';
 
 const { Title, Text } = Typography;
