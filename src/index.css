@@ -86,12 +86,16 @@ body {
 }
 
 .ant-btn-primary {
-  box-shadow: 0 4px 6px -1px rgba(33, 62, 154, 0.2), 0 2px 4px -1px rgba(33, 62, 154, 0.1) !important;
+  box-shadow:
+    0 4px 6px -1px rgba(33, 62, 154, 0.2),
+    0 2px 4px -1px rgba(33, 62, 154, 0.1) !important;
 }
 
 .ant-btn-primary:not(:disabled):hover {
   transform: translateY(-1px);
-  box-shadow: 0 10px 15px -3px rgba(33, 62, 154, 0.2), 0 4px 6px -2px rgba(33, 62, 154, 0.1) !important;
+  box-shadow:
+    0 10px 15px -3px rgba(33, 62, 154, 0.2),
+    0 4px 6px -2px rgba(33, 62, 154, 0.1) !important;
 }
 
 .ant-form-item-label > label {
