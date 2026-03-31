@@ -30,31 +30,36 @@ export function RichTextEditor({ value, onChange, placeholder }: RichTextEditorP
     if (!editor) return null;
 
     return (
-        <div className="border border-surface-border rounded-lg overflow-hidden">
+        <div className="border border-surface-border rounded-lg overflow-hidden transition-all duration-200 focus-within:border-primary focus-within:ring-3 focus-within:ring-primary/10 shadow-sm bg-white">
             {/* Toolbar */}
-            <div className="flex items-center gap-1 px-2 py-1 border-b border-surface-border bg-app-bg">
+            <div className="flex items-center gap-1.5 px-3 py-2 border-b border-surface-border bg-gray-50/80 backdrop-blur-sm">
                 <Button
                     type={editor.isActive('bold') ? 'primary' : 'text'}
                     size="small"
                     icon={<BoldOutlined />}
+                    className={`font-semibold ${editor.isActive('bold') ? 'shadow-sm' : 'text-gray-600 hover:text-gray-900'}`}
                     onMouseDown={(e) => { e.preventDefault(); editor.chain().focus().toggleBold().run(); }}
                 />
                 <Button
                     type={editor.isActive('italic') ? 'primary' : 'text'}
                     size="small"
                     icon={<ItalicOutlined />}
+                    className={`font-semibold ${editor.isActive('italic') ? 'shadow-sm' : 'text-gray-600 hover:text-gray-900'}`}
                     onMouseDown={(e) => { e.preventDefault(); editor.chain().focus().toggleItalic().run(); }}
                 />
+                <div className="w-px h-4 bg-gray-300 mx-1"></div>
                 <Button
                     type={editor.isActive('bulletList') ? 'primary' : 'text'}
                     size="small"
                     icon={<UnorderedListOutlined />}
+                    className={`font-semibold ${editor.isActive('bulletList') ? 'shadow-sm' : 'text-gray-600 hover:text-gray-900'}`}
                     onMouseDown={(e) => { e.preventDefault(); editor.chain().focus().toggleBulletList().run(); }}
                 />
                 <Button
                     type={editor.isActive('orderedList') ? 'primary' : 'text'}
                     size="small"
                     icon={<OrderedListOutlined />}
+                    className={`font-semibold ${editor.isActive('orderedList') ? 'shadow-sm' : 'text-gray-600 hover:text-gray-900'}`}
                     onMouseDown={(e) => { e.preventDefault(); editor.chain().focus().toggleOrderedList().run(); }}
                 />
             </div>
@@ -62,7 +67,7 @@ export function RichTextEditor({ value, onChange, placeholder }: RichTextEditorP
             {/* Editor area */}
             <EditorContent
                 editor={editor}
-                className="prose prose-sm max-w-none p-3 min-h-30 focus:outline-none [&_.ProseMirror]:outline-none [&_.ProseMirror_p.is-editor-empty:first-child::before]:content-[attr(data-placeholder)] [&_.ProseMirror_p.is-editor-empty:first-child::before]:text-muted [&_.ProseMirror_p.is-editor-empty:first-child::before]:pointer-events-none [&_.ProseMirror_p.is-editor-empty:first-child::before]:float-left [&_.ProseMirror_p.is-editor-empty:first-child::before]:h-0"
+                className="prose prose-sm max-w-none p-4 min-h-36 focus:outline-none [&_.ProseMirror]:outline-none [&_.ProseMirror_p.is-editor-empty:first-child::before]:content-[attr(data-placeholder)] [&_.ProseMirror_p.is-editor-empty:first-child::before]:text-gray-400 [&_.ProseMirror_p.is-editor-empty:first-child::before]:pointer-events-none [&_.ProseMirror_p.is-editor-empty:first-child::before]:float-left [&_.ProseMirror_p.is-editor-empty:first-child::before]:h-0"
             />
         </div>
     );

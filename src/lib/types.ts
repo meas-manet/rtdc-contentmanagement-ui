@@ -105,6 +105,10 @@ export interface UpdateContentEntryDto {
   status?: ContentStatus;
 }
 
+export interface UpdateStatusDto {
+  status: ContentStatus;
+}
+
 export interface CreateLocalizationDto {
   data: Record<string, unknown>;
   locale: string;

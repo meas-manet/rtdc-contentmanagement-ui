@@ -16,12 +16,13 @@ import {
     Space,
     Tag,
     Alert,
+    Popconfirm,
 } from 'antd';
 import {
     SaveOutlined,
     ArrowLeftOutlined,
-    TranslationOutlined,
     SendOutlined,
+    EyeInvisibleOutlined,
 } from '@ant-design/icons';
 import { useEffect, useState } from 'react';
 import { schemasApi, websitesApi, contentApi } from '../lib/api';
@@ -128,6 +129,31 @@ function EntryEditorPage() {
         onError: () => messageApi.error('Failed to save entry.'),
     });
 
+    // ── Status-only mutation (unpublish / re-draft) ──────────────────────────
+    // The backend has no dedicated PATCH /status endpoint; status is changed
+    // through the standard PUT /{id} endpoint — we just preserve existing data.
+    const statusMutation = useMutation({
+        mutationFn: (status: ContentStatus) =>
+            contentApi.update(
+                website!.slug,
+                schema!.slug,
+                entry!.id,
+                { data: entry!.data, status },
+                website!.apiKey,
+            ),
+        onSuccess: (_data, status) => {
+            qc.invalidateQueries({ queryKey: ['entry', entryId] });
+            qc.invalidateQueries({ queryKey: ['localizations', entryId] });
+            qc.invalidateQueries({ queryKey: ['content', websiteId, schemaId] });
+            const label = status === 'draft' ? 'reverted to draft' : 'published';
+            messageApi.success(`Entry ${label} successfully.`);
+        },
+        onError: (_err, status) => {
+            const label = status === 'draft' ? 'unpublish' : 'publish';
+            messageApi.error(`Failed to ${label} entry.`);
+        },
+    });
+
     const createLocalizationMutation = useMutation({
         mutationFn: (values: { data: Record<string, unknown>; status: ContentStatus }) =>
             contentApi.createLocalization(
@@ -173,6 +199,9 @@ function EntryEditorPage() {
         updateMutation.isPending ||
         createLocalizationMutation.isPending;
 
+    const isUnpublishing = statusMutation.isPending;
+    const isPublished = !isNew && entry?.status === 'published';
+
     const tabItems = localeOptions.map((loc) => {
         const exists = existingLocales.includes(loc.value) || (isNew && loc.value === (website?.defaultLocale ?? 'en'));
         return {
@@ -191,11 +220,11 @@ function EntryEditorPage() {
     });
 
     return (
-        <div className="p-8 max-w-3xl mx-auto">
+        <div className="min-h-screen bg-app-bg pb-12">
             {contextHolder}
 
-            {/* ── Page header ───────────────────────────────────── */}
-            <div className="flex items-start justify-between mb-8 gap-4">
+            {/* ── Sticky Header ───────────────────────────────────── */}
+            <div className="sticky top-0 z-20 backdrop-blur-md bg-white/80 border-b border-surface-border shadow-sm px-8 py-4 mb-8 flex items-center justify-between transition-all duration-300">
                 <div>
                     <button
                         onClick={() =>
@@ -204,108 +233,226 @@ function EntryEditorPage() {
                                 params: { websiteId, schemaId },
                             })
                         }
-                        className="flex items-center gap-1.5 text-muted text-xs hover:text-gray-800 transition-colors mb-2 bg-transparent border-0 cursor-pointer px-0 font-medium"
+                        className="flex items-center gap-1.5 text-muted hover:text-primary transition-colors mb-2 bg-transparent border-0 cursor-pointer px-0 font-medium text-sm group"
                     >
-                        <ArrowLeftOutlined />
+                        <ArrowLeftOutlined className="group-hover:-translate-x-1 transition-transform" />
                         <span>Back to {schema.name}</span>
                     </button>
-                    <Title level={2} className="mb-0! font-bold! text-gray-900!">
-                        {isNew ? 'New Entry' : 'Edit Entry'}
-                    </Title>
-                    {!isNew && entry && (
-                        <Space className="mt-1">
-                            <Tag color={entry.status === 'published' ? 'green' : 'gold'}>
+                    <div className="flex items-center gap-3">
+                        <Title level={2} className="mb-0! font-bold! text-gray-900! tracking-tight">
+                            {isNew ? 'New Entry' : 'Edit Entry'}
+                        </Title>
+                        {!isNew && entry && (
+                            <Tag
+                                color={entry.status === 'published' ? 'success' : 'processing'}
+                                className="m-0 rounded-full px-3 py-0.5 border-transparent shadow-sm font-semibold"
+                            >
                                 {entry.status.toUpperCase()}
                             </Tag>
-                            <Text type="secondary" className="text-xs">
-                                Updated {new Date(entry.updatedAt).toLocaleString()}
-                            </Text>
-                        </Space>
-                    )}
+                        )}
+                    </div>
                 </div>
 
-                <Space>
+                <Space className="hidden md:flex" wrap>
+                    {/* Unpublish — only visible when the entry is live */}
+                    {isPublished && (
+                        <Popconfirm
+                            title="Revert to draft?"
+                            description="This entry will no longer be visible on the live site."
+                            okText="Yes, unpublish"
+                            cancelText="Cancel"
+                            okButtonProps={{ danger: true }}
+                            onConfirm={() => statusMutation.mutate('draft')}
+                            placement="bottomRight"
+                        >
+                            <Button
+                                size="large"
+                                icon={<EyeInvisibleOutlined />}
+                                loading={isUnpublishing}
+                                disabled={isSaving}
+                                danger
+                                className="font-semibold"
+                            >
+                                Unpublish
+                            </Button>
+                        </Popconfirm>
+                    )}
+
                     <Button
+                        size="large"
                         icon={<SaveOutlined />}
                         onClick={() => handleSave('draft')}
                         loading={isSaving}
+                        disabled={isUnpublishing}
+                        className="font-semibold"
                     >
-                        Save Draft
+                        {isPublished ? 'Update' : 'Save Draft'}
                     </Button>
-                    <Button
-                        type="primary"
-                        size="large"
-                        icon={<SendOutlined />}
-                        onClick={() => handleSave('published')}
-                        loading={isSaving}
-                    >
-                        Publish
-                    </Button>
+
+                    {!isPublished && (
+                        <Button
+                            type="primary"
+                            size="large"
+                            icon={<SendOutlined />}
+                            onClick={() => handleSave('published')}
+                            loading={isSaving}
+                            disabled={isUnpublishing}
+                            className="font-semibold"
+                        >
+                            Publish
+                        </Button>
+                    )}
                 </Space>
             </div>
 
-            {/* Locale Tabs */}
-            {!isNew && (
-                <div className="mb-4">
-                    <div className="flex items-center gap-2 mb-2">
-                        <TranslationOutlined className="text-primary" />
-                        <Text strong className="text-sm">
-                            Translations
-                        </Text>
-                    </div>
-                    <Tabs
-                        activeKey={activeLocale}
-                        onChange={setActiveLocale}
-                        items={tabItems}
-                        size="small"
-                        type="card"
-                    />
-                    {!currentLocaleEntry && !isNew && (
-                        <Alert
-                            type="info"
-                            className="mb-4"
-                            message={`No translation for "${activeLocale}" yet. Fill the form below and click "Publish" to create it.`}
-                            showIcon
+            <div className="px-8 max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8">
+                {/* ── Main content (Form) ─────────────────────────────── */}
+                <div className="lg:col-span-8 xl:col-span-9">
+                    {/* Locale Tabs */}
+                    {!isNew && (
+                        <Tabs
+                            activeKey={activeLocale}
+                            onChange={setActiveLocale}
+                            items={tabItems}
+                            type="card"
+                            className="[&>.ant-tabs-nav::before]:border-b-0 [&_.ant-tabs-nav]:mb-0"
                         />
                     )}
-                </div>
-            )}
 
-            {/* ── Form card ─────────────────────────────────────── */}
-            <div className="bg-white rounded-xl border border-surface-border shadow-sm p-6">
-                {!isNew && entryLoading ? (
-                    <div className="flex justify-center py-12">
-                        <Spin />
-                    </div>
-                ) : (
-                    <Form form={form} layout="vertical" size="middle">
-                        <SchemaForm definition={schema.definition} />
-
-                        {isNew && (
-                            <Form.Item name="_locale" label="Initial Locale" initialValue={website?.defaultLocale ?? 'en'}>
-                                <Select
-                                    options={localeOptions}
-                                    onChange={(v) => setActiveLocale(v)}
-                                />
-                            </Form.Item>
+                    {/* Form Card */}
+                    <div className={`bg-white border border-surface-border shadow-sm p-8 transition-shadow hover:shadow-md duration-300 ${!isNew ? 'rounded-b-2xl rounded-tr-2xl -mt-[1px] relative z-10' : 'rounded-2xl'}`}>
+                        {!currentLocaleEntry && !isNew && (
+                            <Alert
+                                type="info"
+                                className="mb-6 rounded-xl border-blue-200 bg-blue-50/50"
+                                message={`No translation for "${activeLocale}" yet. Fill the form below and click "Publish" to create it.`}
+                                showIcon
+                            />
                         )}
-                    </Form>
-                )}
-            </div>
 
-            {/* ── Bottom action bar ─────────────────────────────── */}
-            <div className="flex justify-end gap-3 mt-6">
-                <Button onClick={() => handleSave('draft')} loading={isSaving} icon={<SaveOutlined />}>
-                    Save Draft
-                </Button>
-                <Button
-                    type="primary"
-                    onClick={() => handleSave('published')}
-                    loading={isSaving}
-                    icon={<SendOutlined />}
-                >
-                    Publish
-                </Button>
+                        <div className="mb-6 pb-4 border-b border-surface-border">
+                            <h3 className="text-lg font-semibold text-gray-800 m-0">Entry Content</h3>
+                            <p className="text-muted text-sm mt-1 mb-0">Fill out the fields below based on the {schema.name} schema.</p>
+                        </div>
+
+                        {!isNew && entryLoading ? (
+                            <div className="flex justify-center py-20">
+                                <Spin size="large" />
+                            </div>
+                        ) : (
+                            <Form form={form} layout="vertical" size="large" className="space-y-6">
+                                <SchemaForm definition={schema.definition} />
+
+                                {isNew && (
+                                    <Form.Item name="_locale" label="Initial Locale" initialValue={website?.defaultLocale ?? 'en'} className="mb-0 pt-4 border-t border-surface-border">
+                                        <Select
+                                            options={localeOptions}
+                                            onChange={(v) => setActiveLocale(v)}
+                                            size="large"
+                                            className="w-full md:w-1/2"
+                                        />
+                                    </Form.Item>
+                                )}
+                            </Form>
+                        )}
+                    </div>
+                </div>
+
+                {/* ── Right Sidebar (Metadata & Mobile actions) ────────── */}
+                <div className="lg:col-span-4 xl:col-span-3">
+                    <div className="sticky top-32 space-y-6">
+
+                        {/* Publishing Meta Card */}
+                        <div className="bg-white rounded-2xl border border-surface-border shadow-sm p-6">
+                            <h3 className="text-base font-semibold text-gray-800 mb-4 pb-3 border-b border-surface-border">Publishing Info</h3>
+
+                            <div className="space-y-4">
+                                <div>
+                                    <Text type="secondary" className="text-xs uppercase font-bold tracking-wider mb-1 block">Current Status</Text>
+                                    {isNew ? (
+                                        <Tag className="m-0 rounded-md">NEW</Tag>
+                                    ) : (
+                                        <Tag color={entry?.status === 'published' ? 'success' : 'processing'} className="m-0 rounded-md py-0.5 px-2 font-medium">
+                                            {entry?.status.toUpperCase() || 'UNKNOWN'}
+                                        </Tag>
+                                    )}
+                                </div>
+
+                                {!isNew && entry && (
+                                    <div>
+                                        <Text type="secondary" className="text-xs uppercase font-bold tracking-wider mb-1 block">Last Updated</Text>
+                                        <Text className="text-sm font-medium text-gray-700">
+                                            {dayjs(entry.updatedAt).format('MMM D, YYYY • h:mm A')}
+                                        </Text>
+                                    </div>
+                                )}
+
+                                {!isNew && entry && (
+                                    <div>
+                                        <Text type="secondary" className="text-xs uppercase font-bold tracking-wider mb-1 block">Entry ID</Text>
+                                        <Text className="text-xs font-mono bg-gray-50 p-1.5 rounded border border-gray-100 break-all">
+                                            {entry.id}
+                                        </Text>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+
+                        {/* Actions Card (Fallback for smaller screens) */}
+                        <div className="bg-white rounded-2xl border border-surface-border shadow-sm p-6 md:hidden">
+                            <h3 className="text-base font-semibold text-gray-800 mb-4 pb-3 border-b border-surface-border">Actions</h3>
+                            <div className="flex flex-col gap-3">
+                                <Button
+                                    size="large"
+                                    icon={<SaveOutlined />}
+                                    onClick={() => handleSave('draft')}
+                                    loading={isSaving}
+                                    disabled={isUnpublishing}
+                                    block
+                                >
+                                    {isPublished ? 'Update' : 'Save Draft'}
+                                </Button>
+
+                                {!isPublished && (
+                                    <Button
+                                        type="primary"
+                                        size="large"
+                                        icon={<SendOutlined />}
+                                        onClick={() => handleSave('published')}
+                                        loading={isSaving}
+                                        disabled={isUnpublishing}
+                                        block
+                                    >
+                                        Publish
+                                    </Button>
+                                )}
+
+                                {isPublished && (
+                                    <Popconfirm
+                                        title="Revert to draft?"
+                                        description="This entry will no longer be visible on the live site."
+                                        okText="Yes, unpublish"
+                                        cancelText="Cancel"
+                                        okButtonProps={{ danger: true }}
+                                        onConfirm={() => statusMutation.mutate('draft')}
+                                        placement="top"
+                                    >
+                                        <Button
+                                            size="large"
+                                            icon={<EyeInvisibleOutlined />}
+                                            loading={isUnpublishing}
+                                            disabled={isSaving}
+                                            danger
+                                            block
+                                        >
+                                            Unpublish
+                                        </Button>
+                                    </Popconfirm>
+                                )}
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     );

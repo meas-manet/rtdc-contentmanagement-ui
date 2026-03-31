@@ -50,3 +50,56 @@ body {
 .ant-table-cell .ant-input-number {
   width: 100%;
 }
+
+/* ── Modern Ant Design Overrides ────────────────────────────── */
+.ant-input,
+.ant-input-number,
+.ant-picker,
+.ant-select-selector {
+  border-radius: 0.5rem !important;
+  border-color: var(--color-surface-border) !important;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05) !important;
+  transition: all 0.2s ease-in-out !important;
+}
+
+.ant-input:focus,
+.ant-input-focused,
+.ant-input-number-focused,
+.ant-picker-focused,
+.ant-select-focused .ant-select-selector {
+  border-color: var(--color-primary) !important;
+  box-shadow: 0 0 0 3px rgba(33, 62, 154, 0.15) !important;
+}
+
+.ant-input:hover,
+.ant-input-number:hover,
+.ant-picker:hover,
+.ant-select:not(.ant-select-disabled):hover .ant-select-selector {
+  border-color: var(--color-primary) !important;
+}
+
+.ant-btn {
+  border-radius: 0.5rem !important;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05) !important;
+  font-weight: 500 !important;
+  transition: all 0.2s ease-in-out !important;
+}
+
+.ant-btn-primary {
+  box-shadow: 0 4px 6px -1px rgba(33, 62, 154, 0.2), 0 2px 4px -1px rgba(33, 62, 154, 0.1) !important;
+}
+
+.ant-btn-primary:not(:disabled):hover {
+  transform: translateY(-1px);
+  box-shadow: 0 10px 15px -3px rgba(33, 62, 154, 0.2), 0 4px 6px -2px rgba(33, 62, 154, 0.1) !important;
+}
+
+.ant-form-item-label > label {
+  color: #374151 !important;
+  font-weight: 600 !important;
+  font-size: 0.875rem !important;
+}
+
+.ant-tabs-card.ant-tabs-small > .ant-tabs-nav .ant-tabs-tab {
+  border-radius: 0.5rem 0.5rem 0 0 !important;
+}
