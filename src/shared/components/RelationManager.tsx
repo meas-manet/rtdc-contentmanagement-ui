@@ -25,7 +25,7 @@ import {
     Tag,
     Typography,
 } from 'antd';
-import { LinkOutlined, UserOutlined } from '@ant-design/icons';
+import { LinkOutlined, UserOutlined, CloseOutlined } from '@ant-design/icons';
 import { useQuery } from '@tanstack/react-query';
 import { contentApi } from '../../features/entries/api';
 import type { RelationType } from '../../features/relations/types';
@@ -157,12 +157,12 @@ export function RelationManager({
         <div>
             {/* Header */}
             <div className="flex items-center gap-2 mb-2">
-                <LinkOutlined style={{ color: '#7c3aed', fontSize: 13 }} />
+                <LinkOutlined style={{ color: '#0858D9', fontSize: 13 }} />
                 <Text strong className="capitalize" style={{ fontSize: 13 }}>
                     {relationName.replace(/_/g, ' ')}
                 </Text>
                 <Tag
-                    color="purple"
+                    color="blue"
                     style={{ fontSize: 10, margin: 0 }}
                 >
                     {relationType}
@@ -248,7 +248,6 @@ export function RelationManager({
                                         actions={[
                                             <Tag
                                                 key="unlink"
-                                                closable
                                                 color="default"
                                                 onClose={(e) => {
                                                     e.preventDefault();
@@ -256,7 +255,7 @@ export function RelationManager({
                                                 }}
                                                 style={{ cursor: 'pointer' }}
                                             >
-                                                unlink
+                                                <CloseOutlined style={{ color: 'red', fontSize: 10 }} />
                                             </Tag>,
                                         ]}
                                     >

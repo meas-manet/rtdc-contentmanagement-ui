@@ -32,8 +32,8 @@ function LoginPage() {
             {contextHolder}
             <div className="w-full max-w-sm">
                 <div className="text-center mb-8">
-                    <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-white/10 backdrop-blur mb-4">
-                        <span className="text-2xl">⚡</span>
+                    <div className="text-white! font-extrabold! inline-flex items-center justify-center w-22 h-12 rounded-2xl bg-white/10 backdrop-blur mb-4">
+                        <span className="text-2xl">RTDC</span>
                     </div>
                     <Title level={3} className="text-white! mb-1! font-bold!">
                         Content Management
