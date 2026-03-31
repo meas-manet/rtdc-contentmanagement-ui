@@ -101,7 +101,7 @@ function MediaPage() {
             mediaApi.createFolder(websiteId, { name, parentFolderId: currentFolderId }),
         onSuccess: () => {
             qc.invalidateQueries({ queryKey: ['media-folders', websiteId] });
-            toast.success('Folder created!');
+            toast.success('The new folder has been created successfully.');
             setCreateFolderOpen(false);
             setNewFolderName('');
         },
@@ -115,7 +115,7 @@ function MediaPage() {
             mediaApi.renameFolder(websiteId, id, { name }),
         onSuccess: () => {
             qc.invalidateQueries({ queryKey: ['media-folders', websiteId] });
-            toast.success('Folder renamed.');
+            toast.success('The folder has been renamed successfully.');
             setRenameFolderTarget(null);
             setRenameFolderName('');
         },
@@ -129,7 +129,7 @@ function MediaPage() {
         onSuccess: () => {
             qc.invalidateQueries({ queryKey: ['media-folders', websiteId] });
             qc.invalidateQueries({ queryKey: ['media', websiteId] });
-            toast.success('Folder deleted.');
+            toast.success('The folder and its contents have been permanently deleted.');
         },
         onError: (err: { response?: { data?: { error?: string } } }) => {
             toast.error(err?.response?.data?.error ?? 'Failed to delete folder.');
@@ -142,9 +142,9 @@ function MediaPage() {
         onSuccess: (_, { folderId }) => {
             qc.invalidateQueries({ queryKey: ['media', websiteId, folderId] });
             qc.invalidateQueries({ queryKey: ['media-folders', websiteId] });
-            toast.success('File uploaded!');
+            toast.success('The file has been uploaded successfully.');
         },
-        onError: () => toast.error('Upload failed.'),
+        onError: () => toast.error('Something went wrong during the upload. Please try again.'),
     });
 
     const deleteMutation = useMutation({
@@ -152,9 +152,9 @@ function MediaPage() {
         onSuccess: () => {
             qc.invalidateQueries({ queryKey: ['media', websiteId] });
             qc.invalidateQueries({ queryKey: ['media-folders', websiteId] });
-            toast.success('Asset deleted.');
+            toast.success('The asset has been permanently deleted.');
         },
-        onError: () => toast.error('Failed to delete asset.'),
+        onError: () => toast.error('Something went wrong while deleting the asset. Please try again.'),
     });
 
     const moveAssetMutation = useMutation({
@@ -163,10 +163,10 @@ function MediaPage() {
         onSuccess: () => {
             qc.invalidateQueries({ queryKey: ['media', websiteId] });
             qc.invalidateQueries({ queryKey: ['media-folders', websiteId] });
-            toast.success('Asset moved.');
+            toast.success('The asset has been moved to the selected folder.');
             setMoveAssetTarget(null);
         },
-        onError: () => toast.error('Failed to move asset.'),
+        onError: () => toast.error('Something went wrong while moving the asset. Please try again.'),
     });
 
     // ── Handlers ───────────────────────────────────────────────────────────
@@ -293,7 +293,7 @@ function MediaPage() {
                             }}
                             onCopy={() => {
                                 navigator.clipboard.writeText(asset.url);
-                                toast.success('URL copied!');
+                                toast.success('The asset URL has been copied to your clipboard.');
                             }}
                             onMove={() => {
                                 setMoveAssetTarget(asset);

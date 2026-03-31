@@ -59,13 +59,13 @@ function CreateSchemaPage() {
             }),
         onSuccess: (created) => {
             qc.invalidateQueries({ queryKey: ['schemas', websiteId] });
-            toast.success('Schema created!');
+            toast.success('Your new schema has been created successfully.');
             navigate({
                 to: '/websites/$websiteId/schemas/$schemaId',
                 params: { websiteId, schemaId: created.id },
             });
         },
-        onError: () => toast.error('Failed to create schema.'),
+        onError: () => toast.error('Something went wrong while creating the schema. Please try again.'),
     });
 
     const handleSave = async () => {

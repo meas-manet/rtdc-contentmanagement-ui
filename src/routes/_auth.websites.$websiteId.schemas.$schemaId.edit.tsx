@@ -77,13 +77,13 @@ function EditSchemaPage() {
         onSuccess: () => {
             qc.invalidateQueries({ queryKey: ['schemas', websiteId] });
             qc.invalidateQueries({ queryKey: ['schemas', websiteId, schemaId] });
-            toast.success('Schema updated!');
+            toast.success('Schema settings have been updated successfully.');
             navigate({
                 to: '/websites/$websiteId/schemas',
                 params: { websiteId },
             });
         },
-        onError: () => toast.error('Failed to update schema.'),
+        onError: () => toast.error('Something went wrong while updating the schema. Please try again.'),
     });
 
     const handleSave = async () => {

@@ -136,7 +136,7 @@ function LocalesTab({ createOpen, onCreateClose }: LocalesTabProps) {
             qc.invalidateQueries({ queryKey: ['locales'] });
             onCreateClose();
             createForm.resetFields();
-            toast.success('Language added.');
+            toast.success('The language has been added successfully.');
         },
         onError: (err: any) =>
             toast.error(err?.response?.data?.error ?? 'Failed to add language.'),
@@ -148,18 +148,18 @@ function LocalesTab({ createOpen, onCreateClose }: LocalesTabProps) {
         onSuccess: () => {
             qc.invalidateQueries({ queryKey: ['locales'] });
             setEditItem(null);
-            toast.success('Language updated.');
+            toast.success('The language settings have been updated successfully.');
         },
-        onError: () => toast.error('Failed to update language.'),
+        onError: () => toast.error('Something went wrong while updating the language. Please try again.'),
     });
 
     const deleteMutation = useMutation({
         mutationFn: localesApi.delete,
         onSuccess: () => {
             qc.invalidateQueries({ queryKey: ['locales'] });
-            toast.success('Language removed.');
+            toast.success('The language has been removed successfully.');
         },
-        onError: () => toast.error('Failed to remove language.'),
+        onError: () => toast.error('Something went wrong while removing the language. Please try again.'),
     });
 
     const columns = [
@@ -329,7 +329,7 @@ function TranslationsTab({ createOpen, onCreateClose }: TranslationsTabProps) {
             qc.invalidateQueries({ queryKey: ['translations'] });
             onCreateClose();
             createForm.resetFields();
-            toast.success('Translation created.');
+            toast.success('The translation has been created successfully.');
         },
         onError: (err: any) =>
             toast.error(err?.response?.data?.error ?? 'Failed to create translation.'),
@@ -341,18 +341,18 @@ function TranslationsTab({ createOpen, onCreateClose }: TranslationsTabProps) {
         onSuccess: () => {
             qc.invalidateQueries({ queryKey: ['translations'] });
             setEditItem(null);
-            toast.success('Translation updated.');
+            toast.success('The translation has been updated successfully.');
         },
-        onError: () => toast.error('Failed to update translation.'),
+        onError: () => toast.error('Something went wrong while updating the translation. Please try again.'),
     });
 
     const deleteMutation = useMutation({
         mutationFn: translationsApi.delete,
         onSuccess: () => {
             qc.invalidateQueries({ queryKey: ['translations'] });
-            toast.success('Translation deleted.');
+            toast.success('The translation has been permanently deleted.');
         },
-        onError: () => toast.error('Failed to delete translation.'),
+        onError: () => toast.error('Something went wrong while deleting the translation. Please try again.'),
     });
 
     const columns = [

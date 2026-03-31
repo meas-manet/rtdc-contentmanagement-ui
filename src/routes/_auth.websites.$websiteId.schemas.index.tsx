@@ -46,9 +46,9 @@ function SchemasPage() {
         mutationFn: (id: string) => schemasApi.delete(websiteId, id),
         onSuccess: () => {
             qc.invalidateQueries({ queryKey: ['schemas', websiteId] });
-            toast.success('Schema deleted.');
+            toast.success('The schema has been permanently deleted.');
         },
-        onError: () => toast.error('Failed to delete schema.'),
+        onError: () => toast.error('Something went wrong while deleting the schema. Please try again.'),
     });
 
     const columns = [

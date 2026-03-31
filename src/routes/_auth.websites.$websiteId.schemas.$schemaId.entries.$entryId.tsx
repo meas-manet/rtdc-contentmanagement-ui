@@ -105,13 +105,13 @@ function EntryEditorPage() {
             contentApi.create(website!.slug, schema!.slug, { ...values, locale: activeLocale }, website!.apiKey),
         onSuccess: (created) => {
             qc.invalidateQueries({ queryKey: ['content', websiteId, schemaId] });
-            toast.success('Entry created!');
+            toast.success('The new entry has been created successfully.');
             navigate({
                 to: '/websites/$websiteId/schemas/$schemaId/entries/$entryId',
                 params: { websiteId, schemaId, entryId: created.id },
             });
         },
-        onError: () => toast.error('Failed to create entry.'),
+        onError: () => toast.error('Something went wrong while creating the entry. Please try again.'),
     });
 
     const updateMutation = useMutation({
@@ -127,9 +127,9 @@ function EntryEditorPage() {
             qc.invalidateQueries({ queryKey: ['content', websiteId, schemaId] });
             qc.invalidateQueries({ queryKey: ['entry', entryId] });
             qc.invalidateQueries({ queryKey: ['localizations', entryId] });
-            toast.success('Entry saved!');
+            toast.success('All entry changes have been saved successfully.');
         },
-        onError: () => toast.error('Failed to save entry.'),
+        onError: () => toast.error('Something went wrong while saving the entry. Please try again.'),
     });
 
     // ── Status-only mutation (unpublish / re-draft) ──────────────────────────
@@ -149,11 +149,11 @@ function EntryEditorPage() {
             qc.invalidateQueries({ queryKey: ['localizations', entryId] });
             qc.invalidateQueries({ queryKey: ['content', websiteId, schemaId] });
             const label = status === 'draft' ? 'reverted to draft' : 'published';
-            toast.success(`Entry ${label} successfully.`);
+            toast.success(`The entry has been ${label} successfully.`);
         },
         onError: (_err, status) => {
             const label = status === 'draft' ? 'unpublish' : 'publish';
-            toast.error(`Failed to ${label} entry.`);
+            toast.error(`Something went wrong while trying to ${label} the entry. Please try again.`);
         },
     });
 
@@ -168,9 +168,9 @@ function EntryEditorPage() {
             ),
         onSuccess: () => {
             qc.invalidateQueries({ queryKey: ['localizations', entryId] });
-            toast.success(`Translation for "${activeLocale}" created!`);
+            toast.success(`A new localization for "${activeLocale}" has been created successfully.`);
         },
-        onError: () => toast.error('Failed to create localization.'),
+        onError: () => toast.error('Something went wrong while creating the localization. Please try again.'),
     });
 
     const handleSave = async (status: ContentStatus = 'draft') => {

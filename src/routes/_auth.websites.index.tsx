@@ -63,9 +63,9 @@ function WebsitesPage() {
             qc.invalidateQueries({ queryKey: ['websites'] });
             setCreateOpen(false);
             form.resetFields();
-            toast.success('Website created!');
+            toast.success('Your new website has been created successfully.');
         },
-        onError: () => toast.error('Failed to create website.'),
+        onError: () => toast.error('Something went wrong while creating the website. Please try again.'),
     });
 
     const updateMutation = useMutation({
@@ -74,27 +74,27 @@ function WebsitesPage() {
         onSuccess: () => {
             qc.invalidateQueries({ queryKey: ['websites'] });
             setEditSite(null);
-            toast.success('Website updated!');
+            toast.success('Website details have been updated successfully.');
         },
-        onError: () => toast.error('Failed to update website.'),
+        onError: () => toast.error('Something went wrong while updating the website. Please try again.'),
     });
 
     const deleteMutation = useMutation({
         mutationFn: websitesApi.delete,
         onSuccess: () => {
             qc.invalidateQueries({ queryKey: ['websites'] });
-            toast.success('Website deleted.');
+            toast.success('The website has been permanently deleted.');
         },
-        onError: () => toast.error('Failed to delete website.'),
+        onError: () => toast.error('Something went wrong while deleting the website. Please try again.'),
     });
 
     const regenMutation = useMutation({
         mutationFn: websitesApi.regenerateKey,
         onSuccess: () => {
             qc.invalidateQueries({ queryKey: ['websites'] });
-            toast.success('API key regenerated.');
+            toast.success('A new API key has been generated for this website.');
         },
-        onError: () => toast.error('Failed to regenerate key.'),
+        onError: () => toast.error('Something went wrong while regenerating the API key. Please try again.'),
     });
 
     return (
@@ -169,7 +169,7 @@ function WebsitesPage() {
                             regenLoading={regenMutation.isPending && regenMutation.variables === site.id}
                             onCopyKey={() => {
                                 navigator.clipboard.writeText(site.apiKey);
-                                toast.success('API key copied!');
+                                toast.success('The API key has been copied to your clipboard.');
                             }}
                         />
                     ))}

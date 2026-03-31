@@ -74,9 +74,9 @@ function ContentTablePage() {
         mutationFn: (id: string) => schemasApi.deleteEntry(websiteId, schemaId, id),
         onSuccess: () => {
             qc.invalidateQueries({ queryKey: ['content', websiteId, schemaId] });
-            toast.success('Entry deleted.');
+            toast.success('The entry has been permanently deleted.');
         },
-        onError: () => toast.error('Failed to delete entry.'),
+        onError: () => toast.error('Something went wrong while deleting the entry. Please try again.'),
     });
 
     const definition: SchemaFieldDto[] = schema?.definition ?? [];
