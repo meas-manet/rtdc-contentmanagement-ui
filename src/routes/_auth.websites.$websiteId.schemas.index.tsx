@@ -1,4 +1,4 @@
-// Schemas management page — list + create + edit with field builder
+// Schemas management page — list with PageHeader + TableCard + RowActions (matches Entries design)
 import { createFileRoute, useParams, useNavigate } from '@tanstack/react-router';
 import {
     useQuery,
@@ -6,44 +6,24 @@ import {
     useQueryClient,
 } from '@tanstack/react-query';
 import {
-    Table,
     Button,
-    Modal,
-    Form,
-    Input,
-    Select,
-    Switch,
     Space,
     Tag,
-    Popconfirm,
     message,
     Typography,
-    Tooltip,
     Empty,
-    Card,
-    type FormInstance,
 } from 'antd';
 import {
     PlusOutlined,
-    EditOutlined,
-    DeleteOutlined,
-    MinusCircleOutlined,
 } from '@ant-design/icons';
-import { useState } from 'react';
 import { schemasApi } from '../features/schemas/api';
-import type { SchemaResponseDto, SchemaFieldDto, FieldType } from '../features/schemas/types';
+import { PageHeader } from '../shared/components/PageHeader';
+import { TableCard } from '../shared/components/TableCard';
+import { RowActions } from '../shared/components/RowActions';
+import { LoadingScreen } from '../shared/components/LoadingScreen';
+import type { SchemaResponseDto, SchemaFieldDto } from '../features/schemas/types';
 
-const { Title, Text } = Typography;
-
-const FIELD_TYPES: { label: string; value: FieldType }[] = [
-    { label: 'String', value: 'string' },
-    { label: 'Number', value: 'number' },
-    { label: 'Boolean', value: 'boolean' },
-    { label: 'Rich Text', value: 'richtext' },
-    { label: 'Date', value: 'date' },
-    { label: 'Array', value: 'array' },
-    { label: 'Object', value: 'object' },
-];
+const { Text } = Typography;
 
 export const Route = createFileRoute('/_auth/websites/$websiteId/schemas/')({
     component: SchemasPage,
@@ -55,41 +35,9 @@ function SchemasPage() {
     const qc = useQueryClient();
     const [messageApi, contextHolder] = message.useMessage();
 
-    const [createOpen, setCreateOpen] = useState(false);
-    const [editSchema, setEditSchema] = useState<SchemaResponseDto | null>(null);
-    const [form] = Form.useForm();
-    const [editForm] = Form.useForm();
-
     const { data: schemas, isPending } = useQuery({
         queryKey: ['schemas', websiteId],
         queryFn: () => schemasApi.getAll(websiteId),
-    });
-
-    const createMutation = useMutation({
-        mutationFn: (dto: Parameters<typeof schemasApi.create>[1]) =>
-            schemasApi.create(websiteId, dto),
-        onSuccess: (created) => {
-            qc.invalidateQueries({ queryKey: ['schemas', websiteId] });
-            setCreateOpen(false);
-            form.resetFields();
-            messageApi.success('Schema created!');
-            navigate({
-                to: '/websites/$websiteId/schemas/$schemaId',
-                params: { websiteId, schemaId: created.id },
-            });
-        },
-        onError: () => messageApi.error('Failed to create schema.'),
-    });
-
-    const updateMutation = useMutation({
-        mutationFn: ({ id, dto }: { id: string; dto: Parameters<typeof schemasApi.update>[2] }) =>
-            schemasApi.update(websiteId, id, dto),
-        onSuccess: () => {
-            qc.invalidateQueries({ queryKey: ['schemas', websiteId] });
-            setEditSchema(null);
-            messageApi.success('Schema updated!');
-        },
-        onError: () => messageApi.error('Failed to update schema.'),
     });
 
     const deleteMutation = useMutation({
@@ -108,7 +56,7 @@ function SchemasPage() {
             key: 'name',
             render: (name: string, row: SchemaResponseDto) => (
                 <button
-                    className="font-medium text-primary hover:underline bg-transparent border-0 p-0 cursor-pointer"
+                    className="font-semibold text-primary hover:underline bg-transparent border-0 p-0 cursor-pointer"
                     onClick={() =>
                         navigate({
                             to: '/websites/$websiteId/schemas/$schemaId',
@@ -132,11 +80,19 @@ function SchemasPage() {
             key: 'fields',
             render: (def: SchemaFieldDto[]) => (
                 <Space size={4} wrap>
-                    {def.map((f) => (
+                    {def.slice(0, 4).map((f) => (
                         <Tag key={f.name} color="geekblue">
-                            {f.name}:{f.type}
+                            {f.name}
+                            <Text type="secondary" className="ml-1 text-xs">
+                                :{f.type}
+                            </Text>
                         </Tag>
                     ))}
+                    {def.length > 4 && (
+                        <Text type="secondary" className="text-xs">
+                            +{def.length - 4} more
+                        </Text>
+                    )}
                 </Space>
             ),
         },
@@ -144,210 +100,88 @@ function SchemasPage() {
             title: 'Created',
             dataIndex: 'createdAt',
             key: 'createdAt',
-            render: (v: string) => new Date(v).toLocaleDateString(),
+            width: 120,
+            render: (v: string) => (
+                <Text type="secondary" className="text-sm">
+                    {new Date(v).toLocaleDateString()}
+                </Text>
+            ),
         },
         {
             title: '',
             key: 'actions',
+            width: 80,
             render: (_: unknown, row: SchemaResponseDto) => (
-                <Space>
-                    <Tooltip title="Edit schema">
-                        <Button
-                            type="text"
-                            icon={<EditOutlined />}
-                            size="small"
-                            onClick={() => {
-                                setEditSchema(row);
-                                editForm.setFieldsValue({ name: row.name, definition: row.definition });
-                            }}
-                        />
-                    </Tooltip>
-                    <Popconfirm
-                        title="Delete schema?"
-                        description="All content entries for this schema will be deleted."
-                        onConfirm={() => deleteMutation.mutate(row.id)}
-                        okText="Delete"
-                        okButtonProps={{ danger: true }}
-                    >
-                        <Button type="text" danger icon={<DeleteOutlined />} size="small" />
-                    </Popconfirm>
-                </Space>
+                <RowActions
+                    editTooltip="Edit schema"
+                    onEdit={() =>
+                        navigate({
+                            to: '/websites/$websiteId/schemas/$schemaId/edit',
+                            params: { websiteId, schemaId: row.id },
+                        })
+                    }
+                    onDelete={() => deleteMutation.mutate(row.id)}
+                    deleteConfirmTitle="Delete schema?"
+                    deleteConfirmDescription="All content entries for this schema will also be deleted."
+                />
             ),
         },
     ];
 
+    if (isPending) return <LoadingScreen />;
+
     return (
-        <div className="p-8 max-w-5xl mx-auto">
+        <div className="p-8">
             {contextHolder}
-            <div className="flex items-center justify-between mb-8">
-                <div>
-                    <Title level={2} className="mb-0! font-bold!">
-                        Content Types
-                    </Title>
-                    <Text className="text-muted!">Define the structure for your content</Text>
-                </div>
-                <Button type="primary" icon={<PlusOutlined />} onClick={() => setCreateOpen(true)}>
-                    New Schema
-                </Button>
-            </div>
 
-            <Card className="rounded-xl border border-surface-border shadow-sm">
-                <Table
-                    dataSource={schemas}
-                    columns={columns}
-                    rowKey="id"
-                    loading={isPending}
-                    locale={{
-                        emptyText: (
-                            <Empty
-                                description="No content types yet"
-                                image={Empty.PRESENTED_IMAGE_SIMPLE}
-                            >
-                                <Button type="primary" icon={<PlusOutlined />} onClick={() => setCreateOpen(true)}>
-                                    Create your first schema
-                                </Button>
-                            </Empty>
-                        ),
-                    }}
-                    pagination={false}
-                />
-            </Card>
-
-            {/* Create Modal */}
-            <SchemaFormModal
-                title="Create Content Type"
-                open={createOpen}
-                onClose={() => { setCreateOpen(false); form.resetFields(); }}
-                form={form}
-                showSlug
-                onFinish={(v) => createMutation.mutate({ ...v, slug: v.slug! })}
-                loading={createMutation.isPending}
+            <PageHeader
+                title="Content Types"
+                subtitle={`${schemas?.length ?? 0} ${(schemas?.length ?? 0) === 1 ? 'schema' : 'schemas'} defined`}
+                actions={
+                    <Button
+                        type="primary"
+                        size="large"
+                        icon={<PlusOutlined />}
+                        onClick={() =>
+                            navigate({
+                                to: '/websites/$websiteId/schemas/new',
+                                params: { websiteId },
+                            })
+                        }
+                    >
+                        New Schema
+                    </Button>
+                }
             />
 
-            {/* Edit Modal */}
-            <SchemaFormModal
-                title="Edit Content Type"
-                open={!!editSchema}
-                onClose={() => setEditSchema(null)}
-                form={editForm}
-                showSlug={false}
-                onFinish={(v) => {
-                    if (!editSchema) return;
-                    updateMutation.mutate({ id: editSchema.id, dto: v });
+            <TableCard
+                dataSource={schemas}
+                columns={columns}
+                rowKey="id"
+                loading={isPending}
+                locale={{
+                    emptyText: (
+                        <Empty
+                            description="No content types yet"
+                            image={Empty.PRESENTED_IMAGE_SIMPLE}
+                        >
+                            <Button
+                                type="primary"
+                                icon={<PlusOutlined />}
+                                onClick={() =>
+                                    navigate({
+                                        to: '/websites/$websiteId/schemas/new',
+                                        params: { websiteId },
+                                    })
+                                }
+                            >
+                                Create your first schema
+                            </Button>
+                        </Empty>
+                    ),
                 }}
-                loading={updateMutation.isPending}
+                pagination={false}
             />
         </div>
-    );
-}
-
-interface SchemaFormModalProps {
-    title: string;
-    open: boolean;
-    onClose: () => void;
-    form: FormInstance<any>;
-    showSlug: boolean;
-    onFinish: (values: { name: string; slug?: string; definition: SchemaFieldDto[] }) => void;
-    loading: boolean;
-}
-
-function SchemaFormModal({
-    title,
-    open,
-    onClose,
-    form,
-    showSlug,
-    onFinish,
-    loading,
-}: SchemaFormModalProps) {
-    return (
-        <Modal
-            title={title}
-            open={open}
-            onCancel={onClose}
-            onOk={() => form.submit()}
-            okText="Save"
-            confirmLoading={loading}
-            width={640}
-            destroyOnHidden
-        >
-            <Form
-                form={form}
-                layout="vertical"
-                onFinish={onFinish}
-                initialValues={{ definition: [{ name: '', type: 'string', required: false }] }}
-                className="mt-4"
-            >
-                <Form.Item name="name" label="Name" rules={[{ required: true }]}>
-                    <Input placeholder="Blog Posts" />
-                </Form.Item>
-                {showSlug && (
-                    <Form.Item
-                        name="slug"
-                        label="Slug"
-                        rules={[
-                            { required: true },
-                            { pattern: /^[a-z0-9-]+$/, message: 'Lowercase, numbers, hyphens only' },
-                        ]}
-                    >
-                        <Input placeholder="blog-posts" />
-                    </Form.Item>
-                )}
-
-                <Form.Item label="Fields">
-                    <Form.List name="definition">
-                        {(fields, { add, remove }) => (
-                            <div className="space-y-2">
-                                {fields.map(({ key, name, ...restField }) => (
-                                    <div
-                                        key={key}
-                                        className="flex items-start gap-2 bg-app-bg rounded-lg p-3 border border-surface-border"
-                                    >
-                                        <Form.Item
-                                            {...restField}
-                                            name={[name, 'name']}
-                                            rules={[{ required: true, message: 'Field name required' }]}
-                                            className="mb-0 flex-1"
-                                        >
-                                            <Input placeholder="field_name" />
-                                        </Form.Item>
-                                        <Form.Item
-                                            {...restField}
-                                            name={[name, 'type']}
-                                            className="mb-0 w-32"
-                                        >
-                                            <Select options={FIELD_TYPES} />
-                                        </Form.Item>
-                                        <Form.Item
-                                            {...restField}
-                                            name={[name, 'required']}
-                                            valuePropName="checked"
-                                            className="mb-0"
-                                        >
-                                            <Switch size="small" checkedChildren="Req" unCheckedChildren="Opt" />
-                                        </Form.Item>
-                                        <Button
-                                            type="text"
-                                            danger
-                                            icon={<MinusCircleOutlined />}
-                                            onClick={() => remove(name)}
-                                            className="mt-1"
-                                        />
-                                    </div>
-                                ))}
-                                <Button
-                                    type="dashed"
-                                    onClick={() => add({ name: '', type: 'string', required: false })}
-                                    block
-                                    icon={<PlusOutlined />}
-                                >
-                                    Add Field
-                                </Button>
-                            </div>
-                        )}
-                    </Form.List>
-                </Form.Item>
-            </Form>
-        </Modal>
     );
 }

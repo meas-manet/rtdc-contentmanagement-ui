@@ -19,7 +19,9 @@ import { Route as AuthWebsitesWebsiteIdRouteImport } from './routes/_auth.websit
 import { Route as AuthWebsitesWebsiteIdIndexRouteImport } from './routes/_auth.websites.$websiteId.index'
 import { Route as AuthWebsitesWebsiteIdMediaRouteImport } from './routes/_auth.websites.$websiteId.media'
 import { Route as AuthWebsitesWebsiteIdSchemasIndexRouteImport } from './routes/_auth.websites.$websiteId.schemas.index'
+import { Route as AuthWebsitesWebsiteIdSchemasNewRouteImport } from './routes/_auth.websites.$websiteId.schemas.new'
 import { Route as AuthWebsitesWebsiteIdSchemasSchemaIdIndexRouteImport } from './routes/_auth.websites.$websiteId.schemas.$schemaId.index'
+import { Route as AuthWebsitesWebsiteIdSchemasSchemaIdEditRouteImport } from './routes/_auth.websites.$websiteId.schemas.$schemaId.edit'
 import { Route as AuthWebsitesWebsiteIdSchemasSchemaIdEntriesEntryIdRouteImport } from './routes/_auth.websites.$websiteId.schemas.$schemaId.entries.$entryId'
 
 const LoginRoute = LoginRouteImport.update({
@@ -74,10 +76,22 @@ const AuthWebsitesWebsiteIdSchemasIndexRoute =
     path: '/schemas/',
     getParentRoute: () => AuthWebsitesWebsiteIdRoute,
   } as any)
+const AuthWebsitesWebsiteIdSchemasNewRoute =
+  AuthWebsitesWebsiteIdSchemasNewRouteImport.update({
+    id: '/schemas/new',
+    path: '/schemas/new',
+    getParentRoute: () => AuthWebsitesWebsiteIdRoute,
+  } as any)
 const AuthWebsitesWebsiteIdSchemasSchemaIdIndexRoute =
   AuthWebsitesWebsiteIdSchemasSchemaIdIndexRouteImport.update({
     id: '/schemas/$schemaId/',
     path: '/schemas/$schemaId/',
+    getParentRoute: () => AuthWebsitesWebsiteIdRoute,
+  } as any)
+const AuthWebsitesWebsiteIdSchemasSchemaIdEditRoute =
+  AuthWebsitesWebsiteIdSchemasSchemaIdEditRouteImport.update({
+    id: '/schemas/$schemaId/edit',
+    path: '/schemas/$schemaId/edit',
     getParentRoute: () => AuthWebsitesWebsiteIdRoute,
   } as any)
 const AuthWebsitesWebsiteIdSchemasSchemaIdEntriesEntryIdRoute =
@@ -96,7 +110,9 @@ export interface FileRoutesByFullPath {
   '/websites/': typeof AuthWebsitesIndexRoute
   '/websites/$websiteId/media': typeof AuthWebsitesWebsiteIdMediaRoute
   '/websites/$websiteId/': typeof AuthWebsitesWebsiteIdIndexRoute
+  '/websites/$websiteId/schemas/new': typeof AuthWebsitesWebsiteIdSchemasNewRoute
   '/websites/$websiteId/schemas/': typeof AuthWebsitesWebsiteIdSchemasIndexRoute
+  '/websites/$websiteId/schemas/$schemaId/edit': typeof AuthWebsitesWebsiteIdSchemasSchemaIdEditRoute
   '/websites/$websiteId/schemas/$schemaId/': typeof AuthWebsitesWebsiteIdSchemasSchemaIdIndexRoute
   '/websites/$websiteId/schemas/$schemaId/entries/$entryId': typeof AuthWebsitesWebsiteIdSchemasSchemaIdEntriesEntryIdRoute
 }
@@ -107,7 +123,9 @@ export interface FileRoutesByTo {
   '/websites': typeof AuthWebsitesIndexRoute
   '/websites/$websiteId/media': typeof AuthWebsitesWebsiteIdMediaRoute
   '/websites/$websiteId': typeof AuthWebsitesWebsiteIdIndexRoute
+  '/websites/$websiteId/schemas/new': typeof AuthWebsitesWebsiteIdSchemasNewRoute
   '/websites/$websiteId/schemas': typeof AuthWebsitesWebsiteIdSchemasIndexRoute
+  '/websites/$websiteId/schemas/$schemaId/edit': typeof AuthWebsitesWebsiteIdSchemasSchemaIdEditRoute
   '/websites/$websiteId/schemas/$schemaId': typeof AuthWebsitesWebsiteIdSchemasSchemaIdIndexRoute
   '/websites/$websiteId/schemas/$schemaId/entries/$entryId': typeof AuthWebsitesWebsiteIdSchemasSchemaIdEntriesEntryIdRoute
 }
@@ -122,7 +140,9 @@ export interface FileRoutesById {
   '/_auth/websites/': typeof AuthWebsitesIndexRoute
   '/_auth/websites/$websiteId/media': typeof AuthWebsitesWebsiteIdMediaRoute
   '/_auth/websites/$websiteId/': typeof AuthWebsitesWebsiteIdIndexRoute
+  '/_auth/websites/$websiteId/schemas/new': typeof AuthWebsitesWebsiteIdSchemasNewRoute
   '/_auth/websites/$websiteId/schemas/': typeof AuthWebsitesWebsiteIdSchemasIndexRoute
+  '/_auth/websites/$websiteId/schemas/$schemaId/edit': typeof AuthWebsitesWebsiteIdSchemasSchemaIdEditRoute
   '/_auth/websites/$websiteId/schemas/$schemaId/': typeof AuthWebsitesWebsiteIdSchemasSchemaIdIndexRoute
   '/_auth/websites/$websiteId/schemas/$schemaId/entries/$entryId': typeof AuthWebsitesWebsiteIdSchemasSchemaIdEntriesEntryIdRoute
 }
@@ -137,7 +157,9 @@ export interface FileRouteTypes {
     | '/websites/'
     | '/websites/$websiteId/media'
     | '/websites/$websiteId/'
+    | '/websites/$websiteId/schemas/new'
     | '/websites/$websiteId/schemas/'
+    | '/websites/$websiteId/schemas/$schemaId/edit'
     | '/websites/$websiteId/schemas/$schemaId/'
     | '/websites/$websiteId/schemas/$schemaId/entries/$entryId'
   fileRoutesByTo: FileRoutesByTo
@@ -148,7 +170,9 @@ export interface FileRouteTypes {
     | '/websites'
     | '/websites/$websiteId/media'
     | '/websites/$websiteId'
+    | '/websites/$websiteId/schemas/new'
     | '/websites/$websiteId/schemas'
+    | '/websites/$websiteId/schemas/$schemaId/edit'
     | '/websites/$websiteId/schemas/$schemaId'
     | '/websites/$websiteId/schemas/$schemaId/entries/$entryId'
   id:
@@ -162,7 +186,9 @@ export interface FileRouteTypes {
     | '/_auth/websites/'
     | '/_auth/websites/$websiteId/media'
     | '/_auth/websites/$websiteId/'
+    | '/_auth/websites/$websiteId/schemas/new'
     | '/_auth/websites/$websiteId/schemas/'
+    | '/_auth/websites/$websiteId/schemas/$schemaId/edit'
     | '/_auth/websites/$websiteId/schemas/$schemaId/'
     | '/_auth/websites/$websiteId/schemas/$schemaId/entries/$entryId'
   fileRoutesById: FileRoutesById
@@ -245,11 +271,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthWebsitesWebsiteIdSchemasIndexRouteImport
       parentRoute: typeof AuthWebsitesWebsiteIdRoute
     }
+    '/_auth/websites/$websiteId/schemas/new': {
+      id: '/_auth/websites/$websiteId/schemas/new'
+      path: '/schemas/new'
+      fullPath: '/websites/$websiteId/schemas/new'
+      preLoaderRoute: typeof AuthWebsitesWebsiteIdSchemasNewRouteImport
+      parentRoute: typeof AuthWebsitesWebsiteIdRoute
+    }
     '/_auth/websites/$websiteId/schemas/$schemaId/': {
       id: '/_auth/websites/$websiteId/schemas/$schemaId/'
       path: '/schemas/$schemaId'
       fullPath: '/websites/$websiteId/schemas/$schemaId/'
       preLoaderRoute: typeof AuthWebsitesWebsiteIdSchemasSchemaIdIndexRouteImport
+      parentRoute: typeof AuthWebsitesWebsiteIdRoute
+    }
+    '/_auth/websites/$websiteId/schemas/$schemaId/edit': {
+      id: '/_auth/websites/$websiteId/schemas/$schemaId/edit'
+      path: '/schemas/$schemaId/edit'
+      fullPath: '/websites/$websiteId/schemas/$schemaId/edit'
+      preLoaderRoute: typeof AuthWebsitesWebsiteIdSchemasSchemaIdEditRouteImport
       parentRoute: typeof AuthWebsitesWebsiteIdRoute
     }
     '/_auth/websites/$websiteId/schemas/$schemaId/entries/$entryId': {
@@ -265,7 +305,9 @@ declare module '@tanstack/react-router' {
 interface AuthWebsitesWebsiteIdRouteChildren {
   AuthWebsitesWebsiteIdMediaRoute: typeof AuthWebsitesWebsiteIdMediaRoute
   AuthWebsitesWebsiteIdIndexRoute: typeof AuthWebsitesWebsiteIdIndexRoute
+  AuthWebsitesWebsiteIdSchemasNewRoute: typeof AuthWebsitesWebsiteIdSchemasNewRoute
   AuthWebsitesWebsiteIdSchemasIndexRoute: typeof AuthWebsitesWebsiteIdSchemasIndexRoute
+  AuthWebsitesWebsiteIdSchemasSchemaIdEditRoute: typeof AuthWebsitesWebsiteIdSchemasSchemaIdEditRoute
   AuthWebsitesWebsiteIdSchemasSchemaIdIndexRoute: typeof AuthWebsitesWebsiteIdSchemasSchemaIdIndexRoute
   AuthWebsitesWebsiteIdSchemasSchemaIdEntriesEntryIdRoute: typeof AuthWebsitesWebsiteIdSchemasSchemaIdEntriesEntryIdRoute
 }
@@ -273,8 +315,11 @@ interface AuthWebsitesWebsiteIdRouteChildren {
 const AuthWebsitesWebsiteIdRouteChildren: AuthWebsitesWebsiteIdRouteChildren = {
   AuthWebsitesWebsiteIdMediaRoute: AuthWebsitesWebsiteIdMediaRoute,
   AuthWebsitesWebsiteIdIndexRoute: AuthWebsitesWebsiteIdIndexRoute,
+  AuthWebsitesWebsiteIdSchemasNewRoute: AuthWebsitesWebsiteIdSchemasNewRoute,
   AuthWebsitesWebsiteIdSchemasIndexRoute:
     AuthWebsitesWebsiteIdSchemasIndexRoute,
+  AuthWebsitesWebsiteIdSchemasSchemaIdEditRoute:
+    AuthWebsitesWebsiteIdSchemasSchemaIdEditRoute,
   AuthWebsitesWebsiteIdSchemasSchemaIdIndexRoute:
     AuthWebsitesWebsiteIdSchemasSchemaIdIndexRoute,
   AuthWebsitesWebsiteIdSchemasSchemaIdEntriesEntryIdRoute:
