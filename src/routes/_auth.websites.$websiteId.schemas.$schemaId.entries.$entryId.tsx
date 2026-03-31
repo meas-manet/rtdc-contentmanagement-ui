@@ -264,6 +264,7 @@ function EntryEditorPage() {
                                 deleteConfirm({
                                     title: 'Revert to draft?',
                                     description: 'This entry will no longer be visible on the live site.',
+                                    okText: 'Unpublish',
                                     onConfirm: () => statusMutation.mutateAsync('draft'),
                                 })
                             }
@@ -281,7 +282,7 @@ function EntryEditorPage() {
                     <Button
                         size="large"
                         icon={<SaveOutlined />}
-                        onClick={() => handleSave('draft')}
+                        onClick={() => handleSave(isPublished ? 'published' : 'draft')}
                         loading={isSaving}
                         disabled={isUnpublishing}
                         className="font-semibold"
@@ -325,7 +326,7 @@ function EntryEditorPage() {
                             <Alert
                                 type="info"
                                 className="mb-6 rounded-xl border-blue-200 bg-blue-50/50"
-                                message={`No translation for "${activeLocale}" yet. Fill the form below and click "Publish" to create it.`}
+                                title={`No translation for "${activeLocale}" yet. Fill the form below and click "Publish" to create it.`}
                                 showIcon
                             />
                         )}
@@ -443,7 +444,7 @@ function EntryEditorPage() {
                                 <Button
                                     size="large"
                                     icon={<SaveOutlined />}
-                                    onClick={() => handleSave('draft')}
+                                    onClick={() => handleSave(isPublished ? 'published' : 'draft')}
                                     loading={isSaving}
                                     disabled={isUnpublishing}
                                     block
@@ -471,6 +472,7 @@ function EntryEditorPage() {
                                             deleteConfirm({
                                                 title: 'Revert to draft?',
                                                 description: 'This entry will no longer be visible on the live site.',
+                                                okText: 'Unpublish',
                                                 onConfirm: () => statusMutation.mutateAsync('draft'),
                                             })
                                         }

@@ -12,14 +12,16 @@ interface DeleteConfirmOptions {
     title: string;
     /** Optional descriptive text below the title */
     description?: string;
-    /** Called when the user clicks "Delete". Should return a Promise (e.g. mutation.mutateAsync). */
+    /** Label for the confirm button. Defaults to "Delete". */
+    okText?: string;
+    /** Called when the user clicks the confirm button. Should return a Promise (e.g. mutation.mutateAsync). */
     onConfirm: () => Promise<unknown> | void;
 }
 
 export function useDeleteConfirm() {
     const { modal } = App.useApp();
 
-    return ({ title, description, onConfirm }: DeleteConfirmOptions) => {
+    return ({ title, description, okText = 'Delete', onConfirm }: DeleteConfirmOptions) => {
         modal.confirm({
             title: (
                 <span className="font-semibold text-gray-900">{title}</span>
@@ -32,7 +34,7 @@ export function useDeleteConfirm() {
             icon: (
                 <ExclamationCircleFilled style={{ color: '#dc2626' }} />
             ),
-            okText: 'Delete',
+            okText,
             okType: 'danger',
             cancelText: 'Cancel',
             okButtonProps: {

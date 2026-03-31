@@ -23,7 +23,7 @@ import {
     MoreOutlined,
     HomeOutlined,
     FolderOpenOutlined,
-    ScissorOutlined,
+    DragOutlined,
 } from '@ant-design/icons';
 import { mediaApi } from '../features/media/api';
 import type { MediaAssetResponseDto, MediaFolderResponseDto } from '../features/media/types';
@@ -511,7 +511,7 @@ function AssetCard({
                         <Button
                             size="small"
                             type="text"
-                            icon={<ScissorOutlined />}
+                            icon={<DragOutlined />}
                             onClick={onMove}
                             className="flex-1"
                         />
