@@ -24,6 +24,7 @@ import {
     HomeOutlined,
     FolderOpenOutlined,
     DragOutlined,
+    RightOutlined,
 } from '@ant-design/icons';
 import { mediaApi } from '../features/media/api';
 import type { MediaAssetResponseDto, MediaFolderResponseDto } from '../features/media/types';
@@ -77,6 +78,8 @@ function MediaPage() {
     // Move asset modal
     const [moveAssetTarget, setMoveAssetTarget] = useState<MediaAssetResponseDto | null>(null);
     const [moveDestFolderId, setMoveDestFolderId] = useState<string | null | undefined>(undefined);
+    const [moveBrowseFolderId, setMoveBrowseFolderId] = useState<string | null>(null);
+    const [moveBrowsePath, setMoveBrowsePath] = useState<BreadcrumbEntry[]>([{ id: null, name: 'Root' }]);
 
     // ── Queries ────────────────────────────────────────────────────────────
     const { data: folders } = useQuery({
@@ -89,11 +92,25 @@ function MediaPage() {
         queryFn: () => mediaApi.getAll(websiteId, currentFolderId),
     });
 
-    // All root-level folders — used for move-to-folder list
-    const { data: rootFolders } = useQuery({
-        queryKey: ['media-folders', websiteId, null],
-        queryFn: () => mediaApi.getFolders(websiteId, null),
+    // Folders shown in the move-to picker, updates as user browses
+    const { data: moveFolders } = useQuery({
+        queryKey: ['media-folders', websiteId, moveBrowseFolderId, 'picker'],
+        queryFn: () => mediaApi.getFolders(websiteId, moveBrowseFolderId),
+        enabled: !!moveAssetTarget,
     });
+
+    const movePickerNavigateInto = (folder: MediaFolderResponseDto) => {
+        setMoveBrowseFolderId(folder.id);
+        setMoveBrowsePath((prev) => [...prev, { id: folder.id, name: folder.name }]);
+        setMoveDestFolderId(undefined);
+    };
+
+    const movePickerNavigateTo = (index: number) => {
+        const newPath = moveBrowsePath.slice(0, index + 1);
+        setMoveBrowsePath(newPath);
+        setMoveBrowseFolderId(newPath[newPath.length - 1].id);
+        setMoveDestFolderId(undefined);
+    };
 
     // ── Mutations ──────────────────────────────────────────────────────────
     const createFolderMutation = useMutation({
@@ -298,6 +315,8 @@ function MediaPage() {
                             onMove={() => {
                                 setMoveAssetTarget(asset);
                                 setMoveDestFolderId(undefined);
+                                setMoveBrowseFolderId(null);
+                                setMoveBrowsePath([{ id: null, name: 'Root' }]);
                             }}
                         />
                     ))}
@@ -365,37 +384,97 @@ function MediaPage() {
                 title={`Move "${moveAssetTarget?.fileName}"`}
                 open={!!moveAssetTarget}
                 onOk={() => {
-                    if (moveAssetTarget) {
+                    if (moveAssetTarget && moveDestFolderId !== undefined) {
                         moveAssetMutation.mutate({
                             id: moveAssetTarget.id,
-                            folderId: moveDestFolderId ?? null,
+                            folderId: moveDestFolderId,
                         });
                     }
                 }}
                 onCancel={() => setMoveAssetTarget(null)}
                 confirmLoading={moveAssetMutation.isPending}
                 okText="Move"
+                okButtonProps={{ disabled: moveDestFolderId === undefined }}
             >
-                <p className="text-sm text-muted mb-3">Select a destination folder:</p>
-                <div className="flex flex-col gap-2">
-                    <div
-                        className={`flex items-center gap-2 px-3 py-2 rounded-lg border cursor-pointer transition-colors ${moveDestFolderId === null ? 'border-primary bg-primary/5' : 'border-surface-border hover:border-primary/50'}`}
-                        onClick={() => setMoveDestFolderId(null)}
-                    >
-                        <HomeOutlined className="text-muted" />
-                        <span className="text-sm">Root</span>
-                    </div>
-                    {rootFolders?.map((f) => (
+                <p className="text-sm text-muted mb-2">Select a destination folder:</p>
+
+                {/* Breadcrumb navigation inside the picker */}
+                <Breadcrumb
+                    className="mb-3"
+                    items={moveBrowsePath.map((crumb, index) => ({
+                        title: (
+                            <span
+                                className={
+                                    index < moveBrowsePath.length - 1
+                                        ? 'cursor-pointer text-primary hover:underline text-xs'
+                                        : 'text-gray-700 font-medium text-xs'
+                                }
+                                onClick={() => {
+                                    if (index < moveBrowsePath.length - 1) movePickerNavigateTo(index);
+                                }}
+                            >
+                                {index === 0 ? <HomeOutlined className="mr-1" /> : null}
+                                {crumb.name}
+                            </span>
+                        ),
+                    }))}
+                />
+
+                <div className="flex flex-col gap-2 max-h-64 overflow-y-auto pr-1 py-2">
+                    {/* Root selectable row — only at root level */}
+                    {moveBrowsePath.length === 1 && (
+                        <div
+                            className={`flex items-center gap-2 px-3 py-2 rounded-lg border cursor-pointer transition-colors ${moveDestFolderId === null ? 'border-primary bg-primary/5' : 'border-surface-border hover:border-primary/50'}`}
+                            onClick={() => setMoveDestFolderId(null)}
+                        >
+                            <HomeOutlined className="text-muted" />
+                            <span className="text-sm flex-1">Root</span>
+                        </div>
+                    )}
+
+                    {/* "Move here" row when browsed into a sub-folder */}
+                    {moveBrowsePath.length > 1 && (
+                        <div
+                            className={`flex items-center gap-2 px-3 py-2 pt-3 rounded-lg border cursor-pointer transition-colors ${moveDestFolderId === moveBrowseFolderId ? 'border-primary bg-primary/5' : 'border-surface-border hover:border-primary/50'}`}
+                            onClick={() => setMoveDestFolderId(moveBrowseFolderId)}
+                        >
+                            <FolderOpenOutlined className="text-yellow-400" />
+                            <span className="text-sm flex-1 font-medium">
+                                Move here — {moveBrowsePath[moveBrowsePath.length - 1].name}
+                            </span>
+                        </div>
+                    )}
+
+                    {/* Sub-folders at the current browse level */}
+                    {moveFolders?.map((f) => (
                         <div
                             key={f.id}
                             className={`flex items-center gap-2 px-3 py-2 rounded-lg border cursor-pointer transition-colors ${moveDestFolderId === f.id ? 'border-primary bg-primary/5' : 'border-surface-border hover:border-primary/50'}`}
                             onClick={() => setMoveDestFolderId(f.id)}
                         >
                             <FolderOutlined className="text-yellow-500" />
-                            <span className="text-sm">{f.name}</span>
-                            <span className="ml-auto text-xs text-muted">{f.assetCount} files</span>
+                            <span className="text-sm flex-1">{f.name}</span>
+                            <span className="text-xs text-muted">{f.assetCount} {f.assetCount === 1 ? 'file' : 'files'}</span>
+                            <Tooltip title="Browse sub-folders">
+                                <Button
+                                    type="text"
+                                    size="small"
+                                    icon={<RightOutlined className="text-xs" />}
+                                    className="ml-1 shrink-0"
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        movePickerNavigateInto(f);
+                                    }}
+                                />
+                            </Tooltip>
                         </div>
                     ))}
+
+                    {moveFolders?.length === 0 && (
+                        <p className="text-sm text-muted text-center py-3">
+                            {moveBrowsePath.length === 1 ? 'No folders yet' : 'No sub-folders'}
+                        </p>
+                    )}
                 </div>
             </Modal>
         </div>
