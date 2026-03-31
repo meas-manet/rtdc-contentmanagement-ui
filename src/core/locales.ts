@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { localesApi } from "../features/locales/api";
+import { localesApi } from "../features/locales";
 import type { LocaleResponseDto } from "../features/locales/types";
 
 /** React Query hook — fetches all locale registry entries from the database. */
