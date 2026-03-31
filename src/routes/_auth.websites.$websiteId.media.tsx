@@ -279,47 +279,68 @@ function MediaPage() {
             {totalItems === 0 ? (
                 <Empty description="This folder is empty" image={Empty.PRESENTED_IMAGE_SIMPLE} />
             ) : (
-                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
-                    {folders?.map((folder) => (
-                        <FolderCard
-                            key={folder.id}
-                            folder={folder}
-                            onOpen={() => navigateInto(folder)}
-                            onRename={() => {
-                                setRenameFolderTarget(folder);
-                                setRenameFolderName(folder.name);
-                            }}
-                            onDelete={() => {
-                                deleteConfirm({
-                                    title: 'Delete this folder?',
-                                    description: 'This will permanently remove the folder and all its contents.',
-                                    onConfirm: () => deleteFolderMutation.mutateAsync(folder.id),
-                                })
-                            }}
-                        />
-                    ))}
-                    {assets?.map((asset) => (
-                        <AssetCard
-                            key={asset.id}
-                            asset={asset}
-                            onDelete={() => {
-                                deleteConfirm({
-                                    title: 'Delete this asset?',
-                                    onConfirm: () => deleteMutation.mutateAsync(asset.id),
-                                })
-                            }}
-                            onCopy={() => {
-                                navigator.clipboard.writeText(asset.url);
-                                toast.success('The asset URL has been copied to your clipboard.');
-                            }}
-                            onMove={() => {
-                                setMoveAssetTarget(asset);
-                                setMoveDestFolderId(undefined);
-                                setMoveBrowseFolderId(null);
-                                setMoveBrowsePath([{ id: null, name: 'Root' }]);
-                            }}
-                        />
-                    ))}
+                <div className="space-y-6">
+                    {/* Folders — horizontal list rows */}
+                    {(folders?.length ?? 0) > 0 && (
+                        <div>
+                            <p className="text-xs font-semibold text-muted uppercase tracking-wide mb-2">
+                                Folders
+                            </p>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2">
+                                {folders?.map((folder) => (
+                                    <FolderCard
+                                        key={folder.id}
+                                        folder={folder}
+                                        onOpen={() => navigateInto(folder)}
+                                        onRename={() => {
+                                            setRenameFolderTarget(folder);
+                                            setRenameFolderName(folder.name);
+                                        }}
+                                        onDelete={() => {
+                                            deleteConfirm({
+                                                title: 'Delete this folder?',
+                                                description: 'This will permanently remove the folder and all its contents.',
+                                                onConfirm: () => deleteFolderMutation.mutateAsync(folder.id),
+                                            });
+                                        }}
+                                    />
+                                ))}
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Assets — thumbnail grid */}
+                    {(assets?.length ?? 0) > 0 && (
+                        <div>
+                            <p className="text-xs font-semibold text-muted uppercase tracking-wide mb-2">
+                                Files
+                            </p>
+                            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+                                {assets?.map((asset) => (
+                                    <AssetCard
+                                        key={asset.id}
+                                        asset={asset}
+                                        onDelete={() => {
+                                            deleteConfirm({
+                                                title: 'Delete this asset?',
+                                                onConfirm: () => deleteMutation.mutateAsync(asset.id),
+                                            });
+                                        }}
+                                        onCopy={() => {
+                                            navigator.clipboard.writeText(asset.url);
+                                            toast.success('The asset URL has been copied to your clipboard.');
+                                        }}
+                                        onMove={() => {
+                                            setMoveAssetTarget(asset);
+                                            setMoveDestFolderId(undefined);
+                                            setMoveBrowseFolderId(null);
+                                            setMoveBrowsePath([{ id: null, name: 'Root' }]);
+                                        }}
+                                    />
+                                ))}
+                            </div>
+                        </div>
+                    )}
                 </div>
             )}
 
@@ -510,29 +531,39 @@ function FolderCard({
 
     return (
         <div
-            className="bg-white rounded-xl overflow-hidden border border-surface-border shadow-sm hover:shadow-md transition-shadow cursor-pointer group"
+            className="group relative flex items-center gap-3 bg-white rounded-xl border border-surface-border px-4 py-3 shadow-sm hover:shadow-md hover:border-primary/40 transition-all cursor-pointer"
             onClick={onOpen}
         >
-            <div className="h-32 flex flex-col items-center justify-center bg-app-bg">
-                <FolderOpenOutlined className="text-5xl text-yellow-400" />
+            {/* Folder icon */}
+            <div className="shrink-0 w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center">
+                <FolderOpenOutlined className="text-2xl text-blue-400" />
             </div>
-            <div className="p-3">
-                <p className="text-xs font-medium text-gray-800 truncate mb-1">{folder.name}</p>
-                <p className="text-[11px] text-muted mb-2">
-                    {folder.assetCount} {folder.assetCount === 1 ? 'file' : 'files'}
-                    {folder.subFolderCount > 0 && `, ${folder.subFolderCount} sub-folder${folder.subFolderCount > 1 ? 's' : ''}`}
+
+            {/* Name + meta */}
+            <div className="flex-1 min-w-0">
+                <p className="text-sm font-semibold text-gray-800 truncate leading-tight">
+                    {folder.name}
                 </p>
-                <div className="flex justify-end">
-                    <Dropdown menu={{ items: menuItems }} trigger={['click']}>
-                        <Button
-                            size="small"
-                            type="text"
-                            icon={<MoreOutlined />}
-                            onClick={(e) => e.stopPropagation()}
-                        />
-                    </Dropdown>
-                </div>
+                <p className="text-[11px] text-muted mt-0.5">
+                    {folder.assetCount} {folder.assetCount === 1 ? 'file' : 'files'}
+                    {folder.subFolderCount > 0 && (
+                        <span className="ml-1 text-gray-400">
+                            · {folder.subFolderCount} {folder.subFolderCount === 1 ? 'subfolder' : 'subfolders'}
+                        </span>
+                    )}
+                </p>
             </div>
+
+            {/* Actions menu */}
+            <Dropdown menu={{ items: menuItems }} trigger={['click']}>
+                <Button
+                    size="small"
+                    type="text"
+                    icon={<MoreOutlined />}
+                    className="opacity-0 group-hover:opacity-100 transition-opacity shrink-0"
+                    onClick={(e) => e.stopPropagation()}
+                />
+            </Dropdown>
         </div>
     );
 }
