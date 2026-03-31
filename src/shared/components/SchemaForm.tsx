@@ -12,7 +12,7 @@ interface SchemaFormProps {
 export function SchemaForm({ definition, disabled }: SchemaFormProps) {
     return (
         <>
-            {definition.map((field) => (
+            {definition.filter((f) => f.type !== 'relation').map((field) => (
                 <Form.Item
                     key={field.name}
                     name={field.name}

@@ -4,8 +4,6 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
     Form,
     Input,
-    Select,
-    Switch,
     Button,
     Spin,
     Typography,
@@ -15,25 +13,15 @@ import {
     SaveOutlined,
     ArrowLeftOutlined,
     PlusOutlined,
-    MinusCircleOutlined,
     CodeOutlined,
 } from '@ant-design/icons';
 import { useEffect } from 'react';
 import { schemasApi } from '../features/schemas/api';
 import { useAppToast } from '../shared/hooks/useAppToast';
-import type { FieldType, SchemaFieldDto } from '../features/schemas/types';
+import { SchemaFieldRow } from '../shared/components/SchemaFieldRow';
+import type { SchemaFieldDto } from '../features/schemas/types';
 
 const { Title, Text } = Typography;
-
-const FIELD_TYPES: { label: string; value: FieldType }[] = [
-    { label: 'String', value: 'string' },
-    { label: 'Number', value: 'number' },
-    { label: 'Boolean', value: 'boolean' },
-    { label: 'Rich Text', value: 'richtext' },
-    { label: 'Date', value: 'date' },
-    { label: 'Array', value: 'array' },
-    { label: 'Object', value: 'object' },
-];
 
 export const Route = createFileRoute('/_auth/websites/$websiteId/schemas/$schemaId/edit')({
     component: EditSchemaPage,
@@ -205,46 +193,13 @@ function EditSchemaPage() {
                                             )}
 
                                             {fields.map(({ key, name, ...restField }) => (
-                                                <div
+                                                <SchemaFieldRow
                                                     key={key}
-                                                    className="grid grid-cols-[1fr_160px_80px_40px] items-start gap-2 bg-app-bg rounded-xl p-3 border border-surface-border hover:border-primary/40 transition-colors duration-200"
-                                                >
-                                                    <Form.Item
-                                                        {...restField}
-                                                        name={[name, 'name']}
-                                                        rules={[{ required: true, message: 'Required' }]}
-                                                        className="mb-0"
-                                                    >
-                                                        <Input placeholder="field_name" size="middle" />
-                                                    </Form.Item>
-                                                    <Form.Item
-                                                        {...restField}
-                                                        name={[name, 'type']}
-                                                        className="mb-0"
-                                                    >
-                                                        <Select options={FIELD_TYPES} size="middle" />
-                                                    </Form.Item>
-                                                    <Form.Item
-                                                        {...restField}
-                                                        name={[name, 'required']}
-                                                        valuePropName="checked"
-                                                        className="mb-0 flex justify-center"
-                                                    >
-                                                        <Switch
-                                                            size="small"
-                                                            checkedChildren="Req"
-                                                            unCheckedChildren="Opt"
-                                                        />
-                                                    </Form.Item>
-                                                    <Button
-                                                        type="text"
-                                                        danger
-                                                        icon={<MinusCircleOutlined />}
-                                                        onClick={() => remove(name)}
-                                                        className="mt-1"
-                                                        size="small"
-                                                    />
-                                                </div>
+                                                    name={name}
+                                                    restField={restField}
+                                                    onRemove={() => remove(name)}
+                                                    websiteId={websiteId}
+                                                />
                                             ))}
 
                                             <Button

@@ -6,13 +6,18 @@ export type FieldType =
   | "richtext"
   | "date"
   | "array"
-  | "object";
+  | "object"
+  | "relation";
 
 export interface SchemaFieldDto {
   name: string;
   type: FieldType;
   required: boolean;
   defaultValue?: string;
+  // Populated only when type === "relation"
+  targetSchemaSlug?: string;
+  relationType?: "one-to-one" | "one-to-many" | "many-to-many";
+  labelField?: string;
 }
 
 export interface SchemaResponseDto {

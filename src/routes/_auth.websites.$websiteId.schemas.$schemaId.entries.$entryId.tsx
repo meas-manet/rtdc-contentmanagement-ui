@@ -28,6 +28,7 @@ import { websitesApi } from '../features/websites/api';
 import { contentApi } from '../features/entries/api';
 import { toLocaleOptions, useLocales } from '../core/locales';
 import { SchemaForm } from '../shared/components/SchemaForm';
+import { RelationManager } from '../shared/components/RelationManager';
 import type { ContentStatus } from '../features/entries/types';
 import { useAppToast } from '../shared/hooks/useAppToast';
 import { useDeleteConfirm } from '../shared/hooks/useDeleteConfirm';
@@ -396,6 +397,44 @@ function EntryEditorPage() {
                                 )}
                             </div>
                         </div>
+
+                        {/* Relations Card — one RelationManager per relation field in the schema */}
+                        {!isNew && entry && (() => {
+                            const relationFields = schema.definition.filter(
+                                (f) => f.type === 'relation' && f.targetSchemaSlug,
+                            );
+                            if (relationFields.length === 0) return null;
+                            return (
+                                <div className="bg-white rounded-2xl border border-surface-border shadow-sm p-6">
+                                    <h3 className="text-base font-semibold text-gray-800 mb-1 pb-3 border-b border-surface-border">
+                                        Relations
+                                    </h3>
+                                    <p className="text-muted text-xs mt-3 mb-4">
+                                        Select records from the linked Content-Types.
+                                        Populate them on fetch with{' '}
+                                        <code className="bg-gray-100 px-1 rounded text-xs">
+                                            ?include=&lt;fieldName&gt;
+                                        </code>.
+                                    </p>
+                                    <div className="space-y-6 divide-y divide-surface-border">
+                                        {relationFields.map((f, i) => (
+                                            <div key={f.name} className={i > 0 ? 'pt-6' : ''}>
+                                                <RelationManager
+                                                    siteSlug={website!.slug}
+                                                    parentSchemaSlug={schema.slug}
+                                                    parentId={entry.id}
+                                                    apiKey={website!.apiKey}
+                                                    relationName={f.name}
+                                                    relationType={f.relationType ?? 'one-to-many'}
+                                                    targetSchemaSlug={f.targetSchemaSlug!}
+                                                    labelField={f.labelField}
+                                                />
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            );
+                        })()}
 
                         {/* Actions Card (Fallback for smaller screens) */}
                         <div className="bg-white rounded-2xl border border-surface-border shadow-sm p-6 md:hidden">
