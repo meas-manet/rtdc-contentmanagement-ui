@@ -11,7 +11,7 @@
  *
  * Used by both the Create Schema and Edit Schema routes.
  */
-import { Form, Input, Select, Switch, Button, Tag, Spin } from 'antd';
+import { Form, Input, Select, Switch, Button, Spin } from 'antd';
 import { MinusCircleOutlined, LinkOutlined, PictureOutlined } from '@ant-design/icons';
 import { useQuery } from '@tanstack/react-query';
 import { schemasApi } from '../../features/schemas/api';
@@ -76,15 +76,12 @@ export function SchemaFieldRow({ name, restField, onRemove, websiteId }: SchemaF
                         optionRender={(opt) =>
                             opt.value === 'relation' ? (
                                 <span className="flex items-center gap-1.5">
-                                    <LinkOutlined style={{ color: '#7c3aed' }} />
                                     {opt.label}
-                                    <Tag color="purple" style={{ fontSize: 10, marginLeft: 'auto' }}>link</Tag>
+
                                 </span>
                             ) : opt.value === 'media' ? (
                                 <span className="flex items-center gap-1.5">
-                                    <PictureOutlined style={{ color: '#0ea5e9' }} />
                                     {opt.label}
-                                    <Tag color="blue" style={{ fontSize: 10, marginLeft: 'auto' }}>media</Tag>
                                 </span>
                             ) : (
                                 <span>{opt.label}</span>
