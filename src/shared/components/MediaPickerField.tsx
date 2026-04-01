@@ -69,7 +69,7 @@ function SelectedPreview({ assets, multi, onRemove, onOpen, disabled }: Selected
                             <img src={asset.url} alt={asset.fileName} className="w-full h-full object-cover" loading="lazy" />
                         ) : (
                             <div className="w-full h-full flex flex-col items-center justify-center gap-1 text-gray-400 p-1">
-                                <FileOutlined style={{ fontSize: 20 }} />
+                                <FileOutlined className="text-xl" />
                                 <span className="text-[9px] text-center break-all leading-tight line-clamp-2">{asset.fileName}</span>
                             </div>
                         )}
@@ -154,7 +154,7 @@ function AssetThumb({ asset, selected, onClick }: { asset: MediaAssetResponseDto
                 <img src={asset.url} alt={asset.fileName} className="w-full h-full object-cover" loading="lazy" />
             ) : (
                 <div className="w-full h-full flex flex-col items-center justify-center gap-1 text-gray-400 p-2">
-                    <FileOutlined style={{ fontSize: 28 }} />
+                    <FileOutlined className="text-[1.75rem]" />
                     <span className="text-xs text-center break-all leading-tight line-clamp-2">{asset.fileName}</span>
                 </div>
             )}

@@ -40,11 +40,10 @@ function NavItem({
     return (
         <button
             onClick={onClick}
-            className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm font-medium transition-colors cursor-pointer border-0 text-left ${
-                active
+            className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm font-medium transition-colors cursor-pointer border-0 text-left ${active
                     ? 'bg-[#213E9A]/10 text-[#213E9A]'
                     : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900 bg-transparent'
-            }`}
+                }`}
         >
             <span className={`text-base leading-none ${active ? 'text-[#213E9A]' : 'text-gray-400'}`}>
                 {icon}
@@ -144,7 +143,7 @@ function WebsiteLayout() {
                                 }
                                 className="w-5 h-5 flex items-center justify-center rounded text-muted hover:bg-gray-100 hover:text-gray-700 bg-transparent border-0 cursor-pointer"
                             >
-                                <PlusOutlined style={{ fontSize: 10 }} />
+                                <PlusOutlined className="text-[10px]" />
                             </button>
                         </Tooltip>
                     </div>

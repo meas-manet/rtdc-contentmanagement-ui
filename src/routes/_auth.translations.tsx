@@ -412,7 +412,7 @@ function TranslationsTab({ createOpen, onCreateClose }: TranslationsTabProps) {
                 <Select
                     allowClear
                     placeholder="All languages"
-                    style={{ width: 180 }}
+                    className="w-[180px]"
                     options={localeSelectOptions}
                     value={localeFilter}
                     onChange={(v) => setLocaleFilter(v)}
@@ -420,7 +420,7 @@ function TranslationsTab({ createOpen, onCreateClose }: TranslationsTabProps) {
                 <Search
                     placeholder="Search by key or value…"
                     allowClear
-                    style={{ maxWidth: 320 }}
+                    className="max-w-[320px]"
                     onChange={(e) => setSearch(e.target.value)}
                 />
                 <Text type="secondary" className="text-sm ml-auto">

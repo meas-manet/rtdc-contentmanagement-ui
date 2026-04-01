@@ -178,8 +178,8 @@ function ContentTablePage() {
                             value={locale}
                             onChange={(v) => { setLocale(v); setPage(1); }}
                             options={localeOptions}
-                            size="middle"
-                            style={{ width: 160 }}
+                            size="large"
+                            className="w-40"
                         />
                         <Button
                             type="primary"

@@ -206,7 +206,7 @@ function MediaPage() {
         <div className="p-8">
 
             {/* ── Page header ────────────────────────────────────────── */}
-            <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center justify-between mb-8">
                 <div>
                     <Title level={2} className="mb-0! font-bold! text-gray-900!">
                         Media Library
@@ -217,6 +217,7 @@ function MediaPage() {
                 </div>
                 <Button
                     icon={<FolderAddOutlined />}
+                    size="large"
                     onClick={() => setCreateFolderOpen(true)}
                 >
                     New Folder

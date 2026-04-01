@@ -157,17 +157,17 @@ export function RelationManager({
         <div>
             {/* Header */}
             <div className="flex items-center gap-2 mb-2">
-                <LinkOutlined style={{ color: '#0858D9', fontSize: 13 }} />
-                <Text strong className="capitalize" style={{ fontSize: 13 }}>
+                <LinkOutlined className="text-sm text-primary" />
+                <Text strong className="capitalize text-sm">
                     {relationName.replace(/_/g, ' ')}
                 </Text>
                 <Tag
                     color="blue"
-                    style={{ fontSize: 10, margin: 0 }}
+                    className="text-[10px]! m-0!"
                 >
                     {relationType}
                 </Tag>
-                <Text type="secondary" style={{ fontSize: 11 }}>
+                <Text type="secondary" className="text-xs">
                     → {targetSchemaSlug}
                 </Text>
             </div>
@@ -195,13 +195,13 @@ export function RelationManager({
                     (!isMulti && linked.length > 0 && !unlinkMutation.isPending) ||
                     linkMutation.isPending
                 }
-                style={{ width: '100%' }}
+                className="w-full"
                 size="middle"
                 notFoundContent={
                     targetLoading ? (
                         <Spin size="small" />
                     ) : (
-                        <Text type="secondary" style={{ fontSize: 12 }}>
+                        <Text type="secondary" className="text-xs">
                             {selectOptions.length === 0 && linked.length > 0
                                 ? 'All available entries are already linked.'
                                 : `No ${targetSchemaSlug} entries found.`}
@@ -212,14 +212,14 @@ export function RelationManager({
 
             {/* one-to-one hint */}
             {!isMulti && linked.length > 0 && (
-                <Text type="secondary" style={{ fontSize: 11, display: 'block', marginTop: 4 }}>
+                <Text type="secondary" className="text-xs block mt-1">
                     Unlink the current entry first to select a different one.
                 </Text>
             )}
 
             {/* ── Linked items display ────────────────────────────── */}
             {linked.length > 0 && (
-                <div style={{ marginTop: 10 }}>
+                <div className="mt-2.5">
                     {relationType === 'many-to-many' ? (
                         /* Tag cloud for N:N */
                         <Space size={[6, 8]} wrap>
@@ -254,23 +254,21 @@ export function RelationManager({
                                                     e.preventDefault();
                                                     handleUnlink(r.id);
                                                 }}
-                                                style={{ cursor: 'pointer' }}
+                                                className="cursor-pointer"
                                             />
 
                                         ]}
                                     >
                                         <List.Item.Meta
                                             avatar={<Avatar icon={<UserOutlined />} size={24} />}
-                                            title={<Text style={{ fontSize: 13 }}>{label}</Text>}
+                                            title={<Text className="text-sm">{label}</Text>}
                                             description={
-                                                <Text type="secondary" style={{ fontSize: 11 }}>
+                                                <Text type="secondary" className="text-xs">
                                                     {r.childId.slice(0, 8)}… ·{' '}
                                                     <span
-                                                        style={{
-                                                            color: r.childStatus === 'published'
-                                                                ? '#52c41a'
-                                                                : '#faad14',
-                                                        }}
+                                                        className={r.childStatus === 'published'
+                                                            ? 'text-green-500'
+                                                            : 'text-yellow-500'}
                                                     >
                                                         {r.childStatus}
                                                     </span>
