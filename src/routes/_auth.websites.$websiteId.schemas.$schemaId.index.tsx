@@ -27,6 +27,7 @@ import { websitesApi } from '../features/websites/api';
 import { toLocaleOptions, useLocales } from '../core/locales';
 import type { ContentEntryResponseDto } from '../features/entries/types';
 import type { SchemaFieldDto } from '../features/schemas/types';
+import { MediaThumbnail } from '../shared/components/MediaThumbnail';
 
 const { Text } = Typography;
 
@@ -90,6 +91,17 @@ function ContentTablePage() {
         ellipsis: true,
         render: (_: unknown, row: ContentEntryResponseDto) => {
             const val = row.data[field.name];
+            if (field.type === 'media') {
+                const fallbackLabel =
+                    (row.data['name'] ?? row.data['title'] ?? row.data['label']) as string | undefined;
+                return (
+                    <MediaThumbnail
+                        value={val as string | string[] | undefined}
+                        websiteId={websiteId}
+                        fallbackLabel={fallbackLabel}
+                    />
+                );
+            }
             if (val === undefined || val === null) return <Text type="secondary">—</Text>;
             if (typeof val === 'boolean') return <Tag>{val ? 'true' : 'false'}</Tag>;
             if (field.type === 'richtext')
