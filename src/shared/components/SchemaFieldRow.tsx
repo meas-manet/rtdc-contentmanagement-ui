@@ -12,10 +12,10 @@
  * Used by both the Create Schema and Edit Schema routes.
  */
 import { Form, Input, Select, Switch, Button, Tag, Spin } from 'antd';
-import { MinusCircleOutlined, LinkOutlined } from '@ant-design/icons';
+import { MinusCircleOutlined, LinkOutlined, PictureOutlined } from '@ant-design/icons';
 import { useQuery } from '@tanstack/react-query';
 import { schemasApi } from '../../features/schemas/api';
-import { FIELD_TYPES, RELATION_TYPES } from '../../features/schemas/fieldTypes';
+import { FIELD_TYPES, RELATION_TYPES, MEDIA_ASSET_TYPES } from '../../features/schemas/fieldTypes';
 
 interface SchemaFieldRowProps {
     /** Index from Form.List — builds nested field name paths. */
@@ -30,6 +30,7 @@ interface SchemaFieldRowProps {
 export function SchemaFieldRow({ name, restField, onRemove, websiteId }: SchemaFieldRowProps) {
     const fieldType = Form.useWatch(['definition', name, 'type']);
     const isRelation = fieldType === 'relation';
+    const isMedia = fieldType === 'media';
 
     // Fetch all schemas for this website so the user can pick a target.
     // Only runs when the relation sub-panel is visible.
@@ -79,6 +80,12 @@ export function SchemaFieldRow({ name, restField, onRemove, websiteId }: SchemaF
                                     {opt.label}
                                     <Tag color="purple" style={{ fontSize: 10, marginLeft: 'auto' }}>link</Tag>
                                 </span>
+                            ) : opt.value === 'media' ? (
+                                <span className="flex items-center gap-1.5">
+                                    <PictureOutlined style={{ color: '#0ea5e9' }} />
+                                    {opt.label}
+                                    <Tag color="blue" style={{ fontSize: 10, marginLeft: 'auto' }}>media</Tag>
+                                </span>
                             ) : (
                                 <span>{opt.label}</span>
                             )
@@ -104,7 +111,44 @@ export function SchemaFieldRow({ name, restField, onRemove, websiteId }: SchemaF
                     size="small"
                 />
             </div>
+            {/* ── Media config sub-panel ─────────────────────────────────────────── */}
+            {isMedia && (
+                <div className="mt-3 pt-3 border-t border-dashed border-sky-200">
+                    <p className="text-xs font-medium text-sky-700 mb-3 flex items-center gap-1.5">
+                        <PictureOutlined />
+                        Media configuration — single asset or multiple assets from the media library
+                    </p>
 
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        {/* ── Asset type ───────────────────────────────────── */}
+                        <Form.Item
+                            {...restField}
+                            name={[name, 'mediaAssetType']}
+                            label={
+                                <span className="text-xs font-semibold text-gray-600">
+                                    Asset selection
+                                </span>
+                            }
+                            initialValue="single"
+                            rules={[{ required: true, message: 'Select asset type' }]}
+                            className="mb-0"
+                        >
+                            <Select
+                                size="middle"
+                                options={MEDIA_ASSET_TYPES.map((m) => ({
+                                    label: (
+                                        <span>
+                                            <span className="font-medium">{m.label}</span>
+                                            <span className="text-xs text-gray-400 ml-1">— {m.description}</span>
+                                        </span>
+                                    ),
+                                    value: m.value,
+                                }))}
+                            />
+                        </Form.Item>
+                    </div>
+                </div>
+            )}
             {/* ── Relation config sub-panel ────────────────────────────
                 Step 1: define the structure — which schema to link to    */}
             {isRelation && (

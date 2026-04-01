@@ -7,7 +7,8 @@ export type FieldType =
   | "date"
   | "array"
   | "object"
-  | "relation";
+  | "relation"
+  | "media";
 
 export interface SchemaFieldDto {
   name: string;
@@ -18,6 +19,8 @@ export interface SchemaFieldDto {
   targetSchemaSlug?: string;
   relationType?: "one-to-one" | "one-to-many" | "many-to-many";
   labelField?: string;
+  // Populated only when type === "media"
+  mediaAssetType?: "single" | "multi";
 }
 
 export interface SchemaResponseDto {

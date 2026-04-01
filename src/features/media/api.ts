@@ -8,12 +8,28 @@ import type {
 } from "./types";
 
 export const mediaApi = {
+  /** Returns ALL assets for the website across every folder. */
+  getAllFlat: (websiteId: string) =>
+    adminClient
+      .get<
+        MediaAssetResponseDto[]
+      >(`/api/admin/websites/${websiteId}/media/all`)
+      .then((r) => r.data),
+
   getAll: (websiteId: string, folderId?: string | null) =>
     adminClient
       .get<MediaAssetResponseDto[]>(`/api/admin/websites/${websiteId}/media`, {
         params: folderId !== undefined ? { folderId } : {},
       })
       .then((r) => r.data),
+
+  getById: (websiteId: string, id: string) =>
+    adminClient
+      .get<MediaAssetResponseDto>(
+        `/api/admin/websites/${websiteId}/media/${id}`,
+      )
+      .then((r) => r.data)
+      .catch(() => null),
 
   upload: (websiteId: string, file: File, folderId?: string | null) => {
     const form = new FormData();
@@ -47,8 +63,7 @@ export const mediaApi = {
       .get<MediaFolderResponseDto[]>(
         `/api/admin/websites/${websiteId}/media/folders`,
         {
-          params:
-            parentFolderId !== undefined ? { parentFolderId } : {},
+          params: parentFolderId !== undefined ? { parentFolderId } : {},
         },
       )
       .then((r) => r.data),
@@ -61,11 +76,7 @@ export const mediaApi = {
       )
       .then((r) => r.data),
 
-  renameFolder: (
-    websiteId: string,
-    id: string,
-    dto: RenameMediaFolderDto,
-  ) =>
+  renameFolder: (websiteId: string, id: string, dto: RenameMediaFolderDto) =>
     adminClient
       .put<MediaFolderResponseDto>(
         `/api/admin/websites/${websiteId}/media/folders/${id}`,
@@ -74,7 +85,5 @@ export const mediaApi = {
       .then((r) => r.data),
 
   deleteFolder: (websiteId: string, id: string) =>
-    adminClient.delete(
-      `/api/admin/websites/${websiteId}/media/folders/${id}`,
-    ),
+    adminClient.delete(`/api/admin/websites/${websiteId}/media/folders/${id}`),
 };

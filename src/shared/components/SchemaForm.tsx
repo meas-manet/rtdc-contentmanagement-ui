@@ -1,15 +1,18 @@
 // Universal schema-driven form engine
 import { Form, Input, InputNumber, Switch, DatePicker, Select } from 'antd';
 import { RichTextEditor } from './RichTextEditor';
+import { MediaPickerField } from './MediaPickerField';
 import type { SchemaFieldDto } from '../../features/schemas/types';
 
 interface SchemaFormProps {
     definition: SchemaFieldDto[];
     /** Ant Design Form instance — caller controls open/submit */
     disabled?: boolean;
+    /** Required to load the media library for media-type fields */
+    websiteId?: string;
 }
 
-export function SchemaForm({ definition, disabled }: SchemaFormProps) {
+export function SchemaForm({ definition, disabled, websiteId }: SchemaFormProps) {
     return (
         <>
             {definition.filter((f) => f.type !== 'relation').map((field) => (
@@ -27,14 +30,14 @@ export function SchemaForm({ definition, disabled }: SchemaFormProps) {
                         field.type === 'richtext' ? (html: string) => html : undefined
                     }
                 >
-                    {renderInput(field, disabled)}
+                    {renderInput(field, disabled, websiteId)}
                 </Form.Item>
             ))}
         </>
     );
 }
 
-function renderInput(field: SchemaFieldDto, disabled?: boolean) {
+function renderInput(field: SchemaFieldDto, disabled?: boolean, websiteId?: string) {
     switch (field.type) {
         case 'richtext':
             return <RichTextEditor placeholder={`Enter ${field.name}…`} />;
@@ -63,6 +66,15 @@ function renderInput(field: SchemaFieldDto, disabled?: boolean) {
                 <Input.TextArea
                     rows={4}
                     placeholder='{ "key": "value" }'
+                    disabled={disabled}
+                />
+            );
+
+        case 'media':
+            return (
+                <MediaPickerField
+                    websiteId={websiteId ?? ''}
+                    assetType={field.mediaAssetType ?? 'single'}
                     disabled={disabled}
                 />
             );

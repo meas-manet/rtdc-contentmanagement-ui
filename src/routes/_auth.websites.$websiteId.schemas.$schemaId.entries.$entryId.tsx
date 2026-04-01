@@ -342,7 +342,7 @@ function EntryEditorPage() {
                             </div>
                         ) : (
                             <Form form={form} layout="vertical" size="large" className="space-y-6">
-                                <SchemaForm definition={schema.definition} />
+                                <SchemaForm definition={schema.definition} websiteId={websiteId} />
 
                                 {isNew && (
                                     <Form.Item name="_locale" label="Initial Locale" initialValue={website?.defaultLocale ?? 'en'} className="mb-0 pt-4 border-t border-surface-border">
