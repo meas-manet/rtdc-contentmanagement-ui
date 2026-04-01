@@ -321,7 +321,7 @@ function EntryEditorPage() {
                     )}
 
                     {/* Form Card */}
-                    <div className={`bg-white border border-surface-border shadow-sm p-8 transition-shadow hover:shadow-md duration-300 ${!isNew ? 'rounded-b-2xl rounded-tr-2xl -mt-[1px] relative z-10' : 'rounded-2xl'}`}>
+                    <div className={`bg-white border border-surface-border shadow-sm p-8 transition-shadow hover:shadow-md duration-300 ${!isNew ? 'rounded-b-2xl rounded-tr-2xl -mt-px relative z-10' : 'rounded-2xl'}`}>
                         {!currentLocaleEntry && !isNew && (
                             <Alert
                                 type="info"

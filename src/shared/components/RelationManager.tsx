@@ -25,7 +25,7 @@ import {
     Tag,
     Typography,
 } from 'antd';
-import { LinkOutlined, UserOutlined, CloseOutlined } from '@ant-design/icons';
+import { LinkOutlined, UserOutlined } from '@ant-design/icons';
 import { useQuery } from '@tanstack/react-query';
 import { contentApi } from '../../features/entries/api';
 import type { RelationType } from '../../features/relations/types';
@@ -249,14 +249,14 @@ export function RelationManager({
                                             <Tag
                                                 key="unlink"
                                                 color="default"
+                                                closable
                                                 onClose={(e) => {
                                                     e.preventDefault();
                                                     handleUnlink(r.id);
                                                 }}
                                                 style={{ cursor: 'pointer' }}
-                                            >
-                                                <CloseOutlined style={{ color: 'red', fontSize: 10 }} />
-                                            </Tag>,
+                                            />
+
                                         ]}
                                     >
                                         <List.Item.Meta
