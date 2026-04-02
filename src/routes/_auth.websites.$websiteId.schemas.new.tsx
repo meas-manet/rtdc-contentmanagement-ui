@@ -218,27 +218,33 @@ function CreateSchemaPage() {
                                 Tips
                             </h3>
                             <div className="space-y-3 text-sm text-gray-600">
-                                <Alert
-                                    type="info"
-                                    showIcon={false}
-                                    className="rounded-xl border-blue-100 bg-blue-50/60 text-xs"
-                                    message={
-                                        <span>
-                                            The <strong>API Slug</strong> is auto-generated from the name and
-                                            cannot be changed after creation. It is used in all API routes.
-                                        </span>
-                                    }
-                                />
-                                <p className="text-muted text-xs m-0">
-                                    <strong className="text-gray-700">Field names</strong> should use{' '}
-                                    <code className="bg-gray-100 px-1 rounded text-xs">snake_case</code> or{' '}
-                                    <code className="bg-gray-100 px-1 rounded text-xs">camelCase</code> — they
-                                    map directly to JSON keys in your API responses.
-                                </p>
-                                <p className="text-muted text-xs m-0">
-                                    Mark fields as <strong className="text-gray-700">Required</strong> to enforce
-                                    validation when publishing entries.
-                                </p>
+                                <div>
+                                    <Alert
+                                        type="info"
+                                        showIcon={false}
+                                        className="rounded-xl border-blue-100 bg-blue-50/60 text-xs!"
+                                        title={
+                                            <span>
+                                                The <strong>API Slug</strong> is auto-generated from the name and
+                                                cannot be changed after creation. It is used in all API routes.
+                                            </span>
+                                        }
+                                    />
+                                </div>
+
+                                <div>
+                                    <p className="text-muted text-xs m-0">
+                                        <strong className="text-gray-700">Field names</strong> should use{' '}
+                                        <code className="bg-gray-100 px-1 rounded text-xs">snake_case</code> or{' '}
+                                        <code className="bg-gray-100 px-1 rounded text-xs">camelCase</code> — they
+                                        map directly to JSON keys in your API responses.
+                                    </p>
+                                    <p className="text-muted text-xs m-0">
+                                        Mark fields as <strong className="text-gray-700">Required</strong> to enforce
+                                        validation when publishing entries.
+                                    </p>
+                                </div>
+
                             </div>
                         </div>
 
