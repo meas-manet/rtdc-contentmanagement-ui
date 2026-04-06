@@ -61,7 +61,7 @@ function renderInput(field: SchemaFieldDto, disabled?: boolean, websiteId?: stri
             );
 
         case 'richtext':
-            return <RichTextEditor placeholder={`Enter ${field.name}…`} />;
+            return <RichTextEditor placeholder={`Enter ${field.name}…`} websiteId={websiteId} />;
 
         case 'number':
             return <InputNumber className="w-full" disabled={disabled} />;
