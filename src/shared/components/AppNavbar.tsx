@@ -1,7 +1,7 @@
 // Top navigation bar — extracted from the authenticated layout shell.
 import { Link, useNavigate } from '@tanstack/react-router';
 import { Avatar, Dropdown, Typography } from 'antd';
-import { LogoutOutlined, UserOutlined, TranslationOutlined } from '@ant-design/icons';
+import { LogoutOutlined, UserOutlined, TranslationOutlined, SafetyCertificateOutlined } from '@ant-design/icons';
 import { useAuth } from '../../core/auth/AuthContext';
 
 const { Text } = Typography;
@@ -21,6 +21,12 @@ export function AppNavbar() {
             icon: <TranslationOutlined />,
             label: 'Manage Locales',
             onClick: () => navigate({ to: '/translations' }),
+        },
+        {
+            key: 'roles',
+            icon: <SafetyCertificateOutlined />,
+            label: 'Roles & Access Control',
+            onClick: () => navigate({ to: '/roles/' }),
         },
         { type: 'divider' as const },
         {

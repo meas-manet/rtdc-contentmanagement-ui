@@ -14,10 +14,13 @@ import { Route as AuthRouteImport } from './routes/_auth'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthWebsitesRouteImport } from './routes/_auth.websites'
 import { Route as AuthTranslationsRouteImport } from './routes/_auth.translations'
+import { Route as AuthRolesRouteImport } from './routes/_auth.roles'
 import { Route as AuthWebsitesIndexRouteImport } from './routes/_auth.websites.index'
+import { Route as AuthRolesIndexRouteImport } from './routes/_auth.roles.index'
 import { Route as AuthWebsitesWebsiteIdRouteImport } from './routes/_auth.websites.$websiteId'
 import { Route as AuthWebsitesWebsiteIdIndexRouteImport } from './routes/_auth.websites.$websiteId.index'
 import { Route as AuthWebsitesWebsiteIdMediaRouteImport } from './routes/_auth.websites.$websiteId.media'
+import { Route as AuthRolesRoleIdEditRouteImport } from './routes/_auth.roles.$roleId.edit'
 import { Route as AuthWebsitesWebsiteIdSchemasIndexRouteImport } from './routes/_auth.websites.$websiteId.schemas.index'
 import { Route as AuthWebsitesWebsiteIdSchemasNewRouteImport } from './routes/_auth.websites.$websiteId.schemas.new'
 import { Route as AuthWebsitesWebsiteIdSchemasSchemaIdIndexRouteImport } from './routes/_auth.websites.$websiteId.schemas.$schemaId.index'
@@ -48,10 +51,20 @@ const AuthTranslationsRoute = AuthTranslationsRouteImport.update({
   path: '/translations',
   getParentRoute: () => AuthRoute,
 } as any)
+const AuthRolesRoute = AuthRolesRouteImport.update({
+  id: '/roles',
+  path: '/roles',
+  getParentRoute: () => AuthRoute,
+} as any)
 const AuthWebsitesIndexRoute = AuthWebsitesIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => AuthWebsitesRoute,
+} as any)
+const AuthRolesIndexRoute = AuthRolesIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AuthRolesRoute,
 } as any)
 const AuthWebsitesWebsiteIdRoute = AuthWebsitesWebsiteIdRouteImport.update({
   id: '/$websiteId',
@@ -70,6 +83,11 @@ const AuthWebsitesWebsiteIdMediaRoute =
     path: '/media',
     getParentRoute: () => AuthWebsitesWebsiteIdRoute,
   } as any)
+const AuthRolesRoleIdEditRoute = AuthRolesRoleIdEditRouteImport.update({
+  id: '/$roleId/edit',
+  path: '/$roleId/edit',
+  getParentRoute: () => AuthRolesRoute,
+} as any)
 const AuthWebsitesWebsiteIdSchemasIndexRoute =
   AuthWebsitesWebsiteIdSchemasIndexRouteImport.update({
     id: '/schemas/',
@@ -104,10 +122,13 @@ const AuthWebsitesWebsiteIdSchemasSchemaIdEntriesEntryIdRoute =
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
+  '/roles': typeof AuthRolesRouteWithChildren
   '/translations': typeof AuthTranslationsRoute
   '/websites': typeof AuthWebsitesRouteWithChildren
   '/websites/$websiteId': typeof AuthWebsitesWebsiteIdRouteWithChildren
+  '/roles/': typeof AuthRolesIndexRoute
   '/websites/': typeof AuthWebsitesIndexRoute
+  '/roles/$roleId/edit': typeof AuthRolesRoleIdEditRoute
   '/websites/$websiteId/media': typeof AuthWebsitesWebsiteIdMediaRoute
   '/websites/$websiteId/': typeof AuthWebsitesWebsiteIdIndexRoute
   '/websites/$websiteId/schemas/new': typeof AuthWebsitesWebsiteIdSchemasNewRoute
@@ -120,7 +141,9 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
   '/translations': typeof AuthTranslationsRoute
+  '/roles': typeof AuthRolesIndexRoute
   '/websites': typeof AuthWebsitesIndexRoute
+  '/roles/$roleId/edit': typeof AuthRolesRoleIdEditRoute
   '/websites/$websiteId/media': typeof AuthWebsitesWebsiteIdMediaRoute
   '/websites/$websiteId': typeof AuthWebsitesWebsiteIdIndexRoute
   '/websites/$websiteId/schemas/new': typeof AuthWebsitesWebsiteIdSchemasNewRoute
@@ -134,10 +157,13 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_auth': typeof AuthRouteWithChildren
   '/login': typeof LoginRoute
+  '/_auth/roles': typeof AuthRolesRouteWithChildren
   '/_auth/translations': typeof AuthTranslationsRoute
   '/_auth/websites': typeof AuthWebsitesRouteWithChildren
   '/_auth/websites/$websiteId': typeof AuthWebsitesWebsiteIdRouteWithChildren
+  '/_auth/roles/': typeof AuthRolesIndexRoute
   '/_auth/websites/': typeof AuthWebsitesIndexRoute
+  '/_auth/roles/$roleId/edit': typeof AuthRolesRoleIdEditRoute
   '/_auth/websites/$websiteId/media': typeof AuthWebsitesWebsiteIdMediaRoute
   '/_auth/websites/$websiteId/': typeof AuthWebsitesWebsiteIdIndexRoute
   '/_auth/websites/$websiteId/schemas/new': typeof AuthWebsitesWebsiteIdSchemasNewRoute
@@ -151,10 +177,13 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/login'
+    | '/roles'
     | '/translations'
     | '/websites'
     | '/websites/$websiteId'
+    | '/roles/'
     | '/websites/'
+    | '/roles/$roleId/edit'
     | '/websites/$websiteId/media'
     | '/websites/$websiteId/'
     | '/websites/$websiteId/schemas/new'
@@ -167,7 +196,9 @@ export interface FileRouteTypes {
     | '/'
     | '/login'
     | '/translations'
+    | '/roles'
     | '/websites'
+    | '/roles/$roleId/edit'
     | '/websites/$websiteId/media'
     | '/websites/$websiteId'
     | '/websites/$websiteId/schemas/new'
@@ -180,10 +211,13 @@ export interface FileRouteTypes {
     | '/'
     | '/_auth'
     | '/login'
+    | '/_auth/roles'
     | '/_auth/translations'
     | '/_auth/websites'
     | '/_auth/websites/$websiteId'
+    | '/_auth/roles/'
     | '/_auth/websites/'
+    | '/_auth/roles/$roleId/edit'
     | '/_auth/websites/$websiteId/media'
     | '/_auth/websites/$websiteId/'
     | '/_auth/websites/$websiteId/schemas/new'
@@ -236,12 +270,26 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthTranslationsRouteImport
       parentRoute: typeof AuthRoute
     }
+    '/_auth/roles': {
+      id: '/_auth/roles'
+      path: '/roles'
+      fullPath: '/roles'
+      preLoaderRoute: typeof AuthRolesRouteImport
+      parentRoute: typeof AuthRoute
+    }
     '/_auth/websites/': {
       id: '/_auth/websites/'
       path: '/'
       fullPath: '/websites/'
       preLoaderRoute: typeof AuthWebsitesIndexRouteImport
       parentRoute: typeof AuthWebsitesRoute
+    }
+    '/_auth/roles/': {
+      id: '/_auth/roles/'
+      path: '/'
+      fullPath: '/roles/'
+      preLoaderRoute: typeof AuthRolesIndexRouteImport
+      parentRoute: typeof AuthRolesRoute
     }
     '/_auth/websites/$websiteId': {
       id: '/_auth/websites/$websiteId'
@@ -263,6 +311,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/websites/$websiteId/media'
       preLoaderRoute: typeof AuthWebsitesWebsiteIdMediaRouteImport
       parentRoute: typeof AuthWebsitesWebsiteIdRoute
+    }
+    '/_auth/roles/$roleId/edit': {
+      id: '/_auth/roles/$roleId/edit'
+      path: '/$roleId/edit'
+      fullPath: '/roles/$roleId/edit'
+      preLoaderRoute: typeof AuthRolesRoleIdEditRouteImport
+      parentRoute: typeof AuthRolesRoute
     }
     '/_auth/websites/$websiteId/schemas/': {
       id: '/_auth/websites/$websiteId/schemas/'
@@ -301,6 +356,20 @@ declare module '@tanstack/react-router' {
     }
   }
 }
+
+interface AuthRolesRouteChildren {
+  AuthRolesIndexRoute: typeof AuthRolesIndexRoute
+  AuthRolesRoleIdEditRoute: typeof AuthRolesRoleIdEditRoute
+}
+
+const AuthRolesRouteChildren: AuthRolesRouteChildren = {
+  AuthRolesIndexRoute: AuthRolesIndexRoute,
+  AuthRolesRoleIdEditRoute: AuthRolesRoleIdEditRoute,
+}
+
+const AuthRolesRouteWithChildren = AuthRolesRoute._addFileChildren(
+  AuthRolesRouteChildren,
+)
 
 interface AuthWebsitesWebsiteIdRouteChildren {
   AuthWebsitesWebsiteIdMediaRoute: typeof AuthWebsitesWebsiteIdMediaRoute
@@ -346,11 +415,13 @@ const AuthWebsitesRouteWithChildren = AuthWebsitesRoute._addFileChildren(
 )
 
 interface AuthRouteChildren {
+  AuthRolesRoute: typeof AuthRolesRouteWithChildren
   AuthTranslationsRoute: typeof AuthTranslationsRoute
   AuthWebsitesRoute: typeof AuthWebsitesRouteWithChildren
 }
 
 const AuthRouteChildren: AuthRouteChildren = {
+  AuthRolesRoute: AuthRolesRouteWithChildren,
   AuthTranslationsRoute: AuthTranslationsRoute,
   AuthWebsitesRoute: AuthWebsitesRouteWithChildren,
 }
