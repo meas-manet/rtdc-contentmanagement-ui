@@ -2,6 +2,7 @@ import type { FieldType } from "./types";
 
 export const FIELD_TYPES: { label: string; value: FieldType }[] = [
   { label: "String", value: "string" },
+  { label: "Slug", value: "slug" },
   { label: "Number", value: "number" },
   { label: "Boolean", value: "boolean" },
   { label: "Rich Text", value: "richtext" },

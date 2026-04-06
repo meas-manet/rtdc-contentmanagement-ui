@@ -118,6 +118,16 @@ function ContentTablePage() {
     const columns = [
         ...dynamicColumns,
         {
+            title: 'Slug',
+            key: 'slug',
+            width: 160,
+            ellipsis: true,
+            render: (_: unknown, row: ContentEntryResponseDto) =>
+                row.slug
+                    ? <Text code className="text-xs">{row.slug}</Text>
+                    : <Text type="secondary">—</Text>,
+        },
+        {
             title: 'Status',
             key: 'status',
             width: 110,

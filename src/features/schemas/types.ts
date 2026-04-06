@@ -8,7 +8,8 @@ export type FieldType =
   | "array"
   | "object"
   | "relation"
-  | "media";
+  | "media"
+  | "slug";
 
 export interface SchemaFieldDto {
   name: string;

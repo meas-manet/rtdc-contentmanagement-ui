@@ -428,6 +428,15 @@ function EntryEditorPage() {
 
                                 {!isNew && entry && (
                                     <div>
+                                        <Text type="secondary" className="text-xs uppercase font-bold tracking-wider mb-1 block">Slug</Text>
+                                        <Text code className="text-xs break-all">
+                                            {entry.slug ?? '—'}
+                                        </Text>
+                                    </div>
+                                )}
+
+                                {!isNew && entry && (
+                                    <div>
                                         <Text type="secondary" className="text-xs uppercase font-bold tracking-wider mb-1 block">Entry ID</Text>
                                         <Text className="text-xs font-mono bg-gray-50 p-1.5 rounded border border-gray-100 break-all">
                                             {entry.id}

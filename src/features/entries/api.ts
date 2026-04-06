@@ -96,8 +96,24 @@ export const contentApi = {
   ) => {
     const client = makeContentClient(apiKey);
     return client
-      .get<ContentEntryResponseDto[]>(
-        `/api/${siteSlug}/${schemaSlug}/${id}/localizations`,
+      .get<
+        ContentEntryResponseDto[]
+      >(`/api/${siteSlug}/${schemaSlug}/${id}/localizations`)
+      .then((r) => r.data);
+  },
+
+  getBySlug: (
+    siteSlug: string,
+    schemaSlug: string,
+    slug: string,
+    apiKey: string,
+    params?: { include?: string; locale?: string },
+  ) => {
+    const client = makeContentClient(apiKey);
+    return client
+      .get<ContentEntryResponseDto>(
+        `/api/${siteSlug}/${schemaSlug}/by-slug/${slug}`,
+        { params },
       )
       .then((r) => r.data);
   },

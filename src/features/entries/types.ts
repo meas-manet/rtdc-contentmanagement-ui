@@ -5,6 +5,7 @@ export interface ContentEntryResponseDto {
   id: string;
   schemaId: string;
   websiteId: string;
+  slug: string | null;
   status: ContentStatus;
   locale: string;
   localizationGroupId?: string;
