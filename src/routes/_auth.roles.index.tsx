@@ -312,7 +312,11 @@ function AdminUsersTab() {
         { value: null as string | null, label: 'All websites' },
         ...websiteOptions,
     ];
-    const roleOptions = roles.map((r) => ({ value: r.id, label: r.name }));
+    // Website Admins cannot assign Super Admin or Website Admin roles.
+    const PRIVILEGED_ROLES = ['Super Admin', 'Website Admin'];
+    const roleOptions = roles
+        .filter((r) => !claimedWebsiteId || !PRIVILEGED_ROLES.includes(r.name))
+        .map((r) => ({ value: r.id, label: r.name }));
 
     const createMutation = useMutation({
         mutationFn: adminUsersApi.create,
@@ -515,7 +519,7 @@ function AdminUsersTab() {
                 </Form>
             </ActionModal>
 
-            {/* Edit user modal */}}
+            {/* Edit user modal */}
             <ActionModal
                 title={`Edit "${editUser?.username}"`}
                 open={!!editUser}
