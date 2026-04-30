@@ -6,9 +6,11 @@ import type {
 } from "./types";
 
 export const adminUsersApi = {
-  getAll: () =>
+  getAll: (websiteId?: string | null) =>
     adminClient
-      .get<AdminUserResponseDto[]>("/api/admin/users")
+      .get<AdminUserResponseDto[]>("/api/admin/users", {
+        params: websiteId ? { websiteId } : undefined,
+      })
       .then((r) => r.data),
 
   getById: (id: string) =>

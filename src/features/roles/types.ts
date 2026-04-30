@@ -35,6 +35,8 @@ export interface RoleResponseDto {
   name: string;
   description?: string;
   isSystem: boolean;
+  websiteId: string | null;
+  websiteName: string | null;
   permissions: Record<string, ModulePermissionsDto>;
   createdAt: string;
   userCount: number;
@@ -43,6 +45,7 @@ export interface RoleResponseDto {
 export interface CreateRoleDto {
   name: string;
   description?: string;
+  websiteId: string | null;
   permissions: Record<string, ModulePermissionsDto>;
 }
 

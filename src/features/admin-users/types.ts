@@ -6,6 +6,8 @@ export interface AdminUserResponseDto {
   isActive: boolean;
   roleId: string;
   roleName: string;
+  websiteId: string | null;
+  websiteName: string | null;
   createdAt: string;
 }
 
@@ -14,6 +16,7 @@ export interface CreateAdminUserDto {
   email: string;
   password: string;
   roleId: string;
+  websiteId: string | null;
 }
 
 export interface UpdateAdminUserDto {
@@ -21,5 +24,6 @@ export interface UpdateAdminUserDto {
   email: string;
   password?: string;
   roleId: string;
+  websiteId: string | null;
   isActive: boolean;
 }

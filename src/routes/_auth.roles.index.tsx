@@ -25,6 +25,7 @@ import {
     TeamOutlined,
     SafetyCertificateOutlined,
     UserOutlined,
+    GlobalOutlined,
 } from '@ant-design/icons';
 import { useState } from 'react';
 import { PageHeader } from '../shared/components/PageHeader';
@@ -35,6 +36,7 @@ import { useAppToast } from '../shared/hooks/useAppToast';
 import { useDeleteConfirm } from '../shared/hooks/useDeleteConfirm';
 import { rolesApi } from '../features/roles/api';
 import { adminUsersApi } from '../features/admin-users/api';
+import { websitesApi } from '../features/websites/api';
 import type { RoleResponseDto } from '../features/roles/types';
 import type { AdminUserResponseDto } from '../features/admin-users/types';
 
@@ -94,8 +96,18 @@ function RolesTab() {
 
     const { data: roles = [], isPending } = useQuery({
         queryKey: ['roles'],
-        queryFn: rolesApi.getAll,
+        queryFn: () => rolesApi.getAll(),
     });
+
+    const { data: websites = [] } = useQuery({
+        queryKey: ['websites'],
+        queryFn: websitesApi.getAll,
+    });
+
+    const websiteOptions = [
+        { value: null, label: <span className="text-gray-400 italic">Global (all websites)</span> },
+        ...websites.map((w) => ({ value: w.id, label: w.name })),
+    ];
 
     const createMutation = useMutation({
         mutationFn: rolesApi.create,
@@ -137,6 +149,21 @@ function RolesTab() {
             title: 'Description',
             dataIndex: 'description',
             render: (v: string) => <span className="text-gray-500 text-sm">{v ?? '—'}</span>,
+        },
+        {
+            title: 'Scope',
+            dataIndex: 'websiteName',
+            width: 160,
+            render: (_: string, row) =>
+                row.websiteId ? (
+                    <Tag color="blue">{row.websiteName}</Tag>
+                ) : (
+                    <Tooltip title="Available to all websites">
+                        <span className="flex items-center gap-1 text-gray-400 text-xs">
+                            <GlobalOutlined /> Global
+                        </span>
+                    </Tooltip>
+                ),
         },
         {
             title: 'Users',
@@ -205,6 +232,7 @@ function RolesTab() {
                         createMutation.mutate({
                             name: vals.name,
                             description: vals.description,
+                            websiteId: vals.websiteId ?? null,
                             permissions: {},
                         })
                     }
@@ -214,6 +242,13 @@ function RolesTab() {
                     </Form.Item>
                     <Form.Item name="description" label="Description">
                         <Input.TextArea rows={2} placeholder="Optional description" />
+                    </Form.Item>
+                    <Form.Item
+                        name="websiteId"
+                        label="Scope"
+                        help="Leave blank to make this role available globally across all websites."
+                    >
+                        <Select options={websiteOptions} placeholder="Global (all websites)" allowClear />
                     </Form.Item>
                     <p className="text-xs text-gray-400 mt-1">
                         You can configure granular permissions after creating the role.
@@ -233,19 +268,34 @@ function AdminUsersTab() {
 
     const [createOpen, setCreateOpen] = useState(false);
     const [editUser, setEditUser] = useState<AdminUserResponseDto | null>(null);
+    const [filterWebsiteId, setFilterWebsiteId] = useState<string | null>(null);
     const [form] = Form.useForm();
     const [editForm] = Form.useForm();
 
+    const { data: websites = [] } = useQuery({
+        queryKey: ['websites'],
+        queryFn: websitesApi.getAll,
+    });
+
     const { data: users = [], isPending } = useQuery({
-        queryKey: ['admin-users'],
-        queryFn: adminUsersApi.getAll,
+        queryKey: ['admin-users', filterWebsiteId],
+        queryFn: () => adminUsersApi.getAll(filterWebsiteId),
     });
 
     const { data: roles = [] } = useQuery({
         queryKey: ['roles'],
-        queryFn: rolesApi.getAll,
+        queryFn: () => rolesApi.getAll(),
     });
 
+    const websiteOptions = websites.map((w) => ({ value: w.id, label: w.name }));
+    const websiteOptionsWithNull = [
+        { value: null as string | null, label: <span className="text-gray-400 italic">None (Super Admin)</span> },
+        ...websiteOptions,
+    ];
+    const filterOptions = [
+        { value: null as string | null, label: 'All websites' },
+        ...websiteOptions,
+    ];
     const roleOptions = roles.map((r) => ({ value: r.id, label: r.name }));
 
     const createMutation = useMutation({
@@ -300,11 +350,27 @@ function AdminUsersTab() {
             render: (role: string) => {
                 const colorMap: Record<string, string> = {
                     'Super Admin': 'red',
+                    'Website Admin': 'purple',
                     Editor: 'blue',
                     Author: 'green',
                 };
                 return <Tag color={colorMap[role] ?? 'default'}>{role}</Tag>;
             },
+        },
+        {
+            title: 'Website',
+            dataIndex: 'websiteName',
+            width: 160,
+            render: (_: string, row) =>
+                row.websiteId ? (
+                    <Tag color="blue">{row.websiteName}</Tag>
+                ) : (
+                    <Tooltip title="Global access — not scoped to any single website">
+                        <span className="flex items-center gap-1 text-gray-400 text-xs">
+                            <GlobalOutlined /> Global
+                        </span>
+                    </Tooltip>
+                ),
         },
         {
             title: 'Status',
@@ -325,6 +391,7 @@ function AdminUsersTab() {
                             username: row.username,
                             email: row.email,
                             roleId: row.roleId,
+                            websiteId: row.websiteId,
                             isActive: row.isActive,
                         });
                     }}
@@ -343,7 +410,14 @@ function AdminUsersTab() {
 
     return (
         <>
-            <div className="flex justify-end mb-4">
+            <div className="flex items-center justify-between mb-4 gap-3">
+                <Select
+                    className="w-52"
+                    value={filterWebsiteId}
+                    onChange={setFilterWebsiteId}
+                    options={filterOptions}
+                    placeholder="Filter by website"
+                />
                 <Button
                     type="primary"
                     icon={<PlusOutlined />}
@@ -383,6 +457,7 @@ function AdminUsersTab() {
                             email: vals.email,
                             password: vals.password,
                             roleId: vals.roleId,
+                            websiteId: vals.websiteId ?? null,
                         })
                     }
                 >
@@ -406,6 +481,17 @@ function AdminUsersTab() {
                     <Form.Item name="roleId" label="Role" rules={[{ required: true }]}>
                         <Select options={roleOptions} placeholder="Select a role" />
                     </Form.Item>
+                    <Form.Item
+                        name="websiteId"
+                        label="Website"
+                        help="Assign this user to a specific website. Leave blank for Super Admins with global access."
+                    >
+                        <Select
+                            options={websiteOptionsWithNull}
+                            placeholder="None (global access)"
+                            allowClear
+                        />
+                    </Form.Item>
                 </Form>
             </ActionModal>
 
@@ -428,6 +514,7 @@ function AdminUsersTab() {
                                 email: vals.email,
                                 password: vals.password || undefined,
                                 roleId: vals.roleId,
+                                websiteId: vals.websiteId ?? null,
                                 isActive: vals.isActive,
                             },
                         })
@@ -452,6 +539,17 @@ function AdminUsersTab() {
                     </Form.Item>
                     <Form.Item name="roleId" label="Role" rules={[{ required: true }]}>
                         <Select options={roleOptions} placeholder="Select a role" />
+                    </Form.Item>
+                    <Form.Item
+                        name="websiteId"
+                        label="Website"
+                        help="Assign to a website, or leave blank for global (Super Admin) access."
+                    >
+                        <Select
+                            options={websiteOptionsWithNull}
+                            placeholder="None (global access)"
+                            allowClear
+                        />
                     </Form.Item>
                     <Form.Item name="isActive" label="Active" valuePropName="checked">
                         <Switch />

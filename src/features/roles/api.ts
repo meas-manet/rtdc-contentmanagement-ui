@@ -2,8 +2,12 @@ import { adminClient } from "../../core/api/adminClient";
 import type { RoleResponseDto, CreateRoleDto, UpdateRoleDto } from "./types";
 
 export const rolesApi = {
-  getAll: () =>
-    adminClient.get<RoleResponseDto[]>("/api/admin/roles").then((r) => r.data),
+  getAll: (websiteId?: string | null) =>
+    adminClient
+      .get<RoleResponseDto[]>("/api/admin/roles", {
+        params: websiteId ? { websiteId } : undefined,
+      })
+      .then((r) => r.data),
 
   getById: (id: string) =>
     adminClient

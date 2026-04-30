@@ -2,6 +2,7 @@
 import { Link, useNavigate } from '@tanstack/react-router';
 import { Avatar, Dropdown, Typography } from 'antd';
 import { LogoutOutlined, UserOutlined, TranslationOutlined, SafetyCertificateOutlined } from '@ant-design/icons';
+import { useQueryClient } from '@tanstack/react-query';
 import { useAuth } from '../../core/auth/AuthContext';
 
 const { Text } = Typography;
@@ -9,9 +10,11 @@ const { Text } = Typography;
 export function AppNavbar() {
     const { logout } = useAuth();
     const navigate = useNavigate();
+    const queryClient = useQueryClient();
 
     const handleLogout = () => {
         logout();
+        queryClient.clear();
         navigate({ to: '/login' });
     };
 

@@ -412,7 +412,7 @@ function TranslationsTab({ createOpen, onCreateClose }: TranslationsTabProps) {
                 <Select
                     allowClear
                     placeholder="All languages"
-                    className="w-[180px]"
+                    className="w-45"
                     options={localeSelectOptions}
                     value={localeFilter}
                     onChange={(v) => setLocaleFilter(v)}
