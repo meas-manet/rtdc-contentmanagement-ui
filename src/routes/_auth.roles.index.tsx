@@ -39,6 +39,11 @@ import { adminUsersApi } from '../features/admin-users/api';
 import { websitesApi } from '../features/websites/api';
 import type { RoleResponseDto } from '../features/roles/types';
 import type { AdminUserResponseDto } from '../features/admin-users/types';
+import { useAuth } from '../core/auth/AuthContext';
+
+function parseJwtPayload(token: string): Record<string, string> {
+    try { return JSON.parse(atob(token.split('.')[1])); } catch { return {}; }
+}
 
 export const Route = createFileRoute('/_auth/roles/')({
     component: RolesPage,
@@ -94,9 +99,13 @@ function RolesTab() {
     const [createOpen, setCreateOpen] = useState(false);
     const [form] = Form.useForm();
 
+    const { token } = useAuth();
+    const claims = token ? parseJwtPayload(token) : {};
+    const claimedWebsiteId: string | null = (claims['websiteId'] as string | undefined) ?? null;
+
     const { data: roles = [], isPending } = useQuery({
-        queryKey: ['roles'],
-        queryFn: () => rolesApi.getAll(),
+        queryKey: ['roles', claimedWebsiteId],
+        queryFn: () => rolesApi.getAll(claimedWebsiteId),
     });
 
     const { data: websites = [] } = useQuery({
@@ -243,13 +252,15 @@ function RolesTab() {
                     <Form.Item name="description" label="Description">
                         <Input.TextArea rows={2} placeholder="Optional description" />
                     </Form.Item>
-                    <Form.Item
-                        name="websiteId"
-                        label="Scope"
-                        help="Leave blank to make this role available globally across all websites."
-                    >
-                        <Select options={websiteOptions} placeholder="Global (all websites)" allowClear />
-                    </Form.Item>
+                    {!claimedWebsiteId && (
+                        <Form.Item
+                            name="websiteId"
+                            label="Scope"
+                            help="Leave blank to make this role available globally across all websites."
+                        >
+                            <Select options={websiteOptions} placeholder="Global (all websites)" allowClear />
+                        </Form.Item>
+                    )}
                     <p className="text-xs text-gray-400 mt-1">
                         You can configure granular permissions after creating the role.
                     </p>
@@ -272,19 +283,24 @@ function AdminUsersTab() {
     const [form] = Form.useForm();
     const [editForm] = Form.useForm();
 
+    const { token } = useAuth();
+    const claims = token ? parseJwtPayload(token) : {};
+    const claimedWebsiteId: string | null = (claims['websiteId'] as string | undefined) ?? null;
+    const effectiveWebsiteFilter = claimedWebsiteId ?? filterWebsiteId;
+
     const { data: websites = [] } = useQuery({
         queryKey: ['websites'],
         queryFn: websitesApi.getAll,
     });
 
     const { data: users = [], isPending } = useQuery({
-        queryKey: ['admin-users', filterWebsiteId],
-        queryFn: () => adminUsersApi.getAll(filterWebsiteId),
+        queryKey: ['admin-users', effectiveWebsiteFilter],
+        queryFn: () => adminUsersApi.getAll(effectiveWebsiteFilter),
     });
 
     const { data: roles = [] } = useQuery({
-        queryKey: ['roles'],
-        queryFn: () => rolesApi.getAll(),
+        queryKey: ['roles', claimedWebsiteId],
+        queryFn: () => rolesApi.getAll(claimedWebsiteId),
     });
 
     const websiteOptions = websites.map((w) => ({ value: w.id, label: w.name }));
@@ -411,13 +427,15 @@ function AdminUsersTab() {
     return (
         <>
             <div className="flex items-center justify-between mb-4 gap-3">
-                <Select
-                    className="w-52"
-                    value={filterWebsiteId}
-                    onChange={setFilterWebsiteId}
-                    options={filterOptions}
-                    placeholder="Filter by website"
-                />
+                {!claimedWebsiteId && (
+                    <Select
+                        className="w-52"
+                        value={filterWebsiteId}
+                        onChange={setFilterWebsiteId}
+                        options={filterOptions}
+                        placeholder="Filter by website"
+                    />
+                )}
                 <Button
                     type="primary"
                     icon={<PlusOutlined />}
@@ -481,21 +499,23 @@ function AdminUsersTab() {
                     <Form.Item name="roleId" label="Role" rules={[{ required: true }]}>
                         <Select options={roleOptions} placeholder="Select a role" />
                     </Form.Item>
-                    <Form.Item
-                        name="websiteId"
-                        label="Website"
-                        help="Assign this user to a specific website. Leave blank for Super Admins with global access."
-                    >
-                        <Select
-                            options={websiteOptionsWithNull}
-                            placeholder="None (global access)"
-                            allowClear
-                        />
-                    </Form.Item>
+                    {!claimedWebsiteId && (
+                        <Form.Item
+                            name="websiteId"
+                            label="Website"
+                            help="Assign this user to a specific website. Leave blank for Super Admins with global access."
+                        >
+                            <Select
+                                options={websiteOptionsWithNull}
+                                placeholder="None (global access)"
+                                allowClear
+                            />
+                        </Form.Item>
+                    )}
                 </Form>
             </ActionModal>
 
-            {/* Edit user modal */}
+            {/* Edit user modal */}}
             <ActionModal
                 title={`Edit "${editUser?.username}"`}
                 open={!!editUser}
@@ -540,17 +560,19 @@ function AdminUsersTab() {
                     <Form.Item name="roleId" label="Role" rules={[{ required: true }]}>
                         <Select options={roleOptions} placeholder="Select a role" />
                     </Form.Item>
-                    <Form.Item
-                        name="websiteId"
-                        label="Website"
-                        help="Assign to a website, or leave blank for global (Super Admin) access."
-                    >
-                        <Select
-                            options={websiteOptionsWithNull}
-                            placeholder="None (global access)"
-                            allowClear
-                        />
-                    </Form.Item>
+                    {!claimedWebsiteId && (
+                        <Form.Item
+                            name="websiteId"
+                            label="Website"
+                            help="Assign to a website, or leave blank for global (Super Admin) access."
+                        >
+                            <Select
+                                options={websiteOptionsWithNull}
+                                placeholder="None (global access)"
+                                allowClear
+                            />
+                        </Form.Item>
+                    )}
                     <Form.Item name="isActive" label="Active" valuePropName="checked">
                         <Switch />
                     </Form.Item>

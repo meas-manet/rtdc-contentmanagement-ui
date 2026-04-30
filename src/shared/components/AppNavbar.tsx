@@ -7,10 +7,21 @@ import { useAuth } from '../../core/auth/AuthContext';
 
 const { Text } = Typography;
 
+function parseJwtPayload(token: string): Record<string, string> {
+    try {
+        return JSON.parse(atob(token.split('.')[1]));
+    } catch {
+        return {};
+    }
+}
+
 export function AppNavbar() {
-    const { logout } = useAuth();
+    const { logout, token } = useAuth();
     const navigate = useNavigate();
     const queryClient = useQueryClient();
+
+    const payload = token ? parseJwtPayload(token) : {};
+    const username = payload['sub'] ?? 'Admin';
 
     const handleLogout = () => {
         logout();
@@ -53,7 +64,7 @@ export function AppNavbar() {
                 <button className="flex items-center gap-2.5 cursor-pointer bg-transparent border-0 p-0 rounded-lg hover:bg-white/10 px-2 py-1.5 transition-colors">
                     <Avatar size={30} icon={<UserOutlined />} className="bg-primary!" />
                     <Text className="text-white/80! text-sm hidden sm:inline font-medium">
-                        Admin
+                        {username}
                     </Text>
                 </button>
             </Dropdown>
