@@ -1,5 +1,5 @@
 // Websites gallery — list, create, edit, delete sites
-import { createFileRoute, useNavigate } from '@tanstack/react-router';
+import { createFileRoute, useNavigate, redirect } from '@tanstack/react-router';
 import {
     useQuery,
     useMutation,
@@ -32,9 +32,17 @@ import type { WebsiteResponseDto } from '../features/websites/types';
 import { useLocales } from '../core/locales';
 import { useAppToast } from '../shared/hooks/useAppToast';
 import { useDeleteConfirm } from '../shared/hooks/useDeleteConfirm';
+import { parseJwtPayload, useJwtClaims } from '../core/auth/AuthContext';
 
 
 export const Route = createFileRoute('/_auth/websites/')({
+    beforeLoad: () => {
+        const token = localStorage.getItem('jwt');
+        if (!token) return;
+        const claims = parseJwtPayload(token);
+        const websiteId = claims['websiteId'];
+        if (websiteId) throw redirect({ to: '/websites/$websiteId', params: { websiteId } });
+    },
     component: WebsitesPage,
 });
 
@@ -43,6 +51,8 @@ function WebsitesPage() {
     const qc = useQueryClient();
     const toast = useAppToast();
     const deleteConfirm = useDeleteConfirm();
+    const claims = useJwtClaims();
+    const isSuperAdmin = claims['role'] === 'Super Admin';
 
     const [createOpen, setCreateOpen] = useState(false);
     const [editSite, setEditSite] = useState<WebsiteResponseDto | null>(null);
@@ -104,14 +114,16 @@ function WebsitesPage() {
                 title="Websites"
                 subtitle="Manage your sites and their API keys"
                 actions={
-                    <Button
-                        type="primary"
-                        icon={<PlusOutlined />}
-                        size="large"
-                        onClick={() => setCreateOpen(true)}
-                    >
-                        New Website
-                    </Button>
+                    isSuperAdmin && (
+                        <Button
+                            type="primary"
+                            icon={<PlusOutlined />}
+                            size="large"
+                            onClick={() => setCreateOpen(true)}
+                        >
+                            New Website
+                        </Button>
+                    )
                 }
             />
 
@@ -128,13 +140,15 @@ function WebsitesPage() {
                         }
                         image={Empty.PRESENTED_IMAGE_SIMPLE}
                     >
-                        <Button
-                            type="primary"
-                            icon={<PlusOutlined />}
-                            onClick={() => setCreateOpen(true)}
-                        >
-                            Create Website
-                        </Button>
+                        {isSuperAdmin && (
+                            <Button
+                                type="primary"
+                                icon={<PlusOutlined />}
+                                onClick={() => setCreateOpen(true)}
+                            >
+                                Create Website
+                            </Button>
+                        )}
                     </Empty>
                 </div>
             ) : (

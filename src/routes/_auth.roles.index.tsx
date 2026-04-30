@@ -39,11 +39,7 @@ import { adminUsersApi } from '../features/admin-users/api';
 import { websitesApi } from '../features/websites/api';
 import type { RoleResponseDto } from '../features/roles/types';
 import type { AdminUserResponseDto } from '../features/admin-users/types';
-import { useAuth } from '../core/auth/AuthContext';
-
-function parseJwtPayload(token: string): Record<string, string> {
-    try { return JSON.parse(atob(token.split('.')[1])); } catch { return {}; }
-}
+import { useJwtClaims } from '../core/auth/AuthContext';
 
 export const Route = createFileRoute('/_auth/roles/')({
     component: RolesPage,
@@ -99,9 +95,8 @@ function RolesTab() {
     const [createOpen, setCreateOpen] = useState(false);
     const [form] = Form.useForm();
 
-    const { token } = useAuth();
-    const claims = token ? parseJwtPayload(token) : {};
-    const claimedWebsiteId: string | null = (claims['websiteId'] as string | undefined) ?? null;
+    const claims = useJwtClaims();
+    const claimedWebsiteId: string | null = claims['websiteId'] ?? null;
 
     const { data: roles = [], isPending } = useQuery({
         queryKey: ['roles', claimedWebsiteId],
@@ -283,9 +278,8 @@ function AdminUsersTab() {
     const [form] = Form.useForm();
     const [editForm] = Form.useForm();
 
-    const { token } = useAuth();
-    const claims = token ? parseJwtPayload(token) : {};
-    const claimedWebsiteId: string | null = (claims['websiteId'] as string | undefined) ?? null;
+    const claims = useJwtClaims();
+    const claimedWebsiteId: string | null = claims['websiteId'] ?? null;
     const effectiveWebsiteFilter = claimedWebsiteId ?? filterWebsiteId;
 
     const { data: websites = [] } = useQuery({

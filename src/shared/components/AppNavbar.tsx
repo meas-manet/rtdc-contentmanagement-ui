@@ -3,25 +3,19 @@ import { Link, useNavigate } from '@tanstack/react-router';
 import { Avatar, Dropdown, Typography } from 'antd';
 import { LogoutOutlined, UserOutlined, TranslationOutlined, SafetyCertificateOutlined } from '@ant-design/icons';
 import { useQueryClient } from '@tanstack/react-query';
+import { useJwtClaims } from '../../core/auth/AuthContext';
 import { useAuth } from '../../core/auth/AuthContext';
 
 const { Text } = Typography;
 
-function parseJwtPayload(token: string): Record<string, string> {
-    try {
-        return JSON.parse(atob(token.split('.')[1]));
-    } catch {
-        return {};
-    }
-}
-
 export function AppNavbar() {
-    const { logout, token } = useAuth();
+    const { logout } = useAuth();
     const navigate = useNavigate();
     const queryClient = useQueryClient();
+    const claims = useJwtClaims();
 
-    const payload = token ? parseJwtPayload(token) : {};
-    const username = payload['sub'] ?? 'Admin';
+    const username = claims['sub'] ?? 'Admin';
+    const isSuperAdmin = claims['role'] === 'Super Admin';
 
     const handleLogout = () => {
         logout();
@@ -36,12 +30,12 @@ export function AppNavbar() {
             label: 'Manage Locales',
             onClick: () => navigate({ to: '/translations' }),
         },
-        {
+        ...(isSuperAdmin ? [{
             key: 'roles',
             icon: <SafetyCertificateOutlined />,
             label: 'Roles & Access Control',
-            onClick: () => navigate({ to: '/roles/' }),
-        },
+            onClick: () => navigate({ to: '/roles' }),
+        }] : []),
         { type: 'divider' as const },
         {
             key: 'logout',
