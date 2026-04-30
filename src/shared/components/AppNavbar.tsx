@@ -1,7 +1,7 @@
 // Top navigation bar — extracted from the authenticated layout shell.
 import { Link, useNavigate } from '@tanstack/react-router';
 import { Avatar, Dropdown, Typography } from 'antd';
-import { LogoutOutlined, UserOutlined, TranslationOutlined, SafetyCertificateOutlined } from '@ant-design/icons';
+import { LogoutOutlined, UserOutlined, TranslationOutlined, SafetyCertificateOutlined, AuditOutlined } from '@ant-design/icons';
 import { useQueryClient } from '@tanstack/react-query';
 import { useJwtClaims } from '../../core/auth/AuthContext';
 import { useAuth } from '../../core/auth/AuthContext';
@@ -35,6 +35,11 @@ export function AppNavbar() {
             icon: <SafetyCertificateOutlined />,
             label: 'Roles & Access Control',
             onClick: () => navigate({ to: '/roles' }),
+        }, {
+            key: 'audit-logs',
+            icon: <AuditOutlined />,
+            label: 'Audit Log',
+            onClick: () => navigate({ to: '/audit-logs' }),
         }] : []),
         { type: 'divider' as const },
         {
