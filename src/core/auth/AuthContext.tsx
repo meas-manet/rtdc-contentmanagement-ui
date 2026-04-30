@@ -1,4 +1,5 @@
 import { createContext, useContext, useState, useCallback, useMemo, type ReactNode } from 'react';
+import axios from 'axios';
 
 interface AuthState {
     token: string | null;
@@ -26,6 +27,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }, []);
 
     const logout = useCallback(() => {
+        // Best-effort: revoke the httpOnly refresh token cookie on the server
+        axios.post('/api/auth/logout', null, { withCredentials: true }).catch(() => {});
         localStorage.removeItem('jwt');
         setToken(null);
     }, []);
