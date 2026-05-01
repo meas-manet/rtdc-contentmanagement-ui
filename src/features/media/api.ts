@@ -5,6 +5,7 @@ import type {
   CreateMediaFolderDto,
   RenameMediaFolderDto,
   MoveMediaAssetDto,
+  MoveFolderDto,
 } from "./types";
 
 export const mediaApi = {
@@ -86,4 +87,19 @@ export const mediaApi = {
 
   deleteFolder: (websiteId: string, id: string) =>
     adminClient.delete(`/api/admin/websites/${websiteId}/media/folders/${id}`),
+
+  getAllFolders: (websiteId: string) =>
+    adminClient
+      .get<
+        MediaFolderResponseDto[]
+      >(`/api/admin/websites/${websiteId}/media/folders/all`)
+      .then((r) => r.data),
+
+  moveFolder: (websiteId: string, id: string, dto: MoveFolderDto) =>
+    adminClient
+      .patch<MediaFolderResponseDto>(
+        `/api/admin/websites/${websiteId}/media/folders/${id}/move`,
+        dto,
+      )
+      .then((r) => r.data),
 };

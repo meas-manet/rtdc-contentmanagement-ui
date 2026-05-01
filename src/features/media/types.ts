@@ -32,3 +32,7 @@ export interface RenameMediaFolderDto {
 export interface MoveMediaAssetDto {
   folderId: string | null;
 }
+
+export interface MoveFolderDto {
+  parentFolderId: string | null;
+}
