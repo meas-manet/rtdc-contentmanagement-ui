@@ -15,6 +15,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthWebsitesRouteImport } from './routes/_auth.websites'
 import { Route as AuthTranslationsRouteImport } from './routes/_auth.translations'
 import { Route as AuthRolesRouteImport } from './routes/_auth.roles'
+import { Route as AuthProfileRouteImport } from './routes/_auth.profile'
 import { Route as AuthAuditLogsRouteImport } from './routes/_auth.audit-logs'
 import { Route as AuthWebsitesIndexRouteImport } from './routes/_auth.websites.index'
 import { Route as AuthRolesIndexRouteImport } from './routes/_auth.roles.index'
@@ -56,6 +57,11 @@ const AuthTranslationsRoute = AuthTranslationsRouteImport.update({
 const AuthRolesRoute = AuthRolesRouteImport.update({
   id: '/roles',
   path: '/roles',
+  getParentRoute: () => AuthRoute,
+} as any)
+const AuthProfileRoute = AuthProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
   getParentRoute: () => AuthRoute,
 } as any)
 const AuthAuditLogsRoute = AuthAuditLogsRouteImport.update({
@@ -136,6 +142,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
   '/audit-logs': typeof AuthAuditLogsRoute
+  '/profile': typeof AuthProfileRoute
   '/roles': typeof AuthRolesRouteWithChildren
   '/translations': typeof AuthTranslationsRoute
   '/websites': typeof AuthWebsitesRouteWithChildren
@@ -156,6 +163,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
   '/audit-logs': typeof AuthAuditLogsRoute
+  '/profile': typeof AuthProfileRoute
   '/translations': typeof AuthTranslationsRoute
   '/roles': typeof AuthRolesIndexRoute
   '/websites': typeof AuthWebsitesIndexRoute
@@ -175,6 +183,7 @@ export interface FileRoutesById {
   '/_auth': typeof AuthRouteWithChildren
   '/login': typeof LoginRoute
   '/_auth/audit-logs': typeof AuthAuditLogsRoute
+  '/_auth/profile': typeof AuthProfileRoute
   '/_auth/roles': typeof AuthRolesRouteWithChildren
   '/_auth/translations': typeof AuthTranslationsRoute
   '/_auth/websites': typeof AuthWebsitesRouteWithChildren
@@ -197,6 +206,7 @@ export interface FileRouteTypes {
     | '/'
     | '/login'
     | '/audit-logs'
+    | '/profile'
     | '/roles'
     | '/translations'
     | '/websites'
@@ -217,6 +227,7 @@ export interface FileRouteTypes {
     | '/'
     | '/login'
     | '/audit-logs'
+    | '/profile'
     | '/translations'
     | '/roles'
     | '/websites'
@@ -235,6 +246,7 @@ export interface FileRouteTypes {
     | '/_auth'
     | '/login'
     | '/_auth/audit-logs'
+    | '/_auth/profile'
     | '/_auth/roles'
     | '/_auth/translations'
     | '/_auth/websites'
@@ -300,6 +312,13 @@ declare module '@tanstack/react-router' {
       path: '/roles'
       fullPath: '/roles'
       preLoaderRoute: typeof AuthRolesRouteImport
+      parentRoute: typeof AuthRoute
+    }
+    '/_auth/profile': {
+      id: '/_auth/profile'
+      path: '/profile'
+      fullPath: '/profile'
+      preLoaderRoute: typeof AuthProfileRouteImport
       parentRoute: typeof AuthRoute
     }
     '/_auth/audit-logs': {
@@ -457,6 +476,7 @@ const AuthWebsitesRouteWithChildren = AuthWebsitesRoute._addFileChildren(
 
 interface AuthRouteChildren {
   AuthAuditLogsRoute: typeof AuthAuditLogsRoute
+  AuthProfileRoute: typeof AuthProfileRoute
   AuthRolesRoute: typeof AuthRolesRouteWithChildren
   AuthTranslationsRoute: typeof AuthTranslationsRoute
   AuthWebsitesRoute: typeof AuthWebsitesRouteWithChildren
@@ -464,6 +484,7 @@ interface AuthRouteChildren {
 
 const AuthRouteChildren: AuthRouteChildren = {
   AuthAuditLogsRoute: AuthAuditLogsRoute,
+  AuthProfileRoute: AuthProfileRoute,
   AuthRolesRoute: AuthRolesRouteWithChildren,
   AuthTranslationsRoute: AuthTranslationsRoute,
   AuthWebsitesRoute: AuthWebsitesRouteWithChildren,

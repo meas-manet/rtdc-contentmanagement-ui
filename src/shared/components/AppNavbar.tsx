@@ -25,6 +25,13 @@ export function AppNavbar() {
 
     const userMenu = [
         {
+            key: 'profile',
+            icon: <UserOutlined />,
+            label: 'My Profile',
+            onClick: () => navigate({ to: '/profile' }),
+        },
+        { type: 'divider' as const },
+        {
             key: 'translations',
             icon: <TranslationOutlined />,
             label: 'Manage Locales',

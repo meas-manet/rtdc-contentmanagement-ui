@@ -8,3 +8,13 @@ export interface TokenResponseDto {
   accessToken: string;
   expiresAt: string;
 }
+
+export interface UpdateProfileDto {
+  username: string;
+  email: string;
+}
+
+export interface ChangePasswordDto {
+  currentPassword: string;
+  newPassword: string;
+}

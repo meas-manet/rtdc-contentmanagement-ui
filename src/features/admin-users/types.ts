@@ -9,6 +9,7 @@ export interface AdminUserResponseDto {
   websiteId: string | null;
   websiteName: string | null;
   createdAt: string;
+  avatarUrl: string | null;
 }
 
 export interface CreateAdminUserDto {
