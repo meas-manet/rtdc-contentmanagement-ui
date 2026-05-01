@@ -9,6 +9,16 @@ export interface WebsiteResponseDto {
   createdAt: string;
 }
 
+export interface WebsiteSummaryDto {
+  publishedEntries: number;
+  draftEntries: number;
+  lastAuditAction: string | null;
+  lastAuditActor: string | null;
+  lastAuditAt: string | null;
+  mediaCount: number;
+  mediaSizeBytes: number;
+}
+
 export interface CreateWebsiteDto {
   name: string;
   slug: string;

@@ -2,6 +2,7 @@
 import { createFileRoute, useNavigate, redirect } from '@tanstack/react-router';
 import {
     useQuery,
+    useQueries,
     useMutation,
     useQueryClient,
 } from '@tanstack/react-query';
@@ -25,10 +26,15 @@ import {
     GlobalOutlined,
     AppstoreOutlined,
     CopyOutlined,
+    CheckCircleOutlined,
+    ClockCircleOutlined,
+    FileOutlined,
+    AuditOutlined,
 } from '@ant-design/icons';
 import { useState } from 'react';
+import type { ReactNode } from 'react';
 import { websitesApi } from '../features/websites/api';
-import type { WebsiteResponseDto } from '../features/websites/types';
+import type { WebsiteResponseDto, WebsiteSummaryDto } from '../features/websites/types';
 import { useLocales } from '../core/locales';
 import { useAppToast } from '../shared/hooks/useAppToast';
 import { useDeleteConfirm } from '../shared/hooks/useDeleteConfirm';
@@ -63,6 +69,18 @@ function WebsitesPage() {
         queryKey: ['websites'],
         queryFn: websitesApi.getAll,
     });
+
+    const summaryResults = useQueries({
+        queries: (websites ?? []).map((site) => ({
+            queryKey: ['website-summary', site.id],
+            queryFn: () => websitesApi.getSummary(site.id),
+            staleTime: 60_000,
+        })),
+    });
+
+    const summaryBySiteId = Object.fromEntries(
+        (websites ?? []).map((site, i) => [site.id, summaryResults[i]?.data ?? null]),
+    );
 
     const { data: localeData = [] } = useLocales();
     const localeSelectOptions = localeData.map((l) => ({ value: l.code, label: l.label }));
@@ -157,6 +175,7 @@ function WebsitesPage() {
                         <SiteCard
                             key={site.id}
                             site={site}
+                            summary={summaryBySiteId[site.id]}
                             onOpen={() =>
                                 navigate({
                                     to: '/websites/$websiteId',
@@ -303,6 +322,7 @@ function WebsitesPage() {
 // ── Site card ──────────────────────────────────────────────────────────────────
 function SiteCard({
     site,
+    summary,
     onOpen,
     onEdit,
     onDelete,
@@ -311,6 +331,7 @@ function SiteCard({
     onCopyKey,
 }: {
     site: WebsiteResponseDto;
+    summary: WebsiteSummaryDto | null;
     onOpen: () => void;
     onEdit: () => void;
     onDelete: () => void;
@@ -358,6 +379,33 @@ function SiteCard({
                 {site.slug}
             </Tag>
 
+            {/* Metrics grid */}
+            <div className="grid grid-cols-2 gap-2 mb-3">
+                <MetricCell
+                    icon={<CheckCircleOutlined className="text-emerald-500" />}
+                    label="Published"
+                    value={summary?.publishedEntries ?? '—'}
+                />
+                <MetricCell
+                    icon={<ClockCircleOutlined className="text-amber-500" />}
+                    label="Drafts"
+                    value={summary?.draftEntries ?? '—'}
+                />
+                <MetricCell
+                    icon={<FileOutlined className="text-blue-400" />}
+                    label="Media"
+                    value={summary ? formatMediaSize(summary.mediaSizeBytes, summary.mediaCount) : '—'}
+                />
+                <MetricCell
+                    icon={<AuditOutlined className="text-purple-400" />}
+                    label="Last event"
+                    value={summary?.lastAuditAt ? formatRelativeTime(summary.lastAuditAt) : '—'}
+                    title={summary?.lastAuditAction && summary?.lastAuditActor
+                        ? `${summary.lastAuditAction} by ${summary.lastAuditActor}`
+                        : undefined}
+                />
+            </div>
+
             {/* API key section */}
             <div
                 className="border-t border-surface-border pt-3"
@@ -393,4 +441,50 @@ function SiteCard({
             </p>
         </div>
     );
+}
+
+// ── Metric cell ────────────────────────────────────────────────────────────────
+function MetricCell({
+    icon,
+    label,
+    value,
+    title,
+}: {
+    icon: ReactNode;
+    label: string;
+    value: ReactNode;
+    title?: string;
+}) {
+    return (
+        <div className="bg-app-bg rounded-lg px-2.5 py-2" title={title}>
+            <div className="flex items-center gap-1.5 mb-0.5">
+                <span className="text-[11px]">{icon}</span>
+                <span className="text-[10px] font-medium text-muted uppercase tracking-wide">{label}</span>
+            </div>
+            <span className="text-xs font-semibold text-gray-800 truncate block">{value}</span>
+        </div>
+    );
+}
+
+// ── Helpers ────────────────────────────────────────────────────────────────────
+function formatMediaSize(bytes: number, count: number): string {
+    const label = count === 1 ? '1 file' : `${count} files`;
+    if (bytes === 0) return label;
+    const units = ['B', 'KB', 'MB', 'GB'];
+    let val = bytes;
+    let unit = 0;
+    while (val >= 1024 && unit < units.length - 1) { val /= 1024; unit++; }
+    return `${label} · ${val.toFixed(unit === 0 ? 0 : 1)} ${units[unit]}`;
+}
+
+function formatRelativeTime(iso: string): string {
+    const diff = Date.now() - new Date(iso).getTime();
+    const mins = Math.floor(diff / 60_000);
+    if (mins < 1) return 'just now';
+    if (mins < 60) return `${mins}m ago`;
+    const hrs = Math.floor(mins / 60);
+    if (hrs < 24) return `${hrs}h ago`;
+    const days = Math.floor(hrs / 24);
+    if (days < 30) return `${days}d ago`;
+    return new Date(iso).toLocaleDateString();
 }

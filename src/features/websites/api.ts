@@ -1,6 +1,7 @@
 import { adminClient } from "../../core/api/adminClient";
 import type {
   WebsiteResponseDto,
+  WebsiteSummaryDto,
   CreateWebsiteDto,
   UpdateWebsiteDto,
 } from "./types";
@@ -31,5 +32,10 @@ export const websitesApi = {
   regenerateKey: (id: string) =>
     adminClient
       .post<{ apiKey: string }>(`/api/admin/websites/${id}/regenerate-key`)
+      .then((r) => r.data),
+
+  getSummary: (id: string) =>
+    adminClient
+      .get<WebsiteSummaryDto>(`/api/admin/websites/${id}/summary`)
       .then((r) => r.data),
 };
