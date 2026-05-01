@@ -369,7 +369,6 @@ function ApiExplorerPage() {
                 <div className="flex-1 overflow-y-auto bg-app-bg">
                     {!activeEndpoint ? (
                         <div className="flex flex-col items-center justify-center h-full gap-3 text-center px-8">
-                            <div className="text-5xl">⚡</div>
                             <Title level={4} className="text-gray-500 mb-0!">
                                 Select an endpoint to start
                             </Title>
