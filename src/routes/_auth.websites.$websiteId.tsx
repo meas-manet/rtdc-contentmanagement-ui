@@ -14,6 +14,7 @@ import {
     ArrowLeftOutlined,
     PlusOutlined,
     SettingOutlined,
+    ApiOutlined,
 } from '@ant-design/icons';
 import type { ReactNode } from 'react';
 import { websitesApi } from '../features/websites/api';
@@ -41,8 +42,8 @@ function NavItem({
         <button
             onClick={onClick}
             className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm font-medium transition-colors cursor-pointer border-0 text-left ${active
-                    ? 'bg-[#213E9A]/10 text-[#213E9A]'
-                    : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900 bg-transparent'
+                ? 'bg-[#213E9A]/10 text-[#213E9A]'
+                : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900 bg-transparent'
                 }`}
         >
             <span className={`text-base leading-none ${active ? 'text-[#213E9A]' : 'text-gray-400'}`}>
@@ -70,6 +71,12 @@ function WebsiteLayout() {
 
     const isMedia = !!matchRoute({
         to: '/websites/$websiteId/media',
+        params: { websiteId },
+        fuzzy: true,
+    });
+
+    const isApiExplorer = !!matchRoute({
+        to: '/websites/$websiteId/api-explorer',
         params: { websiteId },
         fuzzy: true,
     });
@@ -193,6 +200,17 @@ function WebsiteLayout() {
                             onClick={() =>
                                 navigate({
                                     to: '/websites/$websiteId/media',
+                                    params: { websiteId },
+                                })
+                            }
+                        />
+                        <NavItem
+                            icon={<ApiOutlined />}
+                            label="API Explorer"
+                            active={isApiExplorer}
+                            onClick={() =>
+                                navigate({
+                                    to: '/websites/$websiteId/api-explorer',
                                     params: { websiteId },
                                 })
                             }

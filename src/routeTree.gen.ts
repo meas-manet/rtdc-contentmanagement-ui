@@ -21,6 +21,7 @@ import { Route as AuthRolesIndexRouteImport } from './routes/_auth.roles.index'
 import { Route as AuthWebsitesWebsiteIdRouteImport } from './routes/_auth.websites.$websiteId'
 import { Route as AuthWebsitesWebsiteIdIndexRouteImport } from './routes/_auth.websites.$websiteId.index'
 import { Route as AuthWebsitesWebsiteIdMediaRouteImport } from './routes/_auth.websites.$websiteId.media'
+import { Route as AuthWebsitesWebsiteIdApiExplorerRouteImport } from './routes/_auth.websites.$websiteId.api-explorer'
 import { Route as AuthRolesRoleIdEditRouteImport } from './routes/_auth.roles.$roleId.edit'
 import { Route as AuthWebsitesWebsiteIdSchemasIndexRouteImport } from './routes/_auth.websites.$websiteId.schemas.index'
 import { Route as AuthWebsitesWebsiteIdSchemasNewRouteImport } from './routes/_auth.websites.$websiteId.schemas.new'
@@ -89,6 +90,12 @@ const AuthWebsitesWebsiteIdMediaRoute =
     path: '/media',
     getParentRoute: () => AuthWebsitesWebsiteIdRoute,
   } as any)
+const AuthWebsitesWebsiteIdApiExplorerRoute =
+  AuthWebsitesWebsiteIdApiExplorerRouteImport.update({
+    id: '/api-explorer',
+    path: '/api-explorer',
+    getParentRoute: () => AuthWebsitesWebsiteIdRoute,
+  } as any)
 const AuthRolesRoleIdEditRoute = AuthRolesRoleIdEditRouteImport.update({
   id: '/$roleId/edit',
   path: '/$roleId/edit',
@@ -136,6 +143,7 @@ export interface FileRoutesByFullPath {
   '/roles/': typeof AuthRolesIndexRoute
   '/websites/': typeof AuthWebsitesIndexRoute
   '/roles/$roleId/edit': typeof AuthRolesRoleIdEditRoute
+  '/websites/$websiteId/api-explorer': typeof AuthWebsitesWebsiteIdApiExplorerRoute
   '/websites/$websiteId/media': typeof AuthWebsitesWebsiteIdMediaRoute
   '/websites/$websiteId/': typeof AuthWebsitesWebsiteIdIndexRoute
   '/websites/$websiteId/schemas/new': typeof AuthWebsitesWebsiteIdSchemasNewRoute
@@ -152,6 +160,7 @@ export interface FileRoutesByTo {
   '/roles': typeof AuthRolesIndexRoute
   '/websites': typeof AuthWebsitesIndexRoute
   '/roles/$roleId/edit': typeof AuthRolesRoleIdEditRoute
+  '/websites/$websiteId/api-explorer': typeof AuthWebsitesWebsiteIdApiExplorerRoute
   '/websites/$websiteId/media': typeof AuthWebsitesWebsiteIdMediaRoute
   '/websites/$websiteId': typeof AuthWebsitesWebsiteIdIndexRoute
   '/websites/$websiteId/schemas/new': typeof AuthWebsitesWebsiteIdSchemasNewRoute
@@ -173,6 +182,7 @@ export interface FileRoutesById {
   '/_auth/roles/': typeof AuthRolesIndexRoute
   '/_auth/websites/': typeof AuthWebsitesIndexRoute
   '/_auth/roles/$roleId/edit': typeof AuthRolesRoleIdEditRoute
+  '/_auth/websites/$websiteId/api-explorer': typeof AuthWebsitesWebsiteIdApiExplorerRoute
   '/_auth/websites/$websiteId/media': typeof AuthWebsitesWebsiteIdMediaRoute
   '/_auth/websites/$websiteId/': typeof AuthWebsitesWebsiteIdIndexRoute
   '/_auth/websites/$websiteId/schemas/new': typeof AuthWebsitesWebsiteIdSchemasNewRoute
@@ -194,6 +204,7 @@ export interface FileRouteTypes {
     | '/roles/'
     | '/websites/'
     | '/roles/$roleId/edit'
+    | '/websites/$websiteId/api-explorer'
     | '/websites/$websiteId/media'
     | '/websites/$websiteId/'
     | '/websites/$websiteId/schemas/new'
@@ -210,6 +221,7 @@ export interface FileRouteTypes {
     | '/roles'
     | '/websites'
     | '/roles/$roleId/edit'
+    | '/websites/$websiteId/api-explorer'
     | '/websites/$websiteId/media'
     | '/websites/$websiteId'
     | '/websites/$websiteId/schemas/new'
@@ -230,6 +242,7 @@ export interface FileRouteTypes {
     | '/_auth/roles/'
     | '/_auth/websites/'
     | '/_auth/roles/$roleId/edit'
+    | '/_auth/websites/$websiteId/api-explorer'
     | '/_auth/websites/$websiteId/media'
     | '/_auth/websites/$websiteId/'
     | '/_auth/websites/$websiteId/schemas/new'
@@ -331,6 +344,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthWebsitesWebsiteIdMediaRouteImport
       parentRoute: typeof AuthWebsitesWebsiteIdRoute
     }
+    '/_auth/websites/$websiteId/api-explorer': {
+      id: '/_auth/websites/$websiteId/api-explorer'
+      path: '/api-explorer'
+      fullPath: '/websites/$websiteId/api-explorer'
+      preLoaderRoute: typeof AuthWebsitesWebsiteIdApiExplorerRouteImport
+      parentRoute: typeof AuthWebsitesWebsiteIdRoute
+    }
     '/_auth/roles/$roleId/edit': {
       id: '/_auth/roles/$roleId/edit'
       path: '/$roleId/edit'
@@ -391,6 +411,7 @@ const AuthRolesRouteWithChildren = AuthRolesRoute._addFileChildren(
 )
 
 interface AuthWebsitesWebsiteIdRouteChildren {
+  AuthWebsitesWebsiteIdApiExplorerRoute: typeof AuthWebsitesWebsiteIdApiExplorerRoute
   AuthWebsitesWebsiteIdMediaRoute: typeof AuthWebsitesWebsiteIdMediaRoute
   AuthWebsitesWebsiteIdIndexRoute: typeof AuthWebsitesWebsiteIdIndexRoute
   AuthWebsitesWebsiteIdSchemasNewRoute: typeof AuthWebsitesWebsiteIdSchemasNewRoute
@@ -401,6 +422,7 @@ interface AuthWebsitesWebsiteIdRouteChildren {
 }
 
 const AuthWebsitesWebsiteIdRouteChildren: AuthWebsitesWebsiteIdRouteChildren = {
+  AuthWebsitesWebsiteIdApiExplorerRoute: AuthWebsitesWebsiteIdApiExplorerRoute,
   AuthWebsitesWebsiteIdMediaRoute: AuthWebsitesWebsiteIdMediaRoute,
   AuthWebsitesWebsiteIdIndexRoute: AuthWebsitesWebsiteIdIndexRoute,
   AuthWebsitesWebsiteIdSchemasNewRoute: AuthWebsitesWebsiteIdSchemasNewRoute,
