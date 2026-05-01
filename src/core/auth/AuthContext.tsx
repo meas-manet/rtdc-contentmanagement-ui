@@ -28,7 +28,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     const logout = useCallback(() => {
         // Best-effort: revoke the httpOnly refresh token cookie on the server
-        axios.post('/api/auth/logout', null, { withCredentials: true }).catch(() => {});
+        axios.post('/api/auth/logout', null, { withCredentials: true }).catch(() => { });
         localStorage.removeItem('jwt');
         setToken(null);
     }, []);

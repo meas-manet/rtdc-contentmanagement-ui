@@ -6,7 +6,10 @@ const BASE_URL = "";
 // ── Admin client ──────────────────────────────────────────────────────────
 // withCredentials is required so the browser forwards the httpOnly
 // refresh_token cookie on /api/auth/refresh requests.
-export const adminClient = axios.create({ baseURL: BASE_URL, withCredentials: true });
+export const adminClient = axios.create({
+  baseURL: BASE_URL,
+  withCredentials: true,
+});
 
 adminClient.interceptors.request.use((config) => {
   const token = localStorage.getItem("jwt");
@@ -20,11 +23,16 @@ adminClient.interceptors.request.use((config) => {
 // replayed with the new token instead of triggering a redirect cascade.
 
 let isRefreshing = false;
-type QueueEntry = { resolve: (token: string) => void; reject: (err: unknown) => void };
+type QueueEntry = {
+  resolve: (token: string) => void;
+  reject: (err: unknown) => void;
+};
 let queue: QueueEntry[] = [];
 
 function flushQueue(error: unknown, token: string | null) {
-  queue.forEach(({ resolve, reject }) => (error ? reject(error) : resolve(token!)));
+  queue.forEach(({ resolve, reject }) =>
+    error ? reject(error) : resolve(token!),
+  );
   queue = [];
 }
 
